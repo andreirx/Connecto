@@ -1,0 +1,13 @@
+// Skeleton for single bone... cloned for use by unboned animation objects
+CIwAnimSkel
+{
+	// Number of bones in the hierarchy
+	numBones 	1
+
+	CIwAnimBone
+	{
+		name 	"SingleBone"
+		pos		{0 0 0}
+		rot		{1 0 0 0}
+	}
+}

@@ -1,0 +1,36 @@
+#!/usr/bin/env mkb
+
+# files specifies all files to build
+files
+{
+	["src"]
+	(src)
+	main.cpp
+	game.cpp
+	GameTable.cpp
+	LightningManager.cpp
+	(h)
+	game.h
+	GameTable.h
+	LightningManager.h
+}
+
+includepaths
+{
+    h
+}
+
+subprojects
+{
+	iw2d
+}
+
+assets
+{
+	(data)
+		base_tiles.png
+		emoticons.png
+		send_button.png
+		font_bitmap.png
+ 
+}

@@ -1,0 +1,11 @@
+ResGroupResources:
+	CIwAnimSkel (0xe1ccaf5c)
+		"singlebone" (0x4db7c78b)
+		CIwAnimBone (0xe1c36f11)
+			"SingleBone" (0x4db7c78b)
+			Size: 30
+		Size: 46
+	ResList 'CIwAnimSkel' pos:47 size:56
+
+ResGroupResources: Wrote 60 bytes to CIwResGroup "SingleBone_Group"
+

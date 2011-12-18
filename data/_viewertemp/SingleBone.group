@@ -1,0 +1,9 @@
+// Source file: C:/dev/dev/main/iwexporter/UnitTests/Art/combatEva/Maya7/combatEva_rig.mb
+// Exported By: phodgson on 01/25/07 10:54:46
+
+CIwResGroup
+{
+	name "SingleBone_Group"
+	shared true
+	"\_viewertemp\singlebone.skel"
+}
