@@ -101,22 +101,26 @@ void update_worm()
             {
             case CB_LEFT:
                 for (i = 0; i < worm_length; i++)
-                    if ((worm_x[whead * (worm_length - 1)] - 1 == worm_x[i]) && (worm_y[whead * (worm_length - 1)] == worm_y[i]))
+                    if ((worm_x[whead * (worm_length - 1)] - 1 == worm_x[i]) &&
+                        (worm_y[whead * (worm_length - 1)] == worm_y[i]))
                         ok_worm = 0;
                 break;
             case CB_RIGHT:
                 for (i = 0; i < worm_length; i++)
-                    if ((worm_x[whead * (worm_length - 1)] + 1 == worm_x[i]) && (worm_y[whead * (worm_length - 1)] == worm_y[i]))
+                    if ((worm_x[whead * (worm_length - 1)] + 1 == worm_x[i]) &&
+                        (worm_y[whead * (worm_length - 1)] == worm_y[i]))
                         ok_worm = 0;
                 break;
             case CB_UP:
                 for (i = 0; i < worm_length; i++)
-                    if ((worm_y[whead * (worm_length - 1)] - 1 == worm_y[i]) && (worm_x[whead * (worm_length - 1)] == worm_x[i]))
+                    if ((worm_y[whead * (worm_length - 1)] - 1 == worm_y[i]) &&
+                        (worm_x[whead * (worm_length - 1)] == worm_x[i]))
                         ok_worm = 0;
                 break;
             case CB_DOWN:
                 for (i = 0; i < worm_length; i++)
-                    if ((worm_y[whead * (worm_length - 1)] + 1 == worm_y[i]) && (worm_x[whead * (worm_length - 1)] == worm_x[i]))
+                    if ((worm_y[whead * (worm_length - 1)] + 1 == worm_y[i]) &&
+                        (worm_x[whead * (worm_length - 1)] == worm_x[i]))
                         ok_worm = 0;
                 break;
             }
@@ -200,13 +204,17 @@ void draw_worm(int x, int y)
         }
         if (i == worm_length - 1)
         {
-            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) && (worm_y[worm_length - 1] < worm_y[worm_length - 2]))
+            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) &&
+                (worm_y[worm_length - 1] < worm_y[worm_length - 2]))
                 tcode = 13;
-            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) && (worm_y[worm_length - 1] > worm_y[worm_length - 2]))
+            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) &&
+                (worm_y[worm_length - 1] > worm_y[worm_length - 2]))
                 tcode = 15;
-            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) && (worm_x[worm_length - 1] < worm_x[worm_length - 2]))
+            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) &&
+                (worm_x[worm_length - 1] < worm_x[worm_length - 2]))
                 tcode = 12;
-            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) && (worm_x[worm_length - 1] > worm_x[worm_length - 2]))
+            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) &&
+                (worm_x[worm_length - 1] > worm_x[worm_length - 2]))
                 tcode = 14;
         }
         if ((i > 0) && (i < worm_length - 1))
@@ -215,13 +223,17 @@ void draw_worm(int x, int y)
                 tcode = 2;
             if ((worm_y[i - 1] == worm_y[i]) && (worm_y[i + 1] == worm_y[i]))
                 tcode = 1;
-            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] < worm_y[i])) || ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
+            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] < worm_y[i])) ||
+                ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
                 tcode = 4;
-            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] > worm_y[i])) || ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
+            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] > worm_y[i])) ||
+                ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
                 tcode = 3;
-            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] < worm_y[i])) || ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
+            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] < worm_y[i])) ||
+                ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
                 tcode = 5;
-            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] > worm_y[i])) || ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
+            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] > worm_y[i])) ||
+                ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
                 tcode = 6;
         }
         if (tcode == 0)
@@ -361,7 +373,8 @@ void CGame::Update(int framex)
         }
         if (can_send)
             if ((s3ePointerGetX() >= 10) && (s3ePointerGetX() <= 118) &&
-                (s3ePointerGetY() >= Iw2DGetSurfaceHeight() - 118) && (s3ePointerGetY() <= Iw2DGetSurfaceHeight() - 10))
+                (s3ePointerGetY() >= Iw2DGetSurfaceHeight() - 118) &&
+                (s3ePointerGetY() <= Iw2DGetSurfaceHeight() - 10))
             {
                 int j;
                 bonus = 0;
@@ -378,8 +391,10 @@ void CGame::Update(int framex)
                 last_sent = ((current_score & 0xff0000) >> 16);
             }
         if (can_bomb || bombing)
-            if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) && (s3ePointerGetX() <= Iw2DGetSurfaceWidth() - 10) &&
-                (s3ePointerGetY() >= Iw2DGetSurfaceHeight() - 118) && (s3ePointerGetY() <= Iw2DGetSurfaceHeight() - 10))
+            if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) &&
+                (s3ePointerGetX() <= Iw2DGetSurfaceWidth() - 10) &&
+                (s3ePointerGetY() >= Iw2DGetSurfaceHeight() - 118) &&
+                (s3ePointerGetY() <= Iw2DGetSurfaceHeight() - 10))
             {
                 if (can_bomb)
                 {
@@ -481,9 +496,11 @@ void CGame::Render(int framex)
                 if (game_table->grid_anim_type[i][j] == ANIM_FALL)
                 {
                     anim_positions[i][j].x = grid_positions[i][j].x +
-                        game_table->grid_anim_frame[i][j] * game_table->grid_anim_frame[i][j] * (alt_positions[i][j].x - grid_positions[i][j].x) / (FRAMES_FALL * FRAMES_FALL);
+                        game_table->grid_anim_frame[i][j] * game_table->grid_anim_frame[i][j] *
+                        (alt_positions[i][j].x - grid_positions[i][j].x) / (FRAMES_FALL * FRAMES_FALL);
                     anim_positions[i][j].y = grid_positions[i][j].y +
-                        game_table->grid_anim_frame[i][j] * game_table->grid_anim_frame[i][j] * (alt_positions[i][j].y - grid_positions[i][j].y) / (FRAMES_FALL * FRAMES_FALL);
+                        game_table->grid_anim_frame[i][j] * game_table->grid_anim_frame[i][j] *
+                        (alt_positions[i][j].y - grid_positions[i][j].y) / (FRAMES_FALL * FRAMES_FALL);
                     Iw2DDrawImageRegion(g_tiles, anim_positions[i][j],
                         CIwSVec2((grid_codep[game_table->get_grid_connector(i, j)]) << 6,
                         (game_table->get_grid_state(i, j)) << 6),
