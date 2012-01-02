@@ -9,10 +9,11 @@
 
 LightningBranch::LightningBranch(int branch_length)
 {
-    strike_x = s3eMalloc(4 * branch_length);
-    strike_y = s3eMalloc(4 * branch_length);
-    refstrike_x = s3eMalloc(4 * branch_length);
-    refstrike_y = s3eMalloc(4 * branch_length);
+    len_strike = branch_length;
+    strike_x = (int *)s3eMalloc(4 * branch_length);
+    strike_y = (int *)s3eMalloc(4 * branch_length);
+    refstrike_x = (int *)s3eMalloc(4 * branch_length);
+    refstrike_y = (int *)s3eMalloc(4 * branch_length);
 }
 
 LightningBranch::~LightningBranch(void)
@@ -21,6 +22,106 @@ LightningBranch::~LightningBranch(void)
     s3eFree(strike_y);
     s3eFree(refstrike_x);
     s3eFree(refstrike_y);
+}
+
+void LightningBranch::GenerateBranch(int sx, int sy, int ex, int ey, int update_much)
+{
+    int br_0, br_1, br_2;         // how many branches 0, 1, and 2 we are making
+    int i, j, k, lindex;          // indices
+    int lsx, lsy, lex, ley;       // loop local start, end positions
+    int ldx, ldy, lsgn;           // loop local diffs
+    int keep_strike;              // on a scale from 1 to 255, how little of the main strike to keep
+    int line_x;
+    int line_y;
+    //
+    if (update_much >= UPDATE_STRIKE)
+        return;
+    keep_strike = update_much;
+    //
+    srand((unsigned int)s3eTimerGetUTC());
+    //
+    // compute internal coordinates = screen coordinates X 256
+    strike_x[0] = (sx << 8);
+    strike_y[0] = (sy << 8);
+    strike_x[len_strike - 1] = (ex << 8);
+    strike_y[len_strike - 1] = (ey << 8);
+    //
+    // make the main lightning branch, the "strike"
+    make_branch(0, len_strike - 1, strike_x, strike_y);
+    //
+    // update the main strike
+    if (update_much == UPDATE_ALL)
+    {
+        for (i = 0; i < len_strike; i++)
+        {
+            refstrike_x[i] = strike_x[i];
+            refstrike_y[i] = strike_y[i];
+        }
+    }
+    else
+    {
+        for (i = 0; i < len_strike; i++)
+        {
+            strike_x[i] = (refstrike_x[i]) + (((strike_x[i] - refstrike_x[i]) * (UPDATE_STRIKE - keep_strike)) >> 8);
+            strike_y[i] = (refstrike_y[i]) + (((strike_y[i] - refstrike_y[i]) * (UPDATE_STRIKE - keep_strike)) >> 8);
+        }
+    }
+}
+
+void LightningBranch::DrawBranch_as_Lines()
+{
+    int j;
+    //
+    for (j = 1; j < len_strike; j++)
+    {
+        Iw2DDrawLine(CIwSVec2(strike_x[j - 1], strike_y[j - 1]), CIwSVec2(strike_x[j], strike_y[j]));
+    }
+}
+
+void LightningBranch::make_branch(int start_index, int end_index, int *positions_x, int *positions_y)
+{
+    int diff_x, diff_y;                                // differences between end and start positions
+    int mid_index, mid_x, mid_y;                       // index and position of the middle point between start and end
+    int mid_max_x, mid_max_y, mid_min_x, mid_min_y;    // minimum and maximum displacement positions for the mid point
+    int random_displacement;                           // random value to compute final displacement of the mid point
+    //
+    // there is no mid point, job is done, return
+    if (end_index - start_index <= 1)
+        return;
+    //
+    // compute differences between end and start positions, mid point index and initial position
+    diff_x = positions_x[end_index] - positions_x[start_index];
+    diff_y = positions_y[end_index] - positions_y[start_index];
+    mid_index = start_index + ((end_index - start_index) >> 1);
+    mid_x = positions_x[start_index] + (diff_x >> 1);
+    mid_y = positions_y[start_index] + (diff_y >> 1);
+    //
+    // compute minimum and maximum displacement positions for the mid point
+    // by taking diff_x and diff_y, switching between them and dividing by 4
+    // (so that the displacement is perpendicular on the main line from start to end)
+    // (but no greater than a quarter of the start to end distance, on either side of the line)
+    mid_max_x = mid_x - (diff_y >> 2);
+    mid_max_y = mid_y + (diff_x >> 2);
+    mid_min_x = mid_x + (diff_y >> 2);
+    mid_min_y = mid_y - (diff_x >> 2);
+    //
+    // get a random value for the displacement and compute the displaced midpoint
+    random_displacement = (rand() % 256);
+    mid_x = mid_min_x + (((mid_max_x - mid_min_x) * random_displacement) >> 8);
+    mid_y = mid_min_y + (((mid_max_y - mid_min_y) * random_displacement) >> 8);
+    //
+    // update the midpoint in the vectors
+    positions_x[mid_index] = mid_x;
+    positions_y[mid_index] = mid_y;
+    //
+    // we computed the only point left between these two indices,
+    // so it's pointless to compute further midpoints between consecutive indices
+    if ((end_index - start_index) == 2)
+        return;
+    //
+    // compute midpoints for the lines between start to mid, then mid to end
+    make_branch(start_index, mid_index, positions_x, positions_y);
+    make_branch(mid_index, end_index, positions_x, positions_y);
 }
 
 

@@ -41,9 +41,10 @@ public:
     ~LightningBranch(void);
 
     void GenerateBranch(int sx, int sy, int ex, int ey, int update_much);
-    void DrawBranch();
+    void DrawBranch_as_Lines();
 
 private:
+    int len_strike;
     int *strike_x;
     int *strike_y;
     int *refstrike_x;
