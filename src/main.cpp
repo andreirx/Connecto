@@ -80,9 +80,9 @@ int main()
         // execute update steps
         int frames = nextUpdate - currentUpdate;
         frames = MIN(MAX_UPDATES, frames);
-        while(frames--)
+        //while(frames--)
         {
-            pGame->Update(frames);
+            pGame->Update(current_frame);
         }
         currentUpdate = nextUpdate;
         

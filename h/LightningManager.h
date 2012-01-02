@@ -33,17 +33,26 @@
 // CAREFUL! this is how much memory one object will use
 #define OBJ_MEM_USAGE    4*3*LEN_STRIKE + BRANCHES_0*4*3*LEN_BRANCH_0 + BRANCHES_1*4*3*LEN_BRANCH_1 + BRANCHES_2*4*2*LEN_BRANCH_2
 
+#define DEFAULT_LEN      32
+#define DEFAULT_COLOR    0xffffffff
+#define MAX_BRANCHES     1024
+
 
 class LightningBranch
 {
 public:
-    LightningBranch(int branch_length);
+    LightningBranch(void);
     ~LightningBranch(void);
 
-    void GenerateBranch(int sx, int sy, int ex, int ey, int update_much);
+    void SetLength(int branch_length);
+    int GetLength();
+    void GenerateBranch(int sx, int sy, int ex, int ey, unsigned int bcolor, int update_much = UPDATE_ALL);
+    void UpdateBranch(int update_much);
     void DrawBranch_as_Lines();
 
 private:
+    int osx, osy, oex, oey;
+    unsigned int lightning_color;
     int len_strike;
     int *strike_x;
     int *strike_y;
@@ -63,38 +72,15 @@ public:
     CIw2DImage *destImage;
     s3eSurfaceInfo dsInfo;
 
-    void GenerateLightning(int sx, int sy, int ex, int ey, int update_much);
+    void ResetBranches();
+    void AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor);
+    void UpdateAllBranches(int update_much);
     void DrawLightning();
 
 private:
-    // main strike
-    int strike_x[LEN_STRIKE];
-    int strike_y[LEN_STRIKE];
-    int strike_branch[LEN_STRIKE];
-    int refstrike_x[LEN_STRIKE];
-    int refstrike_y[LEN_STRIKE];
-
-    // secondary branches 0
-    int branch_0_x[BRANCHES_0][LEN_BRANCH_0];
-    int branch_0_y[BRANCHES_0][LEN_BRANCH_0];
-    int branch_0_branch[BRANCHES_0][LEN_BRANCH_0];
-    int generated_branches_0;
-
-    // secondary branches 1
-    int branch_1_x[BRANCHES_1][LEN_BRANCH_1];
-    int branch_1_y[BRANCHES_1][LEN_BRANCH_1];
-    int branch_1_branch[BRANCHES_1][LEN_BRANCH_1];
-    int generated_branches_1;
-
-    // secondary branches 2
-    int branch_2_x[BRANCHES_2][LEN_BRANCH_2];
-    int branch_2_y[BRANCHES_2][LEN_BRANCH_2];
-    int generated_branches_2;
-
-    // CAREFUL! this method expects vectors positions_x and positions_y to contain start and end positions
-    // also, it's recursive
-    void make_branch(int start_index, int end_index, int *positions_x, int *positions_y);
-    void blur_image();
+    // lightning branches
+    LightningBranch lightning_branches[MAX_BRANCHES];
+    int total_branches;
 };
 
 #endif

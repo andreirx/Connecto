@@ -286,7 +286,7 @@ CGame::CGame()
     bombing = 0;
     show_arrows = 0;
     //
-    lightning = new LightningManager(640, 640);
+    lightning = new LightningManager(1024, 1024);
     //
     level = 1;
     level_score = 0;
@@ -330,12 +330,13 @@ CGame::~CGame()
 
 void CGame::Update(int framex)
 {
+    int i, j;
     // game logic goes here
     // for example, move a red square towards any touch event...
     if (game_table->is_animating())
         return;
     update_worm();
-    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED) && (framex == 0))
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))// && (framex == 0))
     {
         if((s3ePointerGetX() >= table_x) && (s3ePointerGetY() >= table_y) &&
             (s3ePointerGetX() <= table_x + 640) && (s3ePointerGetY() <= table_y + 640))
@@ -411,6 +412,38 @@ void CGame::Update(int framex)
             }
     }
     can_send = game_table->check_connections();
+    //
+    // OK NOW make some lightning
+    //
+    //if (show_arrows || framex == 0 || internal_frame == 0)
+    {
+        lightning->ResetBranches();
+        for (i = 0; i < GRID_W - 1; i++)
+        {
+            for (j = 0; j < GRID_H - 1; j++)
+            {
+                if (game_table->get_grid_state(i, j) == CONNECT_LEFT)
+                {
+                    if ((game_table->get_grid_connector(i, j) & CB_RIGHT != 0) &&
+                        (game_table->get_grid_connector(i + 1, j) & CB_LEFT != 0))
+                    {
+                        lightning->AddBranch_Generate(DEFAULT_LEN,
+                            grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                            grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
+                            0xffff0000);
+                    }
+                    if ((game_table->get_grid_connector(i, j) & CB_DOWN != 0) &&
+                        (game_table->get_grid_connector(i, j + 1) & CB_UP != 0))
+                    {
+                        lightning->AddBranch_Generate(DEFAULT_LEN,
+                            grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                            grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
+                            0xffff0000);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void CGame::get_anim_fall_y()
@@ -523,6 +556,24 @@ void CGame::Render(int framex)
                     CIwSVec2(64, 64));
     }
 
+    // draw some lightning
+    if ((internal_frame % 10) == 0)
+    {
+        //lightning->UpdateAllBranches(UPDATE_ALL);
+    }
+    else
+    {
+        //lightning->UpdateAllBranches(UPDATE_STRIKE - 30);
+    }
+    if (game_table->is_animating() == ANIM_NONE)
+    {
+        //Iw2DSetColour(0xffffffff);
+        Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+        lightning->DrawLightning();
+        //Iw2DDrawImage(lightning->destImage, CIwSVec2(0, 0), CIwSVec2(1024, 1024));
+        Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    }
+
     // draw the smileys and arrows
     for (j = 0; j < GRID_H; j++)
     {
@@ -607,22 +658,8 @@ void CGame::Render(int framex)
         bitmapStringAt(32 + (Iw2DGetSurfaceWidth() + 640) / 2, 16 + (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2, 20, strbuf);
     }
 
-    // draw some lightning
-    if ((internal_frame % 10) == 0)
-    {
-        //lightning->GenerateLightning(0, (internal_frame % 640), 640, 640 - (internal_frame % 640), UPDATE_ALL);
-    }
-    else
-    {
-        //lightning->GenerateLightning(0, (internal_frame % 640), 640, 640 - (internal_frame % 640), UPDATE_STRIKE - 30);
-    }
-    //lightning->DrawLightning();
-    Iw2DSetColour(0xffffffff);
-    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-    Iw2DDrawImage(lightning->destImage, CIwSVec2((Iw2DGetSurfaceWidth() - 640) >> 1, (Iw2DGetSurfaceHeight() - 640) >> 1), CIwSVec2(640, 640));
-    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
-
     // show the surface
+    //Iw2DFinishDrawing();
     Iw2DSurfaceShow();
     internal_frame++;
 }
