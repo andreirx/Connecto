@@ -610,13 +610,13 @@ void CGame::Render(int framex)
     // draw some lightning
     if ((internal_frame % 10) == 0)
     {
-        lightning->GenerateLightning(0, (internal_frame % 640), 640, 640 - (internal_frame % 640), UPDATE_ALL);
+        //lightning->GenerateLightning(0, (internal_frame % 640), 640, 640 - (internal_frame % 640), UPDATE_ALL);
     }
     else
     {
-        lightning->GenerateLightning(0, (internal_frame % 640), 640, 640 - (internal_frame % 640), UPDATE_STRIKE - 30);
+        //lightning->GenerateLightning(0, (internal_frame % 640), 640, 640 - (internal_frame % 640), UPDATE_STRIKE - 30);
     }
-    lightning->DrawLightning();
+    //lightning->DrawLightning();
     Iw2DSetColour(0xffffffff);
     Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
     Iw2DDrawImage(lightning->destImage, CIwSVec2((Iw2DGetSurfaceWidth() - 640) >> 1, (Iw2DGetSurfaceHeight() - 640) >> 1), CIwSVec2(640, 640));

@@ -34,6 +34,24 @@
 #define OBJ_MEM_USAGE    4*3*LEN_STRIKE + BRANCHES_0*4*3*LEN_BRANCH_0 + BRANCHES_1*4*3*LEN_BRANCH_1 + BRANCHES_2*4*2*LEN_BRANCH_2
 
 
+class LightningBranch
+{
+public:
+    LightningBranch(int branch_length);
+    ~LightningBranch(void);
+
+    void GenerateBranch(int sx, int sy, int ex, int ey, int update_much);
+    void DrawBranch();
+
+private:
+    int *strike_x;
+    int *strike_y;
+    int *refstrike_x;
+    int *refstrike_y;
+
+    void make_branch(int start_index, int end_index, int *positions_x, int *positions_y);
+};
+
 class LightningManager
 {
 public:

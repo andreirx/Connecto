@@ -6,6 +6,24 @@
 #include "Iw2D.h"
 #include "LightningManager.h"
 
+
+LightningBranch::LightningBranch(int branch_length)
+{
+    strike_x = s3eMalloc(4 * branch_length);
+    strike_y = s3eMalloc(4 * branch_length);
+    refstrike_x = s3eMalloc(4 * branch_length);
+    refstrike_y = s3eMalloc(4 * branch_length);
+}
+
+LightningBranch::~LightningBranch(void)
+{
+    s3eFree(strike_x);
+    s3eFree(strike_y);
+    s3eFree(refstrike_x);
+    s3eFree(refstrike_y);
+}
+
+
 LightningManager::LightningManager(int sW, int sH)
 {
     CIw2DSurface *oldSurface = Iw2DGetSurface();
