@@ -100,7 +100,7 @@ void LightningBranch::DrawBranch_as_Lines()
     int j;
     CIwSVec2 start, end;
     //
-    Iw2DSetColour(0xffff0000);//(lightning_color);
+    Iw2DSetColour(lightning_color);
     for (j = 1; j < len_strike; j++)
     {
         start.x = (strike_x[j - 1] >> 8);

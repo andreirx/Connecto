@@ -331,6 +331,7 @@ CGame::~CGame()
 void CGame::Update(int framex)
 {
     int i, j;
+    unsigned int add_color = 0;
     // game logic goes here
     // for example, move a red square towards any touch event...
     if (game_table->is_animating())
@@ -418,27 +419,90 @@ void CGame::Update(int framex)
     //if (show_arrows || framex == 0 || internal_frame == 0)
     {
         lightning->ResetBranches();
-        for (i = 0; i < GRID_W - 1; i++)
+        for (i = 0; i < GRID_W; i++)
         {
-            for (j = 0; j < GRID_H - 1; j++)
+            for (j = 0; j < GRID_H; j++)
             {
+                add_color = 0;
                 if (game_table->get_grid_state(i, j) == CONNECT_LEFT)
                 {
-                    if ((game_table->get_grid_connector(i, j) & CB_RIGHT != 0) &&
-                        (game_table->get_grid_connector(i + 1, j) & CB_LEFT != 0))
+                    add_color = 0xffff5f00;
+                }
+                if (game_table->get_grid_state(i, j) == CONNECT_RIGHT)
+                {
+                    add_color = 0xff5f00ff;
+                }
+                if (game_table->get_grid_state(i, j) == CONNECT_OK)
+                {
+                    add_color = 0xff00bf00;
+                }
+                if (add_color != 0)
+                {
+                    if (i < GRID_W - 1)
                     {
-                        lightning->AddBranch_Generate(DEFAULT_LEN,
-                            grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                            grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
-                            0xffff0000);
+                        if (((game_table->get_grid_connector(i, j) & CB_RIGHT) != 0) &&
+                            ((game_table->get_grid_connector(i + 1, j) & CB_LEFT) != 0))
+                        {
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
+                                add_color);
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
+                                add_color);
+                        }
                     }
-                    if ((game_table->get_grid_connector(i, j) & CB_DOWN != 0) &&
-                        (game_table->get_grid_connector(i, j + 1) & CB_UP != 0))
+                    if (j < GRID_H - 1)
                     {
-                        lightning->AddBranch_Generate(DEFAULT_LEN,
-                            grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                            grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
-                            0xffff0000);
+                        if (((game_table->get_grid_connector(i, j) & CB_DOWN) != 0) &&
+                            ((game_table->get_grid_connector(i, j + 1) & CB_UP) != 0))
+                        {
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
+                                add_color);
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
+                                add_color);
+                        }
+                    }
+                    if (i == 0)
+                    {
+                        if ((game_table->get_grid_connector(i, j) & CB_LEFT) != 0)
+                        {
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x, grid_positions[i][j].y + 16,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                add_color);
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x, grid_positions[i][j].y + 32,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                add_color);
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x, grid_positions[i][j].y + 48,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                add_color);
+                        }
+                    }
+                    if (i == GRID_W - 1)
+                    {
+                        if ((game_table->get_grid_connector(i, j) & CB_RIGHT) != 0)
+                        {
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x + 63, grid_positions[i][j].y + 16,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                add_color);
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x + 63, grid_positions[i][j].y + 32,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                add_color);
+                            lightning->AddBranch_Generate(DEFAULT_LEN,
+                                grid_positions[i][j].x + 63, grid_positions[i][j].y + 48,
+                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                add_color);
+                        }
                     }
                 }
             }
@@ -552,7 +616,7 @@ void CGame::Render(int framex)
             for (i = 0; i < GRID_W; i++)
                 Iw2DDrawImageRegion(g_tiles, grid_positions[i][j],
                     CIwSVec2((grid_codep[game_table->get_grid_connector(i, j)]) << 6,
-                    (game_table->get_grid_state(i, j)) << 6),
+                    CONNECT_NONE << 6),//(game_table->get_grid_state(i, j)) << 6),
                     CIwSVec2(64, 64));
     }
 
