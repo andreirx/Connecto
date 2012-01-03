@@ -58,12 +58,14 @@ public:
 
     inline void justDraw(int px, int py)
     {
-        Iw2DDrawImageRegion(myImage, CIwSVec2(px, py), pos, size);
+        temp.x = px;
+        temp.y = py;
+        Iw2DDrawImageRegion(myImage, temp, pos, size);
     }
 
 private:
     CIw2DImage* myImage;
-    CIwSVec2 pos, size;
+    CIwSVec2 pos, size, temp;
 };
 
 
@@ -184,9 +186,15 @@ void update_worm()
     }
 }
 
+CIwSVec2 dimension32 = CIwSVec2(32, 32);
+CIwSVec2 dimension64 = CIwSVec2(64, 64);
+CIwSVec2 dimension128 = CIwSVec2(128, 128);
+CIwSVec2 zerozero = CIwSVec2(0, 0);
+
 void draw_worm(int x, int y)
 {
     int i, tcode;
+	CIwSVec2 scr_p, tex_p;
     Iw2DSetColour(0xffffffff);
     for (i = 0; i < worm_length; i++)
     {
@@ -238,9 +246,13 @@ void draw_worm(int x, int y)
         }
         if (tcode == 0)
             tcode = 11;
-        Iw2DDrawImageRegion(g_tiles, CIwSVec2(x + (worm_x[i] << 6), y + (worm_y[i] << 6)),
-            CIwSVec2((tcode << 6), 256),
-            CIwSVec2(64, 64));
+		scr_p.x = x + (worm_x[i] << 6);
+		scr_p.y = y + (worm_y[i] << 6);
+		tex_p.x = (tcode << 6);
+		tex_p.y = 256;
+        Iw2DDrawImageRegion(g_tiles, scr_p,
+            tex_p,
+            dimension64);
     }
 }
 
@@ -257,6 +269,7 @@ CIwSVec2 destroy_frame[6] =
 void bitmapStringAt(int x, int y, int padding, char *strw)
 {
     int currx = x, i, k, fx, fy;
+	CIwSVec2 scr_pos, bmp_pos;
     if (strw)
     {
         i = 0;
@@ -265,7 +278,11 @@ void bitmapStringAt(int x, int y, int padding, char *strw)
             k = ((int)strw[i]) & 0x00ff;
             fx = (k & 0x0f) << 5;
             fy = (k & 0xf0) << 1;
-            Iw2DDrawImageRegion(g_font, CIwSVec2(currx, y), CIwSVec2(fx, fy), CIwSVec2(32, 32));
+			scr_pos.x = currx;
+			scr_pos.y = y;
+			bmp_pos.x = fx;
+			bmp_pos.y = fy;
+            Iw2DDrawImageRegion(g_font, scr_pos, bmp_pos, dimension32);
             currx += padding;
             i++;
         }
@@ -538,8 +555,43 @@ void CGame::Render(int framex)
 {
     // game render goes here
     int i, j, k, c, start_destroy, end_destroy;
+	int ntable_x, ntable_y;
     char strbuf[256];
+	CIwSVec2 table_pos = CIwSVec2((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() + 640) / 2);
+	CIwSVec2 scr_p, tex_p;
 
+    //
+    ntable_x = (Iw2DGetSurfaceWidth() - 640) / 2;
+    ntable_y = (Iw2DGetSurfaceHeight() - 640) / 2;
+	//
+	// IS IT ROTATING??
+	//
+	if ((ntable_x != table_x) || (ntable_y != table_y))
+	{
+		table_x = ntable_x;
+		table_y = ntable_y;
+		//
+		for (i = 0; i < GRID_W; i++)
+		{
+			for (j = 0; j < GRID_H; j++)
+			{
+				grid_positions[i][j].x = (i << 6) + (Iw2DGetSurfaceWidth() - 640) / 2;
+				grid_positions[i][j].y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2;
+			}
+		}
+		if ((game_table->is_animating() == ANIM_DESTROY) || (game_table->is_animating() == ANIM_FALL))
+		{
+            for (i = 0; i < GRID_W; i++)
+            {
+                for (j = GRID_H - 1; j >= 0; j--)
+                {
+                    alt_positions[i][j].x = grid_positions[i][j].x;
+                    alt_positions[i][j].y = grid_positions[i][j].y - ((j - grid_shift[i][j]) << 6);
+                }
+            }
+		}
+	}
+	//
     // for example, clear to black (the order of components is ABGR)
     Iw2DSurfaceClear(0xff000000);
 
@@ -576,14 +628,15 @@ void CGame::Render(int framex)
         for (j = 0; j < GRID_H; j++)
             for (i = 0; i < GRID_W; i++)
             {
+				tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
+				tex_p.y = (game_table->get_grid_state(i, j)) << 6;
                 Iw2DDrawImageRegion(g_tiles, alt_positions[i][j],
-                    CIwSVec2((grid_codep[game_table->get_grid_connector(i, j)]) << 6,
-                    (game_table->get_grid_state(i, j)) << 6),
-                    CIwSVec2(64, 64));
+                    tex_p,
+                    dimension64);
                 if (game_table->grid_anim_type[i][j] == ANIM_DESTROY)
                     Iw2DDrawImageRegion(g_arrows, grid_positions[i][j],
                         destroy_frame[game_table->grid_anim_frame[i][j]],
-                        CIwSVec2(64, 64));
+                        dimension64);
             }
         game_table->update_anims();
         break;
@@ -598,26 +651,33 @@ void CGame::Render(int framex)
                     anim_positions[i][j].y = grid_positions[i][j].y +
                         game_table->grid_anim_frame[i][j] * game_table->grid_anim_frame[i][j] *
                         (alt_positions[i][j].y - grid_positions[i][j].y) / (FRAMES_FALL * FRAMES_FALL);
+					tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
+					tex_p.y = (game_table->get_grid_state(i, j)) << 6;
                     Iw2DDrawImageRegion(g_tiles, anim_positions[i][j],
-                        CIwSVec2((grid_codep[game_table->get_grid_connector(i, j)]) << 6,
-                        (game_table->get_grid_state(i, j)) << 6),
-                        CIwSVec2(64, 64));
+                        tex_p,
+                        dimension64);
                 }
                 else
+				{
+					tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
+					tex_p.y = (game_table->get_grid_state(i, j)) << 6;
                     Iw2DDrawImageRegion(g_tiles, grid_positions[i][j],
-                        CIwSVec2((grid_codep[game_table->get_grid_connector(i, j)]) << 6,
-                        (game_table->get_grid_state(i, j)) << 6),
-                        CIwSVec2(64, 64));
+                        tex_p,
+                        dimension64);
+				}
         game_table->update_anims();
         break;
     default:
         first_pass = 0;
         for (j = 0; j < GRID_H; j++)
             for (i = 0; i < GRID_W; i++)
+			{
+				tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
+				tex_p.y = CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
                 Iw2DDrawImageRegion(g_tiles, grid_positions[i][j],
-                    CIwSVec2((grid_codep[game_table->get_grid_connector(i, j)]) << 6,
-                    CONNECT_NONE << 6),//(game_table->get_grid_state(i, j)) << 6),
-                    CIwSVec2(64, 64));
+                    tex_p,
+                    dimension64);
+			}
     }
 
     // draw some lightning
@@ -643,37 +703,49 @@ void CGame::Render(int framex)
     {
         c = left_set[j];
         Iw2DSetColour(0xffff0000);
+		scr_p.x = (Iw2DGetSurfaceWidth() - 640) / 2 - 64;
+		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2;
+		tex_p.x = (c & 0x07) << 6;
+		tex_p.y = (c >> 3) << 6;
         Iw2DDrawImageRegion(g_emoticons,
-            CIwSVec2((Iw2DGetSurfaceWidth() - 640) / 2 - 64,
-            (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2),
-            CIwSVec2((c & 0x07) << 6, (c >> 3) << 6),
-            CIwSVec2(64, 64));
+            scr_p,
+            tex_p,
+            dimension64);
         Iw2DSetColour(0xffffffff);
         c = right_set[j];
+		scr_p.x = (Iw2DGetSurfaceWidth() + 640) / 2;
+		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2;
+		tex_p.x = 256;
+		tex_p.y = 0;
         Iw2DDrawImageRegion(g_arrows,
-            CIwSVec2((Iw2DGetSurfaceWidth() + 640) / 2,
-            (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2),
-            CIwSVec2(256, 0),
-            CIwSVec2(64, 64));
+            scr_p,
+            tex_p,
+            dimension64);
         Iw2DSetColour(0xffffffff);
     }
 
     // draw the arrows
     for (j = 0; j < GRID_W; j++)
     {
+		scr_p.x = (j << 6) + (Iw2DGetSurfaceWidth() - 640) / 2;
+		scr_p.y = (Iw2DGetSurfaceHeight() + 640) / 2;
+		tex_p.x = 128;
+		tex_p.y = 0;
         Iw2DDrawImageRegion(g_arrows,
-            CIwSVec2((j << 6) + (Iw2DGetSurfaceWidth() - 640) / 2,
-            (Iw2DGetSurfaceHeight() + 640) / 2),
-            CIwSVec2(128, 0), CIwSVec2(64, 64));
+            scr_p,
+            tex_p,
+			dimension64);
     }
 
     // draw other elements
     if (show_arrows)
     {
+		scr_p.x = (arrow_x << 6) - 32 + (Iw2DGetSurfaceWidth() - 640) / 2;
+		scr_p.y = (arrow_y << 6) - 32 + (Iw2DGetSurfaceHeight() - 640) / 2;
         Iw2DDrawImageRegion(g_arrows,
-            CIwSVec2((arrow_x << 6) - 32 + (Iw2DGetSurfaceWidth() - 640) / 2,
-            (arrow_y << 6) - 32 + (Iw2DGetSurfaceHeight() - 640) / 2),
-            CIwSVec2(0, 0), CIwSVec2(128, 128));
+            scr_p,
+            zerozero,
+			dimension128);
         show_arrows = 0;
     }
 
@@ -685,28 +757,52 @@ void CGame::Render(int framex)
     {
         c = ((internal_frame & 0x0f) << 4);
         Iw2DSetColour(0xff000000 + (c << 16) + (c << 8) + c);
-        Iw2DDrawImageRegion(g_send, CIwSVec2(0, Iw2DGetSurfaceHeight() - 128), CIwSVec2(0, 0), CIwSVec2(128, 128));
+		scr_p.x = 0;
+		scr_p.y = Iw2DGetSurfaceHeight() - 128;
+        Iw2DDrawImageRegion(g_send, scr_p, zerozero, dimension128);
         Iw2DSetColour(0xffffffff);
     }
     else
-        Iw2DDrawImageRegion(g_send, CIwSVec2(0, Iw2DGetSurfaceHeight() - 128), CIwSVec2(128, 0), CIwSVec2(128, 128));
+	{
+		scr_p.x = 0;
+		scr_p.y = Iw2DGetSurfaceHeight() - 128;
+		tex_p.x = 128;
+		tex_p.y = 0;
+        Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
+	}
 
     if (can_bomb)
-        Iw2DDrawImageRegion(g_send, CIwSVec2(Iw2DGetSurfaceWidth() - 128, Iw2DGetSurfaceHeight() - 128), CIwSVec2(256, 0), CIwSVec2(128, 128));
+	{
+		scr_p.x = Iw2DGetSurfaceWidth() - 128;
+		scr_p.y = Iw2DGetSurfaceHeight() - 128;
+		tex_p.x = 256;
+		tex_p.y = 0;
+        Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
+	}
     else
+	{
+		scr_p.x = Iw2DGetSurfaceWidth() - 128;
+		scr_p.y = Iw2DGetSurfaceHeight() - 128;
         if (bombing)
         {
             c = ((internal_frame & 0x0f) << 4);
             Iw2DSetColour(0xff000000 + (c << 16) + (c << 8) + c);
-            Iw2DDrawImageRegion(g_send, CIwSVec2(Iw2DGetSurfaceWidth() - 128, Iw2DGetSurfaceHeight() - 128), CIwSVec2(256, 0), CIwSVec2(128, 128));
+			tex_p.x = 256;
+			tex_p.y = 0;
+            Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
             Iw2DSetColour(0xffffffff);
         }
         else
-            Iw2DDrawImageRegion(g_send, CIwSVec2(Iw2DGetSurfaceWidth() - 128, Iw2DGetSurfaceHeight() - 128), CIwSVec2(384, 0), CIwSVec2(128, 128));
+		{
+			tex_p.x = 384;
+			tex_p.y = 0;
+            Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
+		}
+	}
 
     // draw the top bar
     Iw2DSetColour(0xff000000);
-    Iw2DFillRect(CIwSVec2(0, 0), CIwSVec2(Iw2DGetSurfaceWidth(), table_y));
+    Iw2DFillRect(zerozero, CIwSVec2(Iw2DGetSurfaceWidth(), (Iw2DGetSurfaceHeight() - 640) / 2));
 
     // draw the strings
     Iw2DSetColour(0xffff7040);
