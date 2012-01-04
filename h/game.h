@@ -15,6 +15,7 @@
 
 #include "GameTable.h"
 #include "LightningManager.h"
+#include "MatrixManager.h"
 
 #ifndef GAME_H
 #define GAME_H
@@ -27,6 +28,7 @@ public:
 
     GameTable *game_table;
     LightningManager *lightning;
+    MatrixManager *matrix_text;
 
     int show_arrows, arrow_x, arrow_y;
     int table_x, table_y, can_send, can_bomb, bombing;

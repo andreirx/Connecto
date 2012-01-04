@@ -7,6 +7,8 @@
 #include "MatrixManager.h"
 
 
+extern CIw2DImage* g_font;
+
 MatrixManager::MatrixManager(void)
 {
     int i, j;
@@ -86,8 +88,14 @@ void MatrixManager::UpdateMatrix()
             }
             else
             {
-                if (matrix_intensity[i][j] > 0)
-                    matrix_intensity[i][j]--;
+                if (matrix_intensity[i][j] >= 2)
+                {
+                    matrix_intensity[i][j] -= 2;
+                }
+                else
+                {
+                    matrix_intensity[i][j] = 0;
+                }
             }
         }
         //
@@ -116,7 +124,7 @@ void MatrixManager::UpdateMatrix()
             {
                 matrix_chars[i][anim_point[i] - 1] = (rand() % 0xfe) + 1;
             }
-            matrix_intensity[i][anim_point[i] - 1] = MAX_INTENSITY;
+            matrix_intensity[i][anim_point[i] - 1] = MAX_INTENSITY / 2;
             //
             if (anim_point[i] >= MATRIX_H)
             {
@@ -148,6 +156,7 @@ void MatrixManager::DrawMatrix()
     {
         for (i = 0; i < MATRIX_W; i++)
         {
+            Iw2DSetColour(0xff000000 | (matrix_intensity[i][j] << 8));
             k = ((int)matrix_chars[i][j]) & 0x00ff;
             fx = (k & 0x0f) << 5;
             fy = (k & 0xf0) << 1;

@@ -304,6 +304,7 @@ CGame::CGame()
     show_arrows = 0;
     //
     lightning = new LightningManager(1024, 1024);
+    matrix_text = new MatrixManager();
     //
     level = 1;
     level_score = 0;
@@ -679,16 +680,8 @@ void CGame::Render(int framex)
                     dimension64);
 			}
     }
-
+    //
     // draw some lightning
-    if ((internal_frame % 10) == 0)
-    {
-        //lightning->UpdateAllBranches(UPDATE_ALL);
-    }
-    else
-    {
-        //lightning->UpdateAllBranches(UPDATE_STRIKE - 30);
-    }
     if (game_table->is_animating() == ANIM_NONE)
     {
         //Iw2DSetColour(0xffffffff);
@@ -697,7 +690,13 @@ void CGame::Render(int framex)
         //Iw2DDrawImage(lightning->destImage, CIwSVec2(0, 0), CIwSVec2(1024, 1024));
         Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     }
-
+    //
+    // draw and update matrix text effect
+    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    matrix_text->UpdateMatrix();
+    matrix_text->DrawMatrix();
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
     // draw the smileys and arrows
     for (j = 0; j < GRID_H; j++)
     {
