@@ -595,6 +595,12 @@ void CGame::Render(int framex)
 	//
     // for example, clear to black (the order of components is ABGR)
     Iw2DSurfaceClear(0xff000000);
+    //
+    // draw and update matrix text effect
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    matrix_text->UpdateMatrix();
+    matrix_text->DrawMatrix();
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 
     Iw2DSetColour(0xffffffff);
 
@@ -690,12 +696,6 @@ void CGame::Render(int framex)
         //Iw2DDrawImage(lightning->destImage, CIwSVec2(0, 0), CIwSVec2(1024, 1024));
         Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     }
-    //
-    // draw and update matrix text effect
-    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-    matrix_text->UpdateMatrix();
-    matrix_text->DrawMatrix();
-    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //
     // draw the smileys and arrows
     for (j = 0; j < GRID_H; j++)

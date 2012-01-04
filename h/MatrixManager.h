@@ -7,8 +7,8 @@
 
 
 #define SURFACE_DIM      1024
-#define CHAR_W           20
-#define CHAR_H           28
+#define CHAR_W           24
+#define CHAR_H           32
 #define MATRIX_W         (SURFACE_DIM / CHAR_W)
 #define MATRIX_H         (SURFACE_DIM / CHAR_H)
 
