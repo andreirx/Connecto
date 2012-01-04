@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include "s3e.h"
 #include "Iw2D.h"
+#include "IwGx.h"
 #include "game.h"
 #include "GameTable.h"
 
@@ -87,7 +88,7 @@ MySprite power_sprites[10] =
 void update_worm()
 {
     int move, i, j, ok_worm, whead;
-    if (rand() % 32 == 0)
+    if (rand() % 8 == 0)
     {
         whead = 0;
         ok_worm = 0;
@@ -611,7 +612,10 @@ void CGame::Render(int framex)
         if ((rand() & 0x1f) == 0)
             right_set[j] = (rand() & 0x07) + ((rand() % 5) << 3);
     }
+    //
     // draw the tiles
+    Iw2DFinishDrawing();
+    IwGxSetScissorScreenSpace(table_x, table_y, 640, 640);
     switch (game_table->is_animating())
     {
     case ANIM_DESTROY:
@@ -640,10 +644,12 @@ void CGame::Render(int framex)
                 Iw2DDrawImageRegion(g_tiles, alt_positions[i][j],
                     tex_p,
                     dimension64);
+                /*
                 if (game_table->grid_anim_type[i][j] == ANIM_DESTROY)
                     Iw2DDrawImageRegion(g_arrows, grid_positions[i][j],
                         destroy_frame[game_table->grid_anim_frame[i][j]],
                         dimension64);
+                */
             }
         game_table->update_anims();
         break;
@@ -686,6 +692,8 @@ void CGame::Render(int framex)
                     dimension64);
 			}
     }
+    Iw2DFinishDrawing();
+    IwGxSetScissorScreenSpace(0, 0, Iw2DGetSurfaceWidth(), Iw2DGetSurfaceHeight());
     //
     // draw some lightning
     if (game_table->is_animating() == ANIM_NONE)
@@ -698,10 +706,11 @@ void CGame::Render(int framex)
     }
     //
     // draw the smileys and arrows
+    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
     for (j = 0; j < GRID_H; j++)
     {
         c = left_set[j];
-        Iw2DSetColour(0xffff0000);
+        Iw2DSetColour(0xffffffff);
 		scr_p.x = (Iw2DGetSurfaceWidth() - 640) / 2 - 64;
 		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2;
 		tex_p.x = (c & 0x07) << 6;
@@ -722,6 +731,7 @@ void CGame::Render(int framex)
             dimension64);
         Iw2DSetColour(0xffffffff);
     }
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 
     // draw the arrows
     for (j = 0; j < GRID_W; j++)
@@ -752,6 +762,7 @@ void CGame::Render(int framex)
     draw_worm((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() - 640) / 2);
 
     // draw buttons
+    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
     if (can_send)
     {
         c = ((internal_frame & 0x0f) << 4);
@@ -798,10 +809,11 @@ void CGame::Render(int framex)
             Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
 		}
 	}
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 
     // draw the top bar
     Iw2DSetColour(0xff000000);
-    Iw2DFillRect(zerozero, CIwSVec2(Iw2DGetSurfaceWidth(), (Iw2DGetSurfaceHeight() - 640) / 2));
+    // Iw2DFillRect(zerozero, CIwSVec2(Iw2DGetSurfaceWidth(), (Iw2DGetSurfaceHeight() - 640) / 2));
 
     // draw the strings
     Iw2DSetColour(0xffff7040);
