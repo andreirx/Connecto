@@ -9,10 +9,12 @@ files
 	game.cpp
 	GameTable.cpp
 	LightningManager.cpp
+	MatrixManager.cpp
 	(h)
 	game.h
 	GameTable.h
 	LightningManager.h
+	MatrixManager.h
 }
 
 includepaths
@@ -23,6 +25,7 @@ includepaths
 subprojects
 {
 	iw2d
+	iwgx
 }
 
 assets
