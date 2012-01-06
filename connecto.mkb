@@ -1,5 +1,14 @@
 #!/usr/bin/env mkb
 
+deployments
+{
+	name='s3eBasic'
+	["Test Config"]
+		iphone
+		target-folder='iphone'
+		provider='Andrei Roman'
+}
+
 # files specifies all files to build
 files
 {
@@ -36,4 +45,12 @@ assets
 		send_button.png
 		font_bitmap.png
  
+}
+#### AUTO GENERATED deployment settings from DeployTool.exe. Do not edit below this line ####
+deployments
+{
+	["Default"]
+	["Test Config"]
+	caption='Pipe Charger'
+	iphone-ipad-only='1'
 }
