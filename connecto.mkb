@@ -2,7 +2,7 @@
 
 deployments
 {
-	name='s3eBasic'
+	name='Pipe Charger'
 	["Test Config"]
 		iphone
 		target-folder='iphone'
@@ -45,12 +45,4 @@ assets
 		send_button.png
 		font_bitmap.png
  
-}
-#### AUTO GENERATED deployment settings from DeployTool.exe. Do not edit below this line ####
-deployments
-{
-	["Default"]
-	["Test Config"]
-	caption='Pipe Charger'
-	iphone-ipad-only='1'
 }
