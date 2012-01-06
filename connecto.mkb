@@ -41,6 +41,7 @@ assets
 {
 	(data)
 		base_tiles.png
+		arrows.png
 		emoticons.png
 		send_button.png
 		font_bitmap.png
