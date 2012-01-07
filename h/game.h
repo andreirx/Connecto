@@ -32,9 +32,27 @@ public:
         time_paused = 1;
         time_elapsed = 0;
         current_charges = 0;
+        level_score = 0;
     }
     ~GameLevel()
     {
+    }
+
+    inline void SetLevelParameters(int param_time_limit,
+        int param_target_charges,
+        int param_bonus_frequency,
+        int param_worm_length,
+        int param_worm_tile_rotations)
+    {
+        time_limit = param_time_limit;
+        target_charges = param_target_charges;
+        bonus_frequency = param_bonus_frequency;
+        worm_length = param_worm_length;
+        worm_tile_rotations = param_worm_tile_rotations;
+        time_paused = 1;
+        time_elapsed = 0;
+        current_charges = 0;
+        level_score = 0;
     }
 
     inline void StartLevel()
@@ -42,6 +60,7 @@ public:
         time_paused = 0;
         time_elapsed = 0;
         current_charges = 0;
+        level_score = 0;
     }
 
     inline void PauseLevel()
@@ -77,6 +96,11 @@ public:
         current_charges += incc;
     }
 
+    inline int IncrementScore(int incs)
+    {
+        level_score += incs;
+    }
+
 private:
     int time_limit;
     int target_charges;
@@ -105,6 +129,7 @@ public:
     int internal_frame, animation_frame;
     int send_anim_frame;
 
+    GameLevel current_level;
     int level, level_score, total_score, current_score, bonus, penalty, last_sent;
 
     void get_anim_fall_y();
