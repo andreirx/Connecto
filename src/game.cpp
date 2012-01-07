@@ -307,6 +307,7 @@ CGame::CGame()
     can_bomb = 1;
     bombing = 0;
     show_arrows = 0;
+    game_state = GAMESTATE_PLAY;
     //
     lightning = new LightningManager(1024, 1024);
     matrix_text = new MatrixManager();
@@ -356,7 +357,7 @@ CGame::~CGame()
 }
 
 
-void CGame::Update(int framex)
+void CGame::Update_PLAY(int framex)
 {
     int i, j;
     unsigned int add_color = 0;
@@ -562,7 +563,7 @@ void CGame::get_anim_fall_y()
     }
 }
 
-void CGame::Render(int framex)
+void CGame::Render_PLAY(int framex)
 {
     // game render goes here
     int i, j, k, c, start_destroy, end_destroy, FPS;
@@ -868,4 +869,44 @@ void CGame::Render(int framex)
     //Iw2DFinishDrawing();
     Iw2DSurfaceShow();
     internal_frame++;
+}
+
+void CGame::Update_SPLASH(int framex)
+{
+}
+
+void CGame::Render_SPLASH(int framex)
+{
+}
+
+void CGame::Update_MAINMENU(int framex)
+{
+}
+
+void CGame::Render_MAINMENU(int framex)
+{
+}
+
+void CGame::Update_LEVELSCREEN(int framex)
+{
+}
+
+void CGame::Render_LEVELSCREEN(int framex)
+{
+}
+
+void CGame::Update_PAUSE(int framex)
+{
+}
+
+void CGame::Render_PAUSE(int framex)
+{
+}
+
+void CGame::Update_DEBRIEF(int framex)
+{
+}
+
+void CGame::Render_DEBRIEF(int framex)
+{
 }

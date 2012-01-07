@@ -99,12 +99,12 @@ public:
         return (time_elapsed > time_limit);
     }
 
-    inline int IncrementCharges(int incc)
+    inline void IncrementCharges(int incc)
     {
         current_charges += incc;
     }
 
-    inline int IncrementScore(int incs)
+    inline void IncrementScore(int incs)
     {
         level_score += incs;
     }
@@ -143,18 +143,109 @@ public:
     int level, level_score, total_score, current_score, bonus, penalty, last_sent;
 
     void get_anim_fall_y();
+
     // update will be called a fixed number of times per second 
     // regardless of visual framerate
-    void Update(int framex);
+    void Update(int framex)
+    {
+        switch (game_state)
+        {
+        case GAMESTATE_SPLASH:
+            Update_SPLASH(framex);
+            break;
+        case GAMESTATE_MAINMENU:
+            Update_MAINMENU(framex);
+            break;
+        case GAMESTATE_LEVELSCREEN:
+            Update_LEVELSCREEN(framex);
+            break;
+        case GAMESTATE_PLAY:
+            Update_PLAY(framex);
+            break;
+        case GAMESTATE_PAUSE:
+            Update_PAUSE(framex);
+            break;
+        case GAMESTATE_DEBRIEF:
+            Update_DEBRIEF(framex);
+            break;
+        default:
+            break;
+        }
+    }
+
     // render will be called as fast as possible (but not faster 
     // than the update rate)
-    void Render(int framex);
+    void Render(int framex)
+    {
+        switch (game_state)
+        {
+        case GAMESTATE_SPLASH:
+            Render_SPLASH(framex);
+            break;
+        case GAMESTATE_MAINMENU:
+            Render_MAINMENU(framex);
+            break;
+        case GAMESTATE_LEVELSCREEN:
+            Render_LEVELSCREEN(framex);
+            break;
+        case GAMESTATE_PLAY:
+            Render_PLAY(framex);
+            break;
+        case GAMESTATE_PAUSE:
+            Render_PAUSE(framex);
+            break;
+        case GAMESTATE_DEBRIEF:
+            Render_DEBRIEF(framex);
+            break;
+        default:
+            break;
+        }
+    }
 
-    void SwitchGameState(int new_game_state);
+    void SwitchGameState(int new_game_state)
+    {
+        // will only allow valid state changes
+        switch (game_state)
+        {
+        case GAMESTATE_SPLASH:
+            if (new_game_state == GAMESTATE_MAINMENU)
+                game_state = new_game_state;
+            break;
+        case GAMESTATE_MAINMENU:
+            if (new_game_state == GAMESTATE_LEVELSCREEN)
+                game_state = new_game_state;
+            break;
+        case GAMESTATE_LEVELSCREEN:
+            if (new_game_state == GAMESTATE_PLAY)
+                game_state = new_game_state;
+            break;
+        case GAMESTATE_PLAY:
+            if (new_game_state == GAMESTATE_PAUSE)
+                game_state = new_game_state;
+            if (new_game_state == GAMESTATE_DEBRIEF)
+                game_state = new_game_state;
+            break;
+        case GAMESTATE_PAUSE:
+            if (new_game_state == GAMESTATE_PLAY)
+                game_state = new_game_state;
+            if (new_game_state == GAMESTATE_MAINMENU)
+                game_state = new_game_state;
+            break;
+        case GAMESTATE_DEBRIEF:
+            if (new_game_state == GAMESTATE_LEVELSCREEN)
+                game_state = new_game_state;
+            if (new_game_state == GAMESTATE_MAINMENU)
+                game_state = new_game_state;
+            break;
+        default:
+            break;
+        }
+    }
 
 private:
     CIwFVec2 m_Position;
     CIwSVec2 m_Size;
+    int timeout;
 
     void Update_SPLASH(int framex);
     void Render_SPLASH(int framex);
