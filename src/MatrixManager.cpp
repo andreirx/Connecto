@@ -124,7 +124,7 @@ void MatrixManager::UpdateMatrix()
             {
                 matrix_chars[i][anim_point[i] - 1] = (rand() % 0xfe) + 1;
             }
-            matrix_intensity[i][anim_point[i] - 1] = MAX_INTENSITY / 2;
+            matrix_intensity[i][anim_point[i] - 1] = MAX_INTENSITY / 3;
             //
             if (anim_point[i] >= MATRIX_H)
             {

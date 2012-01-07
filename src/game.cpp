@@ -32,6 +32,7 @@ extern CIwSVec2 anim_positions[GRID_W][GRID_H];
 extern unsigned char grid_codes[16];
 extern unsigned char grid_codep[16];
 
+int FPS_last_frame = (int)s3eTimerGetMs();
 int first_pass = 0;
 int grid_shift[GRID_W][GRID_H];
 unsigned char left_set[GRID_H];
@@ -556,12 +557,22 @@ void CGame::get_anim_fall_y()
 void CGame::Render(int framex)
 {
     // game render goes here
-    int i, j, k, c, start_destroy, end_destroy;
+    int i, j, k, c, start_destroy, end_destroy, FPS;
 	int ntable_x, ntable_y;
     char strbuf[256];
 	CIwSVec2 table_pos = CIwSVec2((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() + 640) / 2);
 	CIwSVec2 scr_p, tex_p;
+    int FPS_frame = (int)s3eTimerGetMs();
 
+    if (FPS_frame != FPS_last_frame)
+    {
+        FPS = (int)(1000 / (FPS_frame - FPS_last_frame));
+    }
+    else
+    {
+        FPS = 0;
+    }
+    FPS_last_frame = FPS_frame;
     //
     ntable_x = (Iw2DGetSurfaceWidth() - 640) / 2;
     ntable_y = (Iw2DGetSurfaceHeight() - 640) / 2;
@@ -822,6 +833,8 @@ void CGame::Render(int framex)
     Iw2DSetColour(0xffffffff);
     sprintf(strbuf, "Score %d", total_score);
     bitmapStringAt(16, 32, 20, strbuf);
+    sprintf(strbuf, "FPS %d", FPS);
+    bitmapStringAt(Iw2DGetSurfaceWidth() - 160, 0, 20, strbuf);
     Iw2DSetColour(0xff60ff60);
     for (j = 0; j < GRID_H; j++)
     {

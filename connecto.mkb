@@ -2,7 +2,8 @@
 
 deployments
 {
-	name='Pipe Charger'
+	name='PipeCharger'
+	caption='PipeCharger'
 	["Test Config"]
 		iphone
 		target-folder='iphone'
