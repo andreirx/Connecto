@@ -20,8 +20,6 @@
 #include "game.h"
 #include "GameTable.h"
 
-#define FPS_AVERAGE 10
-
 extern CIw2DImage* g_tiles;
 extern CIw2DImage* g_emoticons;
 extern CIw2DImage* g_send;
@@ -34,8 +32,6 @@ extern CIwSVec2 anim_positions[GRID_W][GRID_H];
 extern unsigned char grid_codes[16];
 extern unsigned char grid_codep[16];
 
-int FPS_frames[FPS_AVERAGE];
-int FPS_last_frame = (int)s3eTimerGetMs();
 int first_pass = 0;
 int grid_shift[GRID_W][GRID_H];
 unsigned char left_set[GRID_H];
@@ -566,33 +562,11 @@ void CGame::get_anim_fall_y()
 void CGame::Render_PLAY(int framex)
 {
     // game render goes here
-    int i, j, k, c, start_destroy, end_destroy, FPS;
+    int i, j, k, c, start_destroy, end_destroy;
 	int ntable_x, ntable_y;
     char strbuf[256];
 	CIwSVec2 table_pos = CIwSVec2((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() + 640) / 2);
 	CIwSVec2 scr_p, tex_p;
-    int FPS_frame = (int)s3eTimerGetMs();
-
-    //
-    if (FPS_frame != FPS_last_frame)
-    {
-        FPS = (int)(1000 / (FPS_frame - FPS_last_frame));
-    }
-    else
-    {
-        FPS = 0;
-    }
-    FPS_last_frame = FPS_frame;
-    //
-    for (i = FPS_AVERAGE - 1; i >= 1; i--)
-    {
-        FPS_frames[i] = FPS_frames[i - 1];
-    }
-    FPS_frames[0] = FPS_frame;
-    if (FPS_frames[FPS_AVERAGE - 1] != FPS_frame)
-    {
-        FPS = (int)(((FPS_AVERAGE - 1) * 1000) / (FPS_frame - FPS_frames[FPS_AVERAGE - 1]));
-    }
     //
     ntable_x = (Iw2DGetSurfaceWidth() - 640) / 2;
     ntable_y = (Iw2DGetSurfaceHeight() - 640) / 2;
@@ -855,9 +829,6 @@ void CGame::Render_PLAY(int framex)
     Iw2DSetColour(0xffffffff);
     sprintf(strbuf, "Score %d", total_score);
     bitmapStringAt(16, 32, 20, strbuf);
-    Iw2DSetColour(0xff7040bf);
-    sprintf(strbuf, "FPS %d", FPS);
-    bitmapStringAt(Iw2DGetSurfaceWidth() - 160, 0, 20, strbuf);
     Iw2DSetColour(0xff60ff60);
     for (j = 0; j < GRID_H; j++)
     {

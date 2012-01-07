@@ -22,6 +22,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#define FPS_AVERAGE 10
+
 #define LEVEL_TIME_RESOLUTION 4096
 
 #define GAMESTATE_SPLASH      0
@@ -122,6 +124,8 @@ private:
     int level_score;
 };
 
+void bitmapStringAt(int x, int y, int padding, char *strw);
+
 class CGame
 {
 public:
@@ -177,6 +181,23 @@ public:
     // than the update rate)
     void Render(int framex)
     {
+        int i, FPS;
+        int FPS_frame = (int)s3eTimerGetMs();
+        char strbuf[256];
+        //
+        for (i = FPS_AVERAGE - 1; i >= 1; i--)
+        {
+            FPS_frames[i] = FPS_frames[i - 1];
+        }
+        FPS_frames[0] = FPS_frame;
+        if (FPS_frames[FPS_AVERAGE - 1] != FPS_frame)
+        {
+            FPS = (int)(((FPS_AVERAGE - 1) * 1000) / (FPS_frame - FPS_frames[FPS_AVERAGE - 1]));
+        }
+        else
+        {
+            FPS = 0;
+        }
         switch (game_state)
         {
         case GAMESTATE_SPLASH:
@@ -200,6 +221,9 @@ public:
         default:
             break;
         }
+        Iw2DSetColour(0xff7040bf);
+        sprintf(strbuf, "FPS %d", FPS);
+        bitmapStringAt(Iw2DGetSurfaceWidth() - 160, 0, 20, strbuf);
     }
 
     void SwitchGameState(int new_game_state)
@@ -246,6 +270,7 @@ private:
     CIwFVec2 m_Position;
     CIwSVec2 m_Size;
     int timeout;
+    int FPS_frames[FPS_AVERAGE];
 
     void Update_SPLASH(int framex);
     void Render_SPLASH(int framex);
