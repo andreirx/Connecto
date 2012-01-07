@@ -835,11 +835,6 @@ void CGame::Render_PLAY(int framex)
         sprintf(strbuf, "x%d", right_multiplier[j]);
         bitmapStringAt(32 + (Iw2DGetSurfaceWidth() + 640) / 2, 16 + (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2, 20, strbuf);
     }
-
-    // show the surface
-    //Iw2DFinishDrawing();
-    Iw2DSurfaceShow();
-    internal_frame++;
 }
 
 void CGame::Update_SPLASH(int framex)

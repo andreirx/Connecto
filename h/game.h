@@ -224,6 +224,10 @@ public:
         Iw2DSetColour(0xff7040bf);
         sprintf(strbuf, "FPS %d", FPS);
         bitmapStringAt(Iw2DGetSurfaceWidth() - 160, 0, 20, strbuf);
+        // show the surface
+        //Iw2DFinishDrawing();
+        Iw2DSurfaceShow();
+        internal_frame++;
     }
 
     void SwitchGameState(int new_game_state)
