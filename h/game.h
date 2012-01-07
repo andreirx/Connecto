@@ -24,6 +24,14 @@
 
 #define LEVEL_TIME_RESOLUTION 4096
 
+#define GAMESTATE_SPLASH      0
+#define GAMESTATE_MAINMENU    10
+#define GAMESTATE_LEVELSCREEN 20
+#define GAMESTATE_PLAY        30
+#define GAMESTATE_PAUSE       40
+#define GAMESTATE_DEBRIEF     50
+
+
 class GameLevel
 {
 public:
@@ -129,6 +137,8 @@ public:
     int internal_frame, animation_frame;
     int send_anim_frame;
 
+    int game_state;
+
     GameLevel current_level;
     int level, level_score, total_score, current_score, bonus, penalty, last_sent;
 
@@ -140,9 +150,29 @@ public:
     // than the update rate)
     void Render(int framex);
 
+    void SwitchGameState(int new_game_state);
+
 private:
     CIwFVec2 m_Position;
     CIwSVec2 m_Size;
+
+    void Update_SPLASH(int framex);
+    void Render_SPLASH(int framex);
+
+    void Update_MAINMENU(int framex);
+    void Render_MAINMENU(int framex);
+
+    void Update_LEVELSCREEN(int framex);
+    void Render_LEVELSCREEN(int framex);
+
+    void Update_PLAY(int framex);
+    void Render_PLAY(int framex);
+
+    void Update_PAUSE(int framex);
+    void Render_PAUSE(int framex);
+
+    void Update_DEBRIEF(int framex);
+    void Render_DEBRIEF(int framex);
 };
 
 #endif
