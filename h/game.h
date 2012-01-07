@@ -13,12 +13,82 @@
  * PARTICULAR PURPOSE.
  */
 
+#include "s3e.h"
+
 #include "GameTable.h"
 #include "LightningManager.h"
 #include "MatrixManager.h"
 
 #ifndef GAME_H
 #define GAME_H
+
+#define LEVEL_TIME_RESOLUTION 4096
+
+class GameLevel
+{
+public:
+    GameLevel()
+    {
+        time_paused = 1;
+        time_elapsed = 0;
+        current_charges = 0;
+    }
+    ~GameLevel()
+    {
+    }
+
+    inline void StartLevel()
+    {
+        time_paused = 0;
+        time_elapsed = 0;
+        current_charges = 0;
+    }
+
+    inline void PauseLevel()
+    {
+        time_paused = 1;
+    }
+
+    inline void ResumeLevel()
+    {
+        time_paused = 0;
+    }
+
+    inline void IncrementTime(int inct)
+    {
+        if (!time_paused)
+        {
+            time_elapsed += inct;
+        }
+    }
+
+    inline int GetRelativeLevelTime()
+    {
+        return (int)((LEVEL_TIME_RESOLUTION * time_elapsed) / time_limit);
+    }
+
+    inline int GameOver()
+    {
+        return (time_elapsed > time_limit);
+    }
+
+    inline int IncrementCharges(int incc)
+    {
+        current_charges += incc;
+    }
+
+private:
+    int time_limit;
+    int target_charges;
+    int bonus_frequency;
+    int worm_length;
+    int worm_tile_rotations;
+
+    int time_elapsed;
+    int time_paused;
+    int current_charges;
+    int level_score;
+};
 
 class CGame
 {
