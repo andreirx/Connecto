@@ -98,7 +98,10 @@ private:
     int missing_links;
     int still_animating;
     int fall_finished;
+
     int trigger_anim;
+    int trigger_circle;
+    int tc_x, tc_y;
 
     int new_elements;
     int missing_link_elements;

@@ -2,10 +2,17 @@
 #include <stdlib.h>
 #include "GameTable.h"
 #include "s3e.h"
+#include "Iw2D.h"
+#include "IwGx.h"
 
 int grid_anim_frame[10] =
 {
     1, 1, 2, 2, 3, 3, 2, 2, 1, 1,
+};
+
+int grid_square_dist[16] =
+{
+    0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225,
 };
 
 int get_grid_anim_frame(int i)
@@ -16,6 +23,15 @@ int get_grid_anim_frame(int i)
         return 0;
 }
 
+int get_grid_anim_frame2(int i)
+{
+    if ((i >= 0) && (i < 5))
+        return grid_anim_frame[i * 2];
+    else
+        return 0;
+}
+
+
 GameTable::GameTable(void)
 {
     new_elements = 0;
@@ -23,6 +39,7 @@ GameTable::GameTable(void)
     can_send_connections = 0;
     fall_finished = 0;
     trigger_anim = -1;
+    trigger_circle = -1;
 }
 
 GameTable::~GameTable(void)
@@ -39,6 +56,7 @@ void GameTable::reset_table(int percent_missing_links)
     can_send_connections = 0;
     fall_finished = 0;
     trigger_anim = -1;
+    trigger_circle = -1;
     still_animating = ANIM_FALL;
     for (i = 0; i < GRID_W; i++)
         for (j = 0; j < GRID_H; j++)
@@ -89,6 +107,9 @@ unsigned char GameTable::get_new_element()
 void GameTable::click_element(int x, int y)
 {
     grid_connectors[x][y] = grid_element_rotate(grid_connectors[x][y]);
+    trigger_circle = 0;
+    tc_x = x;
+    tc_y = y;
 }
 
 // public function which deletes the connected paths, and inserts new elements
@@ -194,7 +215,8 @@ void GameTable::update_anims()
 
 void GameTable::update_color_shifts()
 {
-    int i, j;
+    int i, j, k;
+    CIwSVec2 temp;
     //
     if (fall_finished)
     {
@@ -206,13 +228,35 @@ void GameTable::update_color_shifts()
         for (i = 0; i < GRID_W; i++)
             for (j = 0; j < GRID_H; j++)
             {
-                grid_color_shift[i][j] = get_grid_anim_frame(10 + i + j - trigger_anim);
+                grid_color_shift[i][j] = get_grid_anim_frame(15 + i + j - trigger_anim);
             }
             trigger_anim++;
     }
-    else
+    if (trigger_anim >= 40)
     {
         trigger_anim = -1;
+        for (i = 0; i < GRID_W; i++)
+            for (j = 0; j < GRID_H; j++)
+                grid_color_shift[i][j] = 0;
+    }
+    if ((trigger_circle < 40) && (trigger_circle >= 0))
+    {
+        trigger_anim = -1;
+        for (i = 0; i < GRID_W; i++)
+            for (j = 0; j < GRID_H; j++)
+            {
+                // square of the distance to the center
+                //k = (i - tc_x) * (i - tc_x) + (j - tc_y) * (j - tc_y);
+                temp.x = (i - tc_x) << 12;
+                temp.y = (j - tc_y) << 12;
+                k = (temp.GetLength()) >> 12;
+                grid_color_shift[i][j] = get_grid_anim_frame2(k - trigger_circle + 10);
+            }
+            trigger_circle++;
+    }
+    if (trigger_circle >= 40)
+    {
+        trigger_circle = -1;
         for (i = 0; i < GRID_W; i++)
             for (j = 0; j < GRID_H; j++)
                 grid_color_shift[i][j] = 0;
