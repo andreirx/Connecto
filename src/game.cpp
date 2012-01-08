@@ -453,11 +453,11 @@ void CGame::Update_PLAY(int framex)
                 add_color = 0;
                 if (game_table->get_grid_state(i, j) == CONNECT_LEFT)
                 {
-                    add_color = 0xffff5f00;
+                    add_color = 0xffff9955;
                 }
                 if (game_table->get_grid_state(i, j) == CONNECT_RIGHT)
                 {
-                    add_color = 0xff5f00ff;
+                    add_color = 0xffaa44ff;
                 }
                 if (game_table->get_grid_state(i, j) == CONNECT_OK)
                 {
