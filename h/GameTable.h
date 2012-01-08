@@ -45,6 +45,12 @@ public:
         return grid_state[x][y];
     }
 
+    inline unsigned char get_grid_color_shift(int x, int y)
+    {
+        // WARNING: no limit checking
+        return grid_color_shift[x][y];
+    }
+
     // public function for initializing the table
     void reset_table(int percent_missing_links);
     // public function for updating the table connections state ("markers")
@@ -64,10 +70,17 @@ public:
         // returns ANIM_NONE, ANIM_DESTROY, or ANIM_FALL
         return still_animating;
     }
+    int fall_anim_finished()
+    {
+        int rVal = fall_finished;
+        fall_finished = 0;
+        return rVal;
+    }
     // public function which deletes tiles around x, y and inserts new elements
     void bomb_table(int x, int y);
     // public function which updates animations
     void update_anims();
+    void update_color_shifts();
 
     // bit 0: right, bit 1: up, bit 2: left, bit 3: down
     //unsigned char grid_codes[16];// = {0, 5, 10, 12, 6, 3, 9, 7, 11, 13, 14, 15, 1, 8, 4, 2};
@@ -79,10 +92,13 @@ private:
     unsigned char grid_connectors[GRID_W][GRID_H];
     unsigned char grid_clickable[GRID_W][GRID_H];
     unsigned char grid_state[GRID_W][GRID_H];
+    unsigned char grid_color_shift[GRID_W][GRID_H];
 
     int can_send_connections;
     int missing_links;
     int still_animating;
+    int fall_finished;
+    int trigger_anim;
 
     int new_elements;
     int missing_link_elements;

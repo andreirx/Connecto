@@ -694,11 +694,12 @@ void CGame::Render_PLAY(int framex)
             for (i = 0; i < GRID_W; i++)
 			{
 				tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
-				tex_p.y = CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
+				tex_p.y = (CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
                 Iw2DDrawImageRegion(g_tiles, grid_positions[i][j],
                     tex_p,
                     dimension64);
 			}
+        game_table->update_color_shifts();
     }
     Iw2DFinishDrawing();
     IwGxSetScissorScreenSpace(0, 0, Iw2DGetSurfaceWidth(), Iw2DGetSurfaceHeight());

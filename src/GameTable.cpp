@@ -3,11 +3,26 @@
 #include "GameTable.h"
 #include "s3e.h"
 
+int grid_anim_frame[10] =
+{
+    1, 1, 2, 2, 3, 3, 2, 2, 1, 1,
+};
+
+int get_grid_anim_frame(int i)
+{
+    if ((i >= 0) && (i < 10))
+        return grid_anim_frame[i];
+    else
+        return 0;
+}
+
 GameTable::GameTable(void)
 {
     new_elements = 0;
     missing_link_elements = 0;
     can_send_connections = 0;
+    fall_finished = 0;
+    trigger_anim = -1;
 }
 
 GameTable::~GameTable(void)
@@ -22,6 +37,8 @@ void GameTable::reset_table(int percent_missing_links)
     new_elements = 0;
     missing_link_elements = 0;
     can_send_connections = 0;
+    fall_finished = 0;
+    trigger_anim = -1;
     still_animating = ANIM_FALL;
     for (i = 0; i < GRID_W; i++)
         for (j = 0; j < GRID_H; j++)
@@ -31,13 +48,14 @@ void GameTable::reset_table(int percent_missing_links)
             grid_clickable[i][j] = 1;
             grid_anim_frame[i][j] = FRAMES_FALL;
             grid_anim_type[i][j] = ANIM_FALL;
+            grid_color_shift[i][j] = 0;
         }
 }
 
 // public function for returning new elements on a column
 void GameTable::new_column(int x)
 {
-    int k;
+    int k, i, j;
     for (k = 0; k < GRID_H; k++)
     {
         grid_connectors[x][k] = get_new_element();
@@ -45,6 +63,9 @@ void GameTable::new_column(int x)
         grid_anim_frame[x][k] = FRAMES_DESTROY;
         grid_anim_type[x][k] = ANIM_DESTROY;
     }
+    for (i = 0; i < GRID_W; i++)
+        for (j = 0; j < GRID_H; j++)
+            grid_color_shift[i][j] = 0;
     still_animating = ANIM_DESTROY;
 }
 
@@ -100,6 +121,7 @@ int GameTable::send_connections()
                 grid_state[i][0] = CONNECT_NONE;
                 still_animating = ANIM_DESTROY;
             }
+            grid_color_shift[i][j] = 0;
         }
     }
     return rVal;
@@ -129,6 +151,9 @@ void GameTable::bomb_table(int x, int y)
                 still_animating = ANIM_DESTROY;
             }
         }
+    for (i = 0; i < GRID_W; i++)
+        for (j = 0; j < GRID_H; j++)
+            grid_color_shift[i][j] = 0;
 }
 
 // public function which updates animations
@@ -160,7 +185,38 @@ void GameTable::update_anims()
                     grid_anim_type[i][j] = ANIM_NONE;
             }
         }
+    if ((still_animating == ANIM_FALL) && (anim == ANIM_NONE))
+    {
+        fall_finished = 1;
+    }
     still_animating = anim;
+}
+
+void GameTable::update_color_shifts()
+{
+    int i, j;
+    //
+    if (fall_finished)
+    {
+        trigger_anim = 0;
+        fall_finished = 0;
+    }
+    if ((trigger_anim < 40) && (trigger_anim >= 0))
+    {
+        for (i = 0; i < GRID_W; i++)
+            for (j = 0; j < GRID_H; j++)
+            {
+                grid_color_shift[i][j] = get_grid_anim_frame(10 + i + j - trigger_anim);
+            }
+            trigger_anim++;
+    }
+    else
+    {
+        trigger_anim = -1;
+        for (i = 0; i < GRID_W; i++)
+            for (j = 0; j < GRID_H; j++)
+                grid_color_shift[i][j] = 0;
+    }
 }
 
 unsigned char GameTable::grid_element_rotate(unsigned char grid_code)
