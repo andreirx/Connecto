@@ -29,6 +29,7 @@ CIw2DImage* g_emoticons;
 CIw2DImage* g_send;
 CIw2DImage* g_arrows;
 CIw2DImage* g_font;
+CIw2DImage* g_menus;
 
 CIwSVec2 grid_positions[GRID_W][GRID_H];
 CIwSVec2 alt_positions[GRID_W][GRID_H];
@@ -54,6 +55,7 @@ int main()
     g_send = Iw2DCreateImage("send_button.png");
     g_arrows = Iw2DCreateImage("arrows.png");
     g_font = Iw2DCreateImage("font_bitmap.png");
+    g_menus = Iw2DCreateImage("menus.png");
 
     // create game object
     CGame* pGame = new CGame;

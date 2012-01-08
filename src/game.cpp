@@ -25,6 +25,7 @@ extern CIw2DImage* g_emoticons;
 extern CIw2DImage* g_send;
 extern CIw2DImage* g_arrows;
 extern CIw2DImage* g_font;
+extern CIw2DImage* g_menus;
 
 extern CIwSVec2 grid_positions[GRID_W][GRID_H];
 extern CIwSVec2 alt_positions[GRID_W][GRID_H];
@@ -190,6 +191,7 @@ void update_worm()
 CIwSVec2 dimension32 = CIwSVec2(32, 32);
 CIwSVec2 dimension64 = CIwSVec2(64, 64);
 CIwSVec2 dimension128 = CIwSVec2(128, 128);
+CIwSVec2 dimension512 = CIwSVec2(512, 512);
 CIwSVec2 zerozero = CIwSVec2(0, 0);
 
 void draw_worm(int x, int y)
@@ -303,7 +305,7 @@ CGame::CGame()
     can_bomb = 1;
     bombing = 0;
     show_arrows = 0;
-    game_state = GAMESTATE_PLAY;
+    game_state = GAMESTATE_SPLASH;
     //
     lightning = new LightningManager(1024, 1024);
     matrix_text = new MatrixManager();
@@ -839,30 +841,109 @@ void CGame::Render_PLAY(int framex)
 
 void CGame::Update_SPLASH(int framex)
 {
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    {
+        SwitchGameState(GAMESTATE_MAINMENU);
+    }
 }
 
 void CGame::Render_SPLASH(int framex)
 {
+    CIwSVec2 scr_p, tex_p;
+    //
+    Iw2DSurfaceClear(0xff000000);
+    //
+    // draw and update matrix text effect
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    matrix_text->UpdateMatrix();
+    matrix_text->DrawMatrix();
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
+    Iw2DSetColour(0xffffffff);
+    scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
+    scr_p.y = (Iw2DGetSurfaceHeight() - 512) / 2;
+    tex_p.x = 0;
+    tex_p.y = 0;
+    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    Iw2DDrawImageRegion(g_menus,
+        scr_p,
+        tex_p,
+        dimension512);
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 }
 
 void CGame::Update_MAINMENU(int framex)
 {
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    {
+        SwitchGameState(GAMESTATE_LEVELSCREEN);
+    }
 }
 
 void CGame::Render_MAINMENU(int framex)
 {
+    CIwSVec2 scr_p, tex_p;
+    //
+    Iw2DSurfaceClear(0xff000000);
+    //
+    // draw and update matrix text effect
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    matrix_text->UpdateMatrix();
+    matrix_text->DrawMatrix();
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
+    Iw2DSetColour(0xffffffff);
+    scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
+    scr_p.y = (Iw2DGetSurfaceHeight() - 512) / 2;
+    tex_p.x = 512;
+    tex_p.y = 0;
+    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    Iw2DDrawImageRegion(g_menus,
+        scr_p,
+        tex_p,
+        dimension512);
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 }
 
 void CGame::Update_LEVELSCREEN(int framex)
 {
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    {
+        SwitchGameState(GAMESTATE_PLAY);
+    }
 }
 
 void CGame::Render_LEVELSCREEN(int framex)
 {
+    CIwSVec2 scr_p, tex_p;
+    //
+    Iw2DSurfaceClear(0xff000000);
+    //
+    // draw and update matrix text effect
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    matrix_text->UpdateMatrix();
+    matrix_text->DrawMatrix();
+    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
+    Iw2DSetColour(0xffffffff);
+    scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
+    scr_p.y = (Iw2DGetSurfaceHeight() - 512) / 2;
+    tex_p.x = 0;
+    tex_p.y = 512;
+    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    Iw2DDrawImageRegion(g_menus,
+        scr_p,
+        tex_p,
+        dimension512);
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 }
 
 void CGame::Update_PAUSE(int framex)
 {
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    {
+        SwitchGameState(GAMESTATE_PLAY);
+    }
 }
 
 void CGame::Render_PAUSE(int framex)
