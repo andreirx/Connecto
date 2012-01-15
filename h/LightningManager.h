@@ -37,6 +37,13 @@
 #define DEFAULT_COLOR    0xffffffff
 #define MAX_BRANCHES     1024
 
+#define SPARKLE_SPACE_W  1024
+#define SPARKLE_SPACE_H  1024
+#define SPARKLE_SHIFT    8
+#define MAX_SPARKLES     0x01000
+#define SPARKLES_MASK    0x00fff
+#define SPARKLE_GRAVITY  (0x0a)
+
 
 class LightningBranch
 {
@@ -61,6 +68,26 @@ private:
 
     void make_branch(int start_index, int end_index, int *positions_x, int *positions_y);
 };
+
+
+class Sparkle
+{
+public:
+    Sparkle(void);
+    ~Sparkle(void);
+
+    void Enable_SetXYC(int px, int py, int vx, int vy, unsigned int scolor);
+    void UpdateSparkle();
+    void DrawSparkle();
+
+private:
+    int enabled;
+    unsigned int sparkle_color;
+    int ss_x, ss_y;
+    int os_x, os_y;
+    int vel_x, vel_y;
+};
+
 
 class LightningManager
 {

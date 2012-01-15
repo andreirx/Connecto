@@ -158,6 +158,80 @@ void LightningBranch::make_branch(int start_index, int end_index, int *positions
 }
 
 
+Sparkle::Sparkle(void)
+{
+    enabled = 0;
+}
+
+Sparkle::~Sparkle(void)
+{
+    enabled = 0;
+}
+
+void Sparkle::Enable_SetXY(int px, int py, int vx, int vy, unsigned int scolor)
+{
+    int is_x = (Iw2DGetSurfaceWidth() - SPARKLE_SPACE_W) / 2;
+    int is_y = (Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) / 2;
+    //
+    enabled = 1;
+    ss_x = (px + is_x) << SPARKLE_SHIFT;
+    ss_y = (py + is_y) << SPARKLE_SHIFT;
+    os_x = ss_x;
+    os_y = ss_y;
+    vel_x = vx;
+    vel_y = vy;
+    sparkle_color = scolor;
+}
+
+inline void Sparkle::UpdateSparkle()
+{
+    if (enabled)
+    {
+        vel_y = vel_y + SPARKLE_GRAVITY;
+        os_x = ss_x;
+        ss_x = ss_x + vel_x;
+        os_y = ss_y;
+        ss_y = ss_y + vel_y;
+        // check left - right - bottom boundaries
+        if ((ss_x < 0) || (ss_x > (SPARKLE_SPACE_W << SPARKLE_SHIFT)) || (ss_y > (SPARKLE_SPACE_H << SPARKLE_SHIFT)))
+            enabled = 0;
+    }
+}
+
+extern CIw2DImage* g_arrows;
+CIwSVec2 dim16 = CIwSVec2(16, 16);
+CIwSVec2 dim32 = CIwSVec2(32, 32);
+CIwSVec2 dim64 = CIwSVec2(64, 64);
+CIwSVec2 sparkles16[12] = {
+    CIwSVec2(0, 448),
+    CIwSVec2(16, 448),
+    CIwSVec2(32, 448),
+    CIwSVec2(48, 448),
+    CIwSVec2(0, 464),
+    CIwSVec2(16, 464),
+    CIwSVec2(32, 464),
+    CIwSVec2(48, 464),
+    CIwSVec2(0, 480),
+    CIwSVec2(16, 480),
+    CIwSVec2(32, 480),
+    CIwSVec2(48, 480),
+};
+
+inline void Sparkle::DrawSparkle()
+{
+    CIwSVec2 scr_p;
+    if (enabled && (sparkle_color < 12))
+    {
+        scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 8;
+        scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 8;
+        Iw2DDrawImageRegion(g_arrows,
+            scr_p,
+            sparkles16[sparkle_color],
+            dim16);
+    }
+}
+
+
 LightningManager::LightningManager(int sW, int sH)
 {
     CIw2DSurface *oldSurface = Iw2DGetSurface();
