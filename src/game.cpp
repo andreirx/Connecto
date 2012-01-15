@@ -409,11 +409,12 @@ void CGame::Update_PLAY(int framex)
                 bonus = 0;
                 for (j = 0; j < GRID_H; j++)
                 {
-                    if (game_table->get_grid_connector(GRID_W - 1, j) & CB_RIGHT != 0)
+                    if ((game_table->get_grid_connector(GRID_W - 1, j) & CB_RIGHT != 0) &&
+                        (game_table->get_grid_state(GRID_W - 1, j) == CONNECT_OK))
                     {
                         bonus += right_multiplier[j];
                         right_multiplier[j]++;
-                        for (k = 0; k < 40; k++)
+                        for (k = 0; k < 10 * right_multiplier[j]; k++)
                             lightning->AddSparkle_SetXYCS(grid_positions[GRID_W - 1][j].x + 64, grid_positions[GRID_W - 1][j].y + 64,
                             (rand() % 3840) - 2560, (rand() % 3840) - 2560,
                             (rand() % 12),
