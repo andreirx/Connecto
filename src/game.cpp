@@ -820,7 +820,9 @@ void CGame::Render_PLAY(int framex)
 		}
 	}
     // add some particles and draw
-    lightning->AddSparkle_SetXYC(Iw2DGetSurfaceWidth() / 2, Iw2DGetSurfaceHeight() / 2, (rand() % 2560) - 1280, (rand() % 2560) - 1280, (rand() % 12));
+    lightning->AddSparkle_SetXYC(Iw2DGetSurfaceWidth() / 2, Iw2DGetSurfaceHeight() / 2,
+        (rand() % 2560) - 1280, (rand() % 2560) - 1280,
+        (rand() % 12));
     lightning->UpdateAllSparkles();
     lightning->DrawSparkles();
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);

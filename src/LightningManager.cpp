@@ -212,6 +212,7 @@ extern CIw2DImage* g_arrows;
 CIwSVec2 dim16 = CIwSVec2(16, 16);
 CIwSVec2 dim32 = CIwSVec2(32, 32);
 CIwSVec2 dim64 = CIwSVec2(64, 64);
+/*
 CIwSVec2 sparkles16[12] = {
     CIwSVec2(0, 448),
     CIwSVec2(16, 448),
@@ -226,6 +227,21 @@ CIwSVec2 sparkles16[12] = {
     CIwSVec2(32, 480),
     CIwSVec2(48, 480),
 };
+*/
+CIwSVec2 sparkles16[12] = {
+    CIwSVec2(256, 128),
+    CIwSVec2(320, 128),
+    CIwSVec2(384, 128),
+    CIwSVec2(448, 128),
+    CIwSVec2(256, 192),
+    CIwSVec2(320, 192),
+    CIwSVec2(384, 192),
+    CIwSVec2(448, 192),
+    CIwSVec2(256, 256),
+    CIwSVec2(320, 256),
+    CIwSVec2(384, 256),
+    CIwSVec2(448, 256),
+};
 
 inline void Sparkle::DrawSparkle()
 {
@@ -237,7 +253,7 @@ inline void Sparkle::DrawSparkle()
         Iw2DDrawImageRegion(g_arrows,
             scr_p,
             sparkles16[sparkle_color],
-            dim16);
+            dim64);
     }
 }
 
@@ -316,7 +332,7 @@ void LightningManager::DrawLightning()
 void LightningManager::AddSparkle_SetXYC(int px, int py, int vx, int vy, unsigned int scolor)
 {
     int internal_counter = 0;
-    while (sparkles[sparkle_counter].enabled == 0)
+    while (sparkles[sparkle_counter].enabled == 1)
     {
         sparkle_counter = (sparkle_counter + 1) % MAX_SPARKLES;
         internal_counter++;
