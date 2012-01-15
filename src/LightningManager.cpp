@@ -168,7 +168,7 @@ Sparkle::~Sparkle(void)
     enabled = 0;
 }
 
-void Sparkle::Enable_SetXYC(int px, int py, int vx, int vy, unsigned int scolor)
+void Sparkle::Enable_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size)
 {
     int is_x = (Iw2DGetSurfaceWidth() - SPARKLE_SPACE_W) / 2;
     int is_y = (Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) / 2;
@@ -181,6 +181,7 @@ void Sparkle::Enable_SetXYC(int px, int py, int vx, int vy, unsigned int scolor)
     vel_x = vx;
     vel_y = vy;
     sparkle_color = scolor;
+    sparkle_size = size;
 }
 
 inline void Sparkle::UpdateSparkle()
@@ -190,13 +191,13 @@ inline void Sparkle::UpdateSparkle()
         // add gravity effect
         vel_y = vel_y + SPARKLE_GRAVITY;
         // simulate terminal velocity
-        if (vel_y > (10 << SPARKLE_SHIFT))
-            vel_y = (10 << SPARKLE_SHIFT);
+        if (vel_y > (20 << SPARKLE_SHIFT))
+            vel_y = (20 << SPARKLE_SHIFT);
         // simulate air friction
         if (vel_x < 0)
-            vel_x++;
+            vel_x += 16;
         if (vel_x > 0)
-            vel_x--;
+            vel_x -= 16;
         // update position by velocity values, keep old position
         os_x = ss_x;
         ss_x = ss_x + vel_x;
@@ -212,7 +213,7 @@ extern CIw2DImage* g_arrows;
 CIwSVec2 dim16 = CIwSVec2(16, 16);
 CIwSVec2 dim32 = CIwSVec2(32, 32);
 CIwSVec2 dim64 = CIwSVec2(64, 64);
-/*
+
 CIwSVec2 sparkles16[12] = {
     CIwSVec2(0, 448),
     CIwSVec2(16, 448),
@@ -227,8 +228,21 @@ CIwSVec2 sparkles16[12] = {
     CIwSVec2(32, 480),
     CIwSVec2(48, 480),
 };
-*/
-CIwSVec2 sparkles16[12] = {
+CIwSVec2 sparkles32[12] = {
+    CIwSVec2(0, 320),
+    CIwSVec2(32, 320),
+    CIwSVec2(64, 320),
+    CIwSVec2(96, 320),
+    CIwSVec2(0, 352),
+    CIwSVec2(32, 352),
+    CIwSVec2(64, 352),
+    CIwSVec2(96, 352),
+    CIwSVec2(0, 384),
+    CIwSVec2(32, 384),
+    CIwSVec2(64, 384),
+    CIwSVec2(96, 384),
+};
+CIwSVec2 sparkles64[12] = {
     CIwSVec2(256, 128),
     CIwSVec2(320, 128),
     CIwSVec2(384, 128),
@@ -248,12 +262,33 @@ inline void Sparkle::DrawSparkle()
     CIwSVec2 scr_p;
     if (enabled && (sparkle_color < 12))
     {
-        scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 8;
-        scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 8;
-        Iw2DDrawImageRegion(g_arrows,
-            scr_p,
-            sparkles16[sparkle_color],
-            dim64);
+        switch (sparkle_size)
+        {
+        case 1:
+            scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 8;
+            scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 8;
+            Iw2DDrawImageRegion(g_arrows,
+                scr_p,
+                sparkles16[sparkle_color],
+                dim16);
+            break;
+        case 2:
+            scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 16;
+            scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 16;
+            Iw2DDrawImageRegion(g_arrows,
+                scr_p,
+                sparkles32[sparkle_color],
+                dim32);
+            break;
+        case 3:
+            scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 32;
+            scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 32;
+            Iw2DDrawImageRegion(g_arrows,
+                scr_p,
+                sparkles64[sparkle_color],
+                dim64);
+            break;
+        }
     }
 }
 
@@ -329,7 +364,7 @@ void LightningManager::DrawLightning()
     //Iw2DSetSurface(oldSurface);
 }
 
-void LightningManager::AddSparkle_SetXYC(int px, int py, int vx, int vy, unsigned int scolor)
+void LightningManager::AddSparkle_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size)
 {
     int internal_counter = 0;
     while (sparkles[sparkle_counter].enabled == 1)
@@ -340,7 +375,7 @@ void LightningManager::AddSparkle_SetXYC(int px, int py, int vx, int vy, unsigne
         if (internal_counter > MAX_SPARKLES)
             return;
     }
-    sparkles[sparkle_counter].Enable_SetXYC(px, py, vx, vy, scolor);
+    sparkles[sparkle_counter].Enable_SetXYCS(px, py, vx, vy, scolor, size);
 }
 
 void LightningManager::UpdateAllSparkles()

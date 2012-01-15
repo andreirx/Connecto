@@ -42,7 +42,7 @@
 #define SPARKLE_SHIFT    8
 #define MAX_SPARKLES     0x01000
 #define SPARKLES_MASK    0x00fff
-#define SPARKLE_GRAVITY  (0x0a)
+#define SPARKLE_GRAVITY  (0x40)
 
 
 class LightningBranch
@@ -78,12 +78,13 @@ public:
     Sparkle(void);
     ~Sparkle(void);
 
-    void Enable_SetXYC(int px, int py, int vx, int vy, unsigned int scolor);
+    void Enable_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size);
     void UpdateSparkle();
     void DrawSparkle();
 
 private:
     unsigned int sparkle_color;
+    int sparkle_size;
     int ss_x, ss_y;
     int os_x, os_y;
     int vel_x, vel_y;
@@ -105,7 +106,7 @@ public:
     void UpdateAllBranches(int update_much);
     void DrawLightning();
 
-    void AddSparkle_SetXYC(int px, int py, int vx, int vy, unsigned int scolor);
+    void AddSparkle_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size);
     void UpdateAllSparkles();
     void DrawSparkles();
 

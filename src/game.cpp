@@ -405,7 +405,7 @@ void CGame::Update_PLAY(int framex)
                 (s3ePointerGetY() >= Iw2DGetSurfaceHeight() - 118) &&
                 (s3ePointerGetY() <= Iw2DGetSurfaceHeight() - 10))
             {
-                int j;
+                int i, j, k;
                 bonus = 0;
                 for (j = 0; j < GRID_H; j++)
                 {
@@ -413,8 +413,18 @@ void CGame::Update_PLAY(int framex)
                     {
                         bonus += right_multiplier[j];
                         right_multiplier[j]++;
+                        for (k = 0; k < 40; k++)
+                            lightning->AddSparkle_SetXYCS(grid_positions[GRID_W - 1][j].x + 64, grid_positions[GRID_W - 1][j].y + 64,
+                            (rand() % 3840) - 2560, (rand() % 3840) - 2560,
+                            (rand() % 12),
+                            (rand() % 3) + 1);
                     }
                 }
+                /*
+                for (j = 0; j < GRID_H; j++)
+                    for (i = 0; i < GRID_W; i++)
+                        if (game_table->get_grid_state(i, j) == CONNECT_OK)
+                            */
                 current_score = game_table->send_connections();
                 total_score += (current_score & 0x00ffff) * bonus;
                 last_sent = ((current_score & 0xff0000) >> 16);
@@ -820,9 +830,11 @@ void CGame::Render_PLAY(int framex)
 		}
 	}
     // add some particles and draw
+    /*
     lightning->AddSparkle_SetXYC(Iw2DGetSurfaceWidth() / 2, Iw2DGetSurfaceHeight() / 2,
-        (rand() % 2560) - 1280, (rand() % 2560) - 1280,
+        (rand() % 5120) - 2560, (rand() % 5120) - 2560,
         (rand() % 12));
+    */
     lightning->UpdateAllSparkles();
     lightning->DrawSparkles();
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
