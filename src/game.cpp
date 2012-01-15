@@ -414,7 +414,7 @@ void CGame::Update_PLAY(int framex)
                     {
                         bonus += right_multiplier[j];
                         right_multiplier[j]++;
-                        for (k = 0; k < 10 * right_multiplier[j]; k++)
+                        for (k = 0; k < 5 * right_multiplier[j]; k++)
                             lightning->AddSparkle_SetXYCS(grid_positions[GRID_W - 1][j].x + 64, grid_positions[GRID_W - 1][j].y + 64,
                             (rand() % 3840) - 2560, (rand() % 3840) - 2560,
                             (rand() % 12),

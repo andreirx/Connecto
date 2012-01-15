@@ -190,14 +190,15 @@ inline void Sparkle::UpdateSparkle()
     {
         // add gravity effect
         vel_y = vel_y + SPARKLE_GRAVITY;
-        // simulate terminal velocity
-        if (vel_y > (20 << SPARKLE_SHIFT))
-            vel_y = (20 << SPARKLE_SHIFT);
         // simulate air friction
         if (vel_x < 0)
             vel_x += 16;
         if (vel_x > 0)
             vel_x -= 16;
+        if (vel_y < 0)
+            vel_y += 16;
+        if (vel_y > 0)
+            vel_y -= 16;
         // update position by velocity values, keep old position
         os_x = ss_x;
         ss_x = ss_x + vel_x;

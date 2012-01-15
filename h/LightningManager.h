@@ -42,7 +42,7 @@
 #define SPARKLE_SHIFT    8
 #define MAX_SPARKLES     0x01000
 #define SPARKLES_MASK    0x00fff
-#define SPARKLE_GRAVITY  (0x40)
+#define SPARKLE_GRAVITY  (0x60)
 
 
 class LightningBranch
