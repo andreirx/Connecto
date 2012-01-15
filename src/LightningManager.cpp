@@ -168,7 +168,7 @@ Sparkle::~Sparkle(void)
     enabled = 0;
 }
 
-void Sparkle::Enable_SetXY(int px, int py, int vx, int vy, unsigned int scolor)
+void Sparkle::Enable_SetXYC(int px, int py, int vx, int vy, unsigned int scolor)
 {
     int is_x = (Iw2DGetSurfaceWidth() - SPARKLE_SPACE_W) / 2;
     int is_y = (Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) / 2;
