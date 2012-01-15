@@ -819,6 +819,10 @@ void CGame::Render_PLAY(int framex)
             Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
 		}
 	}
+    // add some particles and draw
+    lightning->AddSparkle_SetXYC(Iw2DGetSurfaceWidth() / 2, Iw2DGetSurfaceHeight() / 2, (rand() % 2560) - 1280, (rand() % 2560) - 1280, (rand() % 12));
+    lightning->UpdateAllSparkles();
+    lightning->DrawSparkles();
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 
     // draw the top bar

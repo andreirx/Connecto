@@ -73,6 +73,8 @@ private:
 class Sparkle
 {
 public:
+    int enabled;
+
     Sparkle(void);
     ~Sparkle(void);
 
@@ -81,7 +83,6 @@ public:
     void DrawSparkle();
 
 private:
-    int enabled;
     unsigned int sparkle_color;
     int ss_x, ss_y;
     int os_x, os_y;
@@ -104,10 +105,16 @@ public:
     void UpdateAllBranches(int update_much);
     void DrawLightning();
 
+    void AddSparkle_SetXYC(int px, int py, int vx, int vy, unsigned int scolor);
+    void UpdateAllSparkles();
+    void DrawSparkles();
+
 private:
     // lightning branches
     LightningBranch lightning_branches[MAX_BRANCHES];
     int total_branches;
+    Sparkle sparkles[MAX_SPARKLES];
+    int sparkle_counter;
 };
 
 #endif

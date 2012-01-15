@@ -187,7 +187,17 @@ inline void Sparkle::UpdateSparkle()
 {
     if (enabled)
     {
+        // add gravity effect
         vel_y = vel_y + SPARKLE_GRAVITY;
+        // simulate terminal velocity
+        if (vel_y > (10 << SPARKLE_SHIFT))
+            vel_y = (10 << SPARKLE_SHIFT);
+        // simulate air friction
+        if (vel_x < 0)
+            vel_x++;
+        if (vel_x > 0)
+            vel_x--;
+        // update position by velocity values, keep old position
         os_x = ss_x;
         ss_x = ss_x + vel_x;
         os_y = ss_y;
@@ -245,6 +255,7 @@ LightningManager::LightningManager(int sW, int sH)
     Iw2DGetSurfaceInfo(dsInfo);
     Iw2DSetSurface(oldSurface);
     total_branches = 0;
+    sparkle_counter = 0;
     //
     srand((unsigned int)s3eTimerGetUTC());
 }
@@ -300,4 +311,32 @@ void LightningManager::DrawLightning()
     //
     //Iw2DFinishDrawing();
     //Iw2DSetSurface(oldSurface);
+}
+
+void LightningManager::AddSparkle_SetXYC(int px, int py, int vx, int vy, unsigned int scolor)
+{
+    int internal_counter = 0;
+    while (sparkles[sparkle_counter].enabled == 0)
+    {
+        sparkle_counter = (sparkle_counter + 1) % MAX_SPARKLES;
+        internal_counter++;
+        // if all sparkles are already enabled, do nothing
+        if (internal_counter > MAX_SPARKLES)
+            return;
+    }
+    sparkles[sparkle_counter].Enable_SetXYC(px, py, vx, vy, scolor);
+}
+
+void LightningManager::UpdateAllSparkles()
+{
+    int i;
+    for (i = 0; i < MAX_SPARKLES; i++)
+        sparkles[i].UpdateSparkle();
+}
+
+void LightningManager::DrawSparkles()
+{
+    int i;
+    for (i = 0; i < MAX_SPARKLES; i++)
+        sparkles[i].DrawSparkle();
 }
