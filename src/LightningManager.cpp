@@ -4,6 +4,8 @@
 #include "GameTable.h"
 #include "s3e.h"
 #include "Iw2D.h"
+#include "IwGx.h"
+#include "IwGeom.h"
 #include "LightningManager.h"
 
 
@@ -257,7 +259,7 @@ CIwSVec2 sparkles64[12] = {
     CIwSVec2(384, 256),
     CIwSVec2(448, 256),
 };
-
+/*
 inline void Sparkle::DrawSparkle()
 {
     CIwSVec2 scr_p;
@@ -292,6 +294,190 @@ inline void Sparkle::DrawSparkle()
         }
     }
 }
+*/
+inline void Sparkle::DrawSparkle()
+{
+    int sx, sy, ex, ey;
+    if (enabled && (sparkle_color < 12))
+    {
+        sx = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT);
+        sy = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT);
+        ex = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (os_x >> SPARKLE_SHIFT);
+        ey = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (os_y >> SPARKLE_SHIFT);
+        DrawSparklingLine(sx, sy, ex, ey, sparkle_color, sparkle_size);
+    }
+}
+
+
+// vertex, strip, UV data
+uint16 tristrip[DGX_VERTICES] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+CIwSVec2 vertices[DGX_VERTICES];
+CIwSVec2 uvdata[DGX_VERTICES];
+CIwTexture* sparkling_texture = NULL;
+CIwMaterial* pMat;
+
+void InitSparklingLines()
+{
+    // Create empty texture object
+    sparkling_texture = new CIwTexture;
+    // Load image data from disk into texture
+    sparkling_texture->LoadFromFile("arrows.png");
+    // "Upload" texture to VRAM
+    sparkling_texture->Upload();
+}
+
+void PrepareSparklingLines()
+{
+    IwGxClear(IW_GX_DEPTH_BUFFER_F);
+    // Allocate and initialise material from the IwGx global cache
+    pMat = IW_GX_ALLOC_MATERIAL();
+    // Set the diffuse map
+    pMat->SetTexture(sparkling_texture);
+    // Set this as the active material
+    IwGxSetMaterial(pMat);
+}
+
+void DrawSparklingLine(int sx, int sy, int ex, int ey, unsigned int lcolor, int size)
+{
+    CIwSVec2 scr_p;
+    int dx, dy, ndx, ndy;
+    int sizeconst[4] = { 0, 8, 16, 32 };
+    iwangle line_angle;
+    //
+    if ((lcolor < 12) && (size >= 1) && (size <= 3))
+    {
+        if ((sx == ex) && (sy == ey))
+        {
+            // it's just a point
+            switch (size)
+            {
+            case 1:
+                scr_p.x = sx - 8;
+                scr_p.y = sy - 8;
+                Iw2DDrawImageRegion(g_arrows,
+                    scr_p,
+                    sparkles16[lcolor],
+                    dim16);
+                break;
+            case 2:
+                scr_p.x = sx - 16;
+                scr_p.y = sy - 16;
+                Iw2DDrawImageRegion(g_arrows,
+                    scr_p,
+                    sparkles32[lcolor],
+                    dim32);
+                break;
+            case 3:
+                scr_p.x = sx - 32;
+                scr_p.y = sy - 32;
+                Iw2DDrawImageRegion(g_arrows,
+                    scr_p,
+                    sparkles64[lcolor],
+                    dim64);
+                break;
+            }
+        }
+        else
+        {
+            dx = ex - sx;
+            dy = ey - sy;
+            line_angle = IwGeomAtan2(-dy, dx);
+            ndx = ((IwGeomCos(line_angle)) >> (10 - size));
+            ndy = ((IwGeomSin(line_angle)) >> (10 - size));
+            //
+            vertices[0].x = sx - ndx + ndy;
+            vertices[0].y = sy + ndx + ndy;
+            vertices[1].x = sx - ndx - ndy;
+            vertices[1].y = sy - ndx + ndy;
+            vertices[2].x = sx + ndy;
+            vertices[2].y = sy + ndx;
+            vertices[3].x = sx - ndy;
+            vertices[3].y = sy - ndx;
+            vertices[4].x = ex + ndy;
+            vertices[4].y = ey + ndx;
+            vertices[5].x = ex - ndy;
+            vertices[5].y = ey - ndx;
+            vertices[6].x = ex + ndx + ndy;
+            vertices[6].y = ey + ndx - ndy;
+            vertices[7].x = ex + ndx - ndy;
+            vertices[7].y = ey - ndx - ndy;
+            //
+            switch (size)
+            {
+            case 1:
+                uvdata[0].x = (sparkles16[lcolor].x) << 3;
+                uvdata[0].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[1].x = (sparkles16[lcolor].x) << 3;
+                uvdata[1].y = (sparkles16[lcolor].y) << 3;
+                uvdata[2].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[2].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[3].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[3].y = (sparkles16[lcolor].y) << 3;
+                uvdata[4].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[4].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[5].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[5].y = (sparkles16[lcolor].y) << 3;
+                uvdata[6].x = (sparkles16[lcolor].x + 16) << 3;
+                uvdata[6].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[7].x = (sparkles16[lcolor].x + 16) << 3;
+                uvdata[7].y = (sparkles16[lcolor].y) << 3;
+                break;
+            case 2:
+                uvdata[0].x = (sparkles32[lcolor].x) << 3;
+                uvdata[0].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[1].x = (sparkles32[lcolor].x) << 3;
+                uvdata[1].y = (sparkles32[lcolor].y) << 3;
+                uvdata[2].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[2].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[3].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[3].y = (sparkles32[lcolor].y) << 3;
+                uvdata[4].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[4].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[5].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[5].y = (sparkles32[lcolor].y) << 3;
+                uvdata[6].x = (sparkles32[lcolor].x + 32) << 3;
+                uvdata[6].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[7].x = (sparkles32[lcolor].x + 32) << 3;
+                uvdata[7].y = (sparkles32[lcolor].y) << 3;
+                break;
+            case 3:
+                uvdata[0].x = (sparkles64[lcolor].x) << 3;
+                uvdata[0].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[1].x = (sparkles64[lcolor].x) << 3;
+                uvdata[1].y = (sparkles64[lcolor].y) << 3;
+                uvdata[2].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[2].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[3].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[3].y = (sparkles64[lcolor].y) << 3;
+                uvdata[4].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[4].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[5].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[5].y = (sparkles64[lcolor].y) << 3;
+                uvdata[6].x = (sparkles64[lcolor].x + 64) << 3;
+                uvdata[6].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[7].x = (sparkles64[lcolor].x + 64) << 3;
+                uvdata[7].y = (sparkles64[lcolor].y) << 3;
+                break;
+            }
+            //
+            // Set the vertex UV stream
+            IwGxSetUVStream(uvdata);
+            // Clear the vertex colour stream
+            IwGxSetColStream(NULL);
+            // Set the screen space vertex stream
+            IwGxSetVertStreamScreenSpace(vertices, DGX_VERTICES);
+            // Draw the textured triangles
+            IwGxDrawPrims(IW_GX_TRI_STRIP, tristrip, DGX_VERTICES);
+        }
+    }
+}
+
+void DoneSparklingLines()
+{
+    //IwGxFlush();
+    //IwGxSwapBuffers();
+}
+
 
 
 LightningManager::LightningManager(int sW, int sH)
@@ -309,6 +495,8 @@ LightningManager::LightningManager(int sW, int sH)
     total_branches = 0;
     sparkle_counter = 0;
     //
+    InitSparklingLines();
+    //
     srand((unsigned int)s3eTimerGetUTC());
 }
 
@@ -316,6 +504,7 @@ LightningManager::~LightningManager(void)
 {
     delete destImage;
     delete destSurface;
+    delete sparkling_texture;
 }
 
 void LightningManager::AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor)
@@ -389,6 +578,8 @@ void LightningManager::UpdateAllSparkles()
 void LightningManager::DrawSparkles()
 {
     int i;
+    PrepareSparklingLines();
     for (i = 0; i < MAX_SPARKLES; i++)
         sparkles[i].DrawSparkle();
+    DoneSparklingLines();
 }

@@ -44,6 +44,8 @@
 #define SPARKLES_MASK    0x00fff
 #define SPARKLE_GRAVITY  (0x60)
 
+#define DGX_VERTICES     0x0008
+
 
 class LightningBranch
 {
@@ -91,6 +93,12 @@ private:
 };
 
 
+void InitSparklingLines();
+void PrepareSparklingLines();
+void DrawSparklingLine(int sx, int sy, int ex, int ey, unsigned int lcolor, int size);
+void DoneSparklingLines();
+
+
 class LightningManager
 {
 public:
@@ -114,6 +122,7 @@ private:
     // lightning branches
     LightningBranch lightning_branches[MAX_BRANCHES];
     int total_branches;
+    // sparkles
     Sparkle sparkles[MAX_SPARKLES];
     int sparkle_counter;
 };

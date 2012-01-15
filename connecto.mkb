@@ -36,6 +36,7 @@ subprojects
 {
 	iw2d
 	iwgx
+	iwgeom
 }
 
 assets
