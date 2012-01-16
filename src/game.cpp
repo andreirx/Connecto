@@ -414,7 +414,7 @@ void CGame::Update_PLAY(int framex)
                     {
                         bonus += right_multiplier[j];
                         right_multiplier[j]++;
-                        for (k = 0; k < 5 * right_multiplier[j]; k++)
+                        for (k = 0; k < 3 * right_multiplier[j]; k++)
                             lightning->AddSparkle_SetXYCS(grid_positions[GRID_W - 1][j].x + 64, grid_positions[GRID_W - 1][j].y + 32,
                             (rand() % 3840) - 2560, (rand() % 3840) - 2560,
                             (rand() % 12),
@@ -459,7 +459,7 @@ void CGame::Update_PLAY(int framex)
         {
             if (game_table->grid_anim_type[i][j] == ANIM_DESTROY)
             {
-                for (k = 0; k < 2; k++)
+                for (k = 0; k < 3; k++)
                     lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
                     (rand() % 2560) - 1280, (rand() % 3840) - 2560,
                     ((rand() % 3) + 11) % 12,
@@ -738,8 +738,9 @@ void CGame::Render_PLAY(int framex)
                     tex_p,
                     dimension64);
 			}
-        game_table->update_color_shifts();
     }
+    if ((framex % 2) == 0)
+        game_table->update_color_shifts();
     Iw2DFinishDrawing();
     IwGxSetScissorScreenSpace(0, 0, Iw2DGetSurfaceWidth(), Iw2DGetSurfaceHeight());
     //Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
