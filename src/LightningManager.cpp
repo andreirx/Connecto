@@ -310,9 +310,10 @@ inline void Sparkle::DrawSparkle()
 
 
 // vertex, strip, UV data
-uint16 tristrip[DGX_VERTICES] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+uint16 tristrip[DGX_VERTICES];
 CIwSVec2 vertices[DGX_VERTICES];
 CIwSVec2 uvdata[DGX_VERTICES];
+uint32 send_vertices;
 CIwTexture* sparkling_texture = NULL;
 CIwMaterial* pMat;
 
@@ -329,13 +330,37 @@ void InitSparklingLines()
 void PrepareSparklingLines()
 {
     IwGxClear(IW_GX_DEPTH_BUFFER_F);
-    // Allocate and initialise material from the IwGx global cache
-    pMat = IW_GX_ALLOC_MATERIAL();
-    // Set the diffuse map
-    pMat->SetTexture(sparkling_texture);
-    // Set this as the active material
-    IwGxSetMaterial(pMat);
+    send_vertices = 0;
 }
+
+/*
+add quads
+{
+// 0 = top-left
+// 1 = bottom-left
+// 2 = bottom-right
+// 3 = top-right
+screen_vertices = ...
+uv_coordinates = ...
+// colors = ...
+quads++
+}
+
+draw_quads
+{
+IwGxSetVertStreamScreenSpace( screen_vertices, quads * 4 );
+CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
+pMat->SetAlphaMode( CIwMaterial::ALPHA_BLEND );
+pMat->SetTexture( ... );
+pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
+IwGxSetMaterial( pMat );
+IwGxSetUVStream( uv_coordinates );
+// IwGxSetColStream( colors, quads * 4 );
+IwGxSetColStream( NULL );
+IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, quads * 4 );
+IwGxFlush();
+}
+*/
 
 void DrawSparklingLine(int sx, int sy, int ex, int ey, unsigned int lcolor, int size)
 {
@@ -346,136 +371,157 @@ void DrawSparklingLine(int sx, int sy, int ex, int ey, unsigned int lcolor, int 
     //
     if ((lcolor < 12) && (size >= 1) && (size <= 3))
     {
-        if ((sx == ex) && (sy == ey))
+        if ((send_vertices + 12) < DGX_VERTICES)
         {
-            // it's just a point
-            switch (size)
-            {
-            case 1:
-                scr_p.x = sx - 8;
-                scr_p.y = sy - 8;
-                Iw2DDrawImageRegion(g_arrows,
-                    scr_p,
-                    sparkles16[lcolor],
-                    dim16);
-                break;
-            case 2:
-                scr_p.x = sx - 16;
-                scr_p.y = sy - 16;
-                Iw2DDrawImageRegion(g_arrows,
-                    scr_p,
-                    sparkles32[lcolor],
-                    dim32);
-                break;
-            case 3:
-                scr_p.x = sx - 32;
-                scr_p.y = sy - 32;
-                Iw2DDrawImageRegion(g_arrows,
-                    scr_p,
-                    sparkles64[lcolor],
-                    dim64);
-                break;
-            }
-        }
-        else
-        {
+            //
             dx = ex - sx;
             dy = ey - sy;
-            line_angle = IwGeomAtan2(-dy, dx);
+            if (dx == 0 && dy == 0)
+                line_angle = 0;
+            else
+                line_angle = IwGeomAtan2(-dy, dx);
             ndx = ((IwGeomCos(line_angle)) >> (10 - size));
             ndy = ((IwGeomSin(line_angle)) >> (10 - size));
             //
-            vertices[0].x = sx - ndx + ndy;
-            vertices[0].y = sy + ndx + ndy;
-            vertices[1].x = sx - ndx - ndy;
-            vertices[1].y = sy - ndx + ndy;
-            vertices[2].x = sx + ndy;
-            vertices[2].y = sy + ndx;
-            vertices[3].x = sx - ndy;
-            vertices[3].y = sy - ndx;
-            vertices[4].x = ex + ndy;
-            vertices[4].y = ey + ndx;
-            vertices[5].x = ex - ndy;
-            vertices[5].y = ey - ndx;
-            vertices[6].x = ex + ndx + ndy;
-            vertices[6].y = ey + ndx - ndy;
-            vertices[7].x = ex + ndx - ndy;
-            vertices[7].y = ey - ndx - ndy;
+            // 0 = top-left
+            // 1 = bottom-left
+            // 2 = bottom-right
+            // 3 = top-right
+            //
+            vertices[send_vertices + 0].x = sx - ndx - ndy;
+            vertices[send_vertices + 0].y = sy - ndx + ndy;
+            vertices[send_vertices + 1].x = sx - ndx + ndy;
+            vertices[send_vertices + 1].y = sy + ndx + ndy;
+            vertices[send_vertices + 2].x = sx + ndy;
+            vertices[send_vertices + 2].y = sy + ndx;
+            vertices[send_vertices + 3].x = sx - ndy;
+            vertices[send_vertices + 3].y = sy - ndx;
+            //
+            vertices[send_vertices + 4].x = sx - ndy;
+            vertices[send_vertices + 4].y = sy - ndx;
+            vertices[send_vertices + 5].x = sx + ndy;
+            vertices[send_vertices + 5].y = sy + ndx;
+            vertices[send_vertices + 6].x = ex + ndy;
+            vertices[send_vertices + 6].y = ey + ndx;
+            vertices[send_vertices + 7].x = ex - ndy;
+            vertices[send_vertices + 7].y = ey - ndx;
+            //
+            vertices[send_vertices + 8].x = ex - ndy;
+            vertices[send_vertices + 8].y = ey - ndx;
+            vertices[send_vertices + 9].x = ex + ndy;
+            vertices[send_vertices + 9].y = ey + ndx;
+            vertices[send_vertices + 10].x = ex + ndx + ndy;
+            vertices[send_vertices + 10].y = ey + ndx - ndy;
+            vertices[send_vertices + 11].x = ex + ndx - ndy;
+            vertices[send_vertices + 11].y = ey - ndx - ndy;
             //
             switch (size)
             {
             case 1:
-                uvdata[0].x = (sparkles16[lcolor].x) << 3;
-                uvdata[0].y = (sparkles16[lcolor].y + 16) << 3;
-                uvdata[1].x = (sparkles16[lcolor].x) << 3;
-                uvdata[1].y = (sparkles16[lcolor].y) << 3;
-                uvdata[2].x = (sparkles16[lcolor].x + 8) << 3;
-                uvdata[2].y = (sparkles16[lcolor].y + 16) << 3;
-                uvdata[3].x = (sparkles16[lcolor].x + 8) << 3;
-                uvdata[3].y = (sparkles16[lcolor].y) << 3;
-                uvdata[4].x = (sparkles16[lcolor].x + 8) << 3;
-                uvdata[4].y = (sparkles16[lcolor].y + 16) << 3;
-                uvdata[5].x = (sparkles16[lcolor].x + 8) << 3;
-                uvdata[5].y = (sparkles16[lcolor].y) << 3;
-                uvdata[6].x = (sparkles16[lcolor].x + 16) << 3;
-                uvdata[6].y = (sparkles16[lcolor].y + 16) << 3;
-                uvdata[7].x = (sparkles16[lcolor].x + 16) << 3;
-                uvdata[7].y = (sparkles16[lcolor].y) << 3;
+                uvdata[send_vertices + 0].x = (sparkles16[lcolor].x) << 3;
+                uvdata[send_vertices + 0].y = (sparkles16[lcolor].y) << 3;
+                uvdata[send_vertices + 1].x = (sparkles16[lcolor].x) << 3;
+                uvdata[send_vertices + 1].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[send_vertices + 2].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 2].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[send_vertices + 3].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 3].y = (sparkles16[lcolor].y) << 3;
+                //
+                uvdata[send_vertices + 4].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 4].y = (sparkles16[lcolor].y) << 3;
+                uvdata[send_vertices + 5].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 5].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[send_vertices + 6].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 6].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[send_vertices + 7].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 7].y = (sparkles16[lcolor].y) << 3;
+                //
+                uvdata[send_vertices + 8].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 8].y = (sparkles16[lcolor].y) << 3;
+                uvdata[send_vertices + 9].x = (sparkles16[lcolor].x + 8) << 3;
+                uvdata[send_vertices + 9].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[send_vertices + 10].x = (sparkles16[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 10].y = (sparkles16[lcolor].y + 16) << 3;
+                uvdata[send_vertices + 11].x = (sparkles16[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 11].y = (sparkles16[lcolor].y) << 3;
                 break;
             case 2:
-                uvdata[0].x = (sparkles32[lcolor].x) << 3;
-                uvdata[0].y = (sparkles32[lcolor].y + 32) << 3;
-                uvdata[1].x = (sparkles32[lcolor].x) << 3;
-                uvdata[1].y = (sparkles32[lcolor].y) << 3;
-                uvdata[2].x = (sparkles32[lcolor].x + 16) << 3;
-                uvdata[2].y = (sparkles32[lcolor].y + 32) << 3;
-                uvdata[3].x = (sparkles32[lcolor].x + 16) << 3;
-                uvdata[3].y = (sparkles32[lcolor].y) << 3;
-                uvdata[4].x = (sparkles32[lcolor].x + 16) << 3;
-                uvdata[4].y = (sparkles32[lcolor].y + 32) << 3;
-                uvdata[5].x = (sparkles32[lcolor].x + 16) << 3;
-                uvdata[5].y = (sparkles32[lcolor].y) << 3;
-                uvdata[6].x = (sparkles32[lcolor].x + 32) << 3;
-                uvdata[6].y = (sparkles32[lcolor].y + 32) << 3;
-                uvdata[7].x = (sparkles32[lcolor].x + 32) << 3;
-                uvdata[7].y = (sparkles32[lcolor].y) << 3;
+                uvdata[send_vertices + 0].x = (sparkles32[lcolor].x) << 3;
+                uvdata[send_vertices + 0].y = (sparkles32[lcolor].y) << 3;
+                uvdata[send_vertices + 1].x = (sparkles32[lcolor].x) << 3;
+                uvdata[send_vertices + 1].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[send_vertices + 2].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 2].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[send_vertices + 3].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 3].y = (sparkles32[lcolor].y) << 3;
+                //
+                uvdata[send_vertices + 4].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 4].y = (sparkles32[lcolor].y) << 3;
+                uvdata[send_vertices + 5].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 5].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[send_vertices + 6].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 6].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[send_vertices + 7].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 7].y = (sparkles32[lcolor].y) << 3;
+                //
+                uvdata[send_vertices + 8].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 8].y = (sparkles32[lcolor].y) << 3;
+                uvdata[send_vertices + 9].x = (sparkles32[lcolor].x + 16) << 3;
+                uvdata[send_vertices + 9].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[send_vertices + 10].x = (sparkles32[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 10].y = (sparkles32[lcolor].y + 32) << 3;
+                uvdata[send_vertices + 11].x = (sparkles32[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 11].y = (sparkles32[lcolor].y) << 3;
                 break;
             case 3:
-                uvdata[0].x = (sparkles64[lcolor].x) << 3;
-                uvdata[0].y = (sparkles64[lcolor].y + 64) << 3;
-                uvdata[1].x = (sparkles64[lcolor].x) << 3;
-                uvdata[1].y = (sparkles64[lcolor].y) << 3;
-                uvdata[2].x = (sparkles64[lcolor].x + 32) << 3;
-                uvdata[2].y = (sparkles64[lcolor].y + 64) << 3;
-                uvdata[3].x = (sparkles64[lcolor].x + 32) << 3;
-                uvdata[3].y = (sparkles64[lcolor].y) << 3;
-                uvdata[4].x = (sparkles64[lcolor].x + 32) << 3;
-                uvdata[4].y = (sparkles64[lcolor].y + 64) << 3;
-                uvdata[5].x = (sparkles64[lcolor].x + 32) << 3;
-                uvdata[5].y = (sparkles64[lcolor].y) << 3;
-                uvdata[6].x = (sparkles64[lcolor].x + 64) << 3;
-                uvdata[6].y = (sparkles64[lcolor].y + 64) << 3;
-                uvdata[7].x = (sparkles64[lcolor].x + 64) << 3;
-                uvdata[7].y = (sparkles64[lcolor].y) << 3;
+                uvdata[send_vertices + 0].x = (sparkles64[lcolor].x) << 3;
+                uvdata[send_vertices + 0].y = (sparkles64[lcolor].y) << 3;
+                uvdata[send_vertices + 1].x = (sparkles64[lcolor].x) << 3;
+                uvdata[send_vertices + 1].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[send_vertices + 2].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 2].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[send_vertices + 3].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 3].y = (sparkles64[lcolor].y) << 3;
+                //
+                uvdata[send_vertices + 4].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 4].y = (sparkles64[lcolor].y) << 3;
+                uvdata[send_vertices + 5].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 5].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[send_vertices + 6].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 6].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[send_vertices + 7].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 7].y = (sparkles64[lcolor].y) << 3;
+                //
+                uvdata[send_vertices + 8].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 8].y = (sparkles64[lcolor].y) << 3;
+                uvdata[send_vertices + 9].x = (sparkles64[lcolor].x + 32) << 3;
+                uvdata[send_vertices + 9].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[send_vertices + 10].x = (sparkles64[lcolor].x + 64) << 3;
+                uvdata[send_vertices + 10].y = (sparkles64[lcolor].y + 64) << 3;
+                uvdata[send_vertices + 11].x = (sparkles64[lcolor].x + 64) << 3;
+                uvdata[send_vertices + 11].y = (sparkles64[lcolor].y) << 3;
                 break;
             }
+            send_vertices = send_vertices + 12;
             //
-            // Set the vertex UV stream
-            IwGxSetUVStream(uvdata);
-            // Clear the vertex colour stream
-            IwGxSetColStream(NULL);
-            // Set the screen space vertex stream
-            IwGxSetVertStreamScreenSpace(vertices, DGX_VERTICES);
-            // Draw the textured triangles
-            IwGxDrawPrims(IW_GX_TRI_STRIP, tristrip, DGX_VERTICES);
         }
     }
 }
 
 void DoneSparklingLines()
 {
-    //IwGxFlush();
-    //IwGxSwapBuffers();
+    IwGxSetScreenSpaceSlot(3);
+    IwGxSetVertStreamScreenSpace( vertices, send_vertices );
+    CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
+    pMat->SetAlphaMode( CIwMaterial::ALPHA_ADD );
+    pMat->SetTexture( sparkling_texture );
+    pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
+    IwGxSetMaterial( pMat );
+    IwGxSetUVStream( uvdata );
+    // IwGxSetColStream( colors, quads * 4 );
+    IwGxSetColStream( NULL );
+    IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, send_vertices );
+    IwGxFlush();
 }
 
 

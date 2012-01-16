@@ -44,7 +44,7 @@
 #define SPARKLES_MASK    0x00fff
 #define SPARKLE_GRAVITY  (0x60)
 
-#define DGX_VERTICES     0x0008
+#define DGX_VERTICES     (MAX_SPARKLES * 3 * 4)
 
 
 class LightningBranch
