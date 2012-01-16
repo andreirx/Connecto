@@ -157,7 +157,11 @@ void GameTable::bomb_table(int x, int y)
         for (j = (y - 2); j <= (y + 2); j++)
         {
             // check boundaries
-            if ((i >= 0) && (i < GRID_W) && (j >= 0) && (j < GRID_H))
+            if ((i >= 0) && (i < GRID_W) && (j >= 0) && (j < GRID_H) &&
+                !((i == (x - 2)) && (j == y - 2)) &&
+                !((i == (x + 2)) && (j == y - 2)) &&
+                !((i == (x - 2)) && (j == y + 2)) &&
+                !((i == (x + 2)) && (j == y + 2)))
             {
                 // move one position down
                 for (k = j; k > 0; k--)

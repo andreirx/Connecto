@@ -357,7 +357,7 @@ CGame::~CGame()
 
 void CGame::Update_PLAY(int framex)
 {
-    int i, j;
+    int i, j, k;
     unsigned int add_color = 0;
     // game logic goes here
     // for example, move a red square towards any touch event...
@@ -415,7 +415,7 @@ void CGame::Update_PLAY(int framex)
                         bonus += right_multiplier[j];
                         right_multiplier[j]++;
                         for (k = 0; k < 5 * right_multiplier[j]; k++)
-                            lightning->AddSparkle_SetXYCS(grid_positions[GRID_W - 1][j].x + 64, grid_positions[GRID_W - 1][j].y + 64,
+                            lightning->AddSparkle_SetXYCS(grid_positions[GRID_W - 1][j].x + 64, grid_positions[GRID_W - 1][j].y + 32,
                             (rand() % 3840) - 2560, (rand() % 3840) - 2560,
                             (rand() % 12),
                             (rand() % 3) + 1);
@@ -452,6 +452,22 @@ void CGame::Update_PLAY(int framex)
     }
     can_send = game_table->check_connections();
     //
+    // make particles for destroyed tiles
+    for (i = 0; i < GRID_W; i++)
+    {
+        for (j = 0; j < GRID_H; j++)
+        {
+            if (game_table->grid_anim_type[i][j] == ANIM_DESTROY)
+            {
+                for (k = 0; k < 2; k++)
+                    lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                    (rand() % 2560) - 1280, (rand() % 3840) - 2560,
+                    ((rand() % 3) + 11) % 12,
+                    (rand() % 2) + 1);
+            }
+        }
+    }
+    //
     // OK NOW make some lightning
     //
     //if (show_arrows || framex == 0 || internal_frame == 0)
@@ -464,7 +480,7 @@ void CGame::Update_PLAY(int framex)
                 add_color = 0;
                 if (game_table->get_grid_state(i, j) == CONNECT_LEFT)
                 {
-                    add_color = 7;//0xffff9955;
+                    add_color = 8;//0xffff9955;
                 }
                 if (game_table->get_grid_state(i, j) == CONNECT_RIGHT)
                 {
@@ -786,7 +802,7 @@ void CGame::Render_PLAY(int framex)
     {
         //Iw2DSetColour(0xffffffff);
         //Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-        lightning->DrawLightning();
+        lightning->DrawLightning(1);
         //Iw2DDrawImage(lightning->destImage, CIwSVec2(0, 0), CIwSVec2(1024, 1024));
         //Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     }

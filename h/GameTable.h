@@ -18,8 +18,8 @@
 #define ANIM_NONE      0
 #define ANIM_FALL      101
 #define ANIM_DESTROY   102
-#define FRAMES_DESTROY 5
-#define FRAMES_FALL    10
+#define FRAMES_DESTROY 8
+#define FRAMES_FALL    30
 
 class GameTable
 {

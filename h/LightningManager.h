@@ -113,7 +113,7 @@ public:
     void ResetBranches();
     void AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor);
     void UpdateAllBranches(int update_much);
-    void DrawLightning();
+    void DrawLightning(int size);
 
     void AddSparkle_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size);
     void UpdateAllSparkles();

@@ -599,7 +599,7 @@ void LightningManager::UpdateAllBranches(int update_much)
     }
 }
 
-void LightningManager::DrawLightning()
+void LightningManager::DrawLightning(int size)
 {
     int i, j, k;
     //CIw2DSurface *oldSurface = Iw2DGetSurface();
@@ -613,7 +613,7 @@ void LightningManager::DrawLightning()
     for (i = 0; i < total_branches; i++)
     {
         //lightning_branches[i].DrawBranch_as_Lines();
-        lightning_branches[i].DrawBranch_as_Sparkles(4, 1);
+        lightning_branches[i].DrawBranch_as_Sparkles(4, size);
     }
     DoneSparklingLines();
     //
