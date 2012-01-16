@@ -19,4 +19,5 @@
 MemSize=10000000
 
 [GX]
-DataCacheSize = 262144
+DataCacheSize = 1048576
+VertCacheSize = 10240

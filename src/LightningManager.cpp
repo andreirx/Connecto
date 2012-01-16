@@ -113,6 +113,19 @@ void LightningBranch::DrawBranch_as_Lines()
     }
 }
 
+void LightningBranch::DrawBranch_as_Sparkles(unsigned int bcolor, int size)
+{
+    int j;
+    for (j = 1; j < len_strike; j++)
+    {
+        DrawSparklingLine((strike_x[j - 1] >> 8),
+            (strike_y[j - 1] >> 8),
+            (strike_x[j] >> 8),
+            (strike_y[j] >> 8),
+            lightning_color, size);
+    }
+}
+
 void LightningBranch::make_branch(int start_index, int end_index, int *positions_x, int *positions_y)
 {
     int diff_x, diff_y;                                // differences between end and start positions
@@ -371,7 +384,12 @@ void DrawSparklingLine(int sx, int sy, int ex, int ey, unsigned int lcolor, int 
     //
     if ((lcolor < 12) && (size >= 1) && (size <= 3))
     {
-        if ((send_vertices + 12) < DGX_VERTICES)
+        if ((send_vertices + 12) > DGX_VERTICES)
+        {
+            DoneSparklingLines();
+            //PrepareSparklingLines();
+            send_vertices = 0;
+        }
         {
             //
             dx = ex - sx;
@@ -591,10 +609,13 @@ void LightningManager::DrawLightning()
     //Iw2DSetColour(0x7f000000);
     //Iw2DFillRect(CIwSVec2(0, 0), CIwSVec2(dsInfo.m_Width, dsInfo.m_Height));
     //
+    PrepareSparklingLines();
     for (i = 0; i < total_branches; i++)
     {
-        lightning_branches[i].DrawBranch_as_Lines();
+        //lightning_branches[i].DrawBranch_as_Lines();
+        lightning_branches[i].DrawBranch_as_Sparkles(4, 1);
     }
+    DoneSparklingLines();
     //
     //Iw2DFinishDrawing();
     //Iw2DSetSurface(oldSurface);

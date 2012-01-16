@@ -44,7 +44,7 @@
 #define SPARKLES_MASK    0x00fff
 #define SPARKLE_GRAVITY  (0x60)
 
-#define DGX_VERTICES     (MAX_SPARKLES * 3 * 4)
+#define DGX_VERTICES     (2048)
 
 
 class LightningBranch
@@ -58,6 +58,7 @@ public:
     void GenerateBranch(int sx, int sy, int ex, int ey, unsigned int bcolor, int update_much = UPDATE_ALL);
     void UpdateBranch(int update_much);
     void DrawBranch_as_Lines();
+    void DrawBranch_as_Sparkles(unsigned int bcolor, int size);
 
 private:
     int osx, osy, oex, oey;
