@@ -416,7 +416,7 @@ void CGame::Update_PLAY(int framex)
                         right_multiplier[j]++;
                         for (k = 0; k < 3 * right_multiplier[j]; k++)
                             lightning->AddSparkle_SetXYCS(grid_positions[GRID_W - 1][j].x + 64, grid_positions[GRID_W - 1][j].y + 32,
-                            (rand() % 3840) - 2560, (rand() % 3840) - 2560,
+                            (rand() % 5120) - 3840, (rand() % 5120) - 3840,
                             (rand() % 12),
                             (rand() % 3) + 1);
                     }
@@ -461,7 +461,7 @@ void CGame::Update_PLAY(int framex)
             {
                 for (k = 0; k < 3; k++)
                     lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                    (rand() % 2560) - 1280, (rand() % 3840) - 2560,
+                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
                     ((rand() % 3) + 11) % 12,
                     (rand() % 2) + 1);
             }
@@ -480,7 +480,7 @@ void CGame::Update_PLAY(int framex)
                 add_color = 0;
                 if (game_table->get_grid_state(i, j) == CONNECT_LEFT)
                 {
-                    add_color = 8;//0xffff9955;
+                    add_color = 7;//0xffff9955;
                 }
                 if (game_table->get_grid_state(i, j) == CONNECT_RIGHT)
                 {
