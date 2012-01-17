@@ -40,7 +40,8 @@
 #define SPARKLE_SPACE_W  1024
 #define SPARKLE_SPACE_H  1024
 #define SPARKLE_SHIFT    8
-#define MAX_SPARKLES     0x01000
+#define MAX_SPARKLES     0x02000
+#define MAX_GENERATORS   0x00100
 #define SPARKLES_MASK    0x00fff
 #define SPARKLE_GRAVITY  (0xaa)
 
@@ -106,6 +107,58 @@ public:
     LightningManager(int sW, int sH);
     ~LightningManager(void);
 
+    class SparkleGenerator
+    {
+    public:
+        int enabled;
+
+        SparkleGenerator() {}
+        ~SparkleGenerator(void) {}
+
+        void StartGenerator_XYT(int x, int y, int duration_ms, int intensity_is, int size, LightningManager *lm)
+        {
+            px = x;
+            py = y;
+            duration = duration_ms;
+            intensity = intensity_is;
+            total_generated = 0;
+            max_size = size;
+            lightning = lm;
+            start_timer = (int)s3eTimerGetMs();
+        }
+
+        void UpdateGenerator()
+        {
+            int delta_t;
+            if (enabled)
+            {
+                delta_t = (int)s3eTimerGetMs() - start_timer;
+                if (delta_t >= duration)
+                    intensity--;
+                if (intensity <= 0)
+                    enabled = 0;
+                if (enabled)
+                {
+                    while (total_generated < (intensity * delta_t / 1000))
+                    {
+                        lightning->AddSparkle_SetXYCS(px, py, (rand() % 5120) - 2560, (rand() % 5120) - 3840,
+                            (rand() % 12), (rand() % max_size) + 1);
+                        total_generated++;
+                    }
+                }
+            }
+        }
+
+    private:
+        LightningManager *lightning;
+        int px, py;
+        int start_timer;
+        int duration;
+        int intensity;
+        int total_generated;
+        int max_size;
+    };
+
     CIw2DSurface *destSurface;
     CIw2DImage *destImage;
     s3eSurfaceInfo dsInfo;
@@ -119,6 +172,9 @@ public:
     void UpdateAllSparkles();
     void DrawSparkles();
 
+    void AddGenerator_SetXYT(int x, int y, int duration_ms, int intensity_is, int size);
+    void UpdateAllGenerators();
+
 private:
     // lightning branches
     LightningBranch lightning_branches[MAX_BRANCHES];
@@ -126,6 +182,9 @@ private:
     // sparkles
     Sparkle sparkles[MAX_SPARKLES];
     int sparkle_counter;
+    // sparkle generators
+    SparkleGenerator generators[MAX_GENERATORS];
+    int generator_counter;
 };
 
 #endif

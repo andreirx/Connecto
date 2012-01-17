@@ -185,8 +185,8 @@ Sparkle::~Sparkle(void)
 
 void Sparkle::Enable_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size)
 {
-    int is_x = (Iw2DGetSurfaceWidth() - SPARKLE_SPACE_W) / 2;
-    int is_y = (Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) / 2;
+    int is_x = (SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) / 2;
+    int is_y = (SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) / 2;
     //
     enabled = 1;
     ss_x = (px + is_x) << SPARKLE_SHIFT;
@@ -220,7 +220,7 @@ inline void Sparkle::UpdateSparkle()
         os_y = ss_y;
         ss_y = ss_y + vel_y;
         // check left - right - bottom boundaries
-        if ((ss_x < 0) || (ss_x > (SPARKLE_SPACE_W << SPARKLE_SHIFT)) || (ss_y > (SPARKLE_SPACE_H << SPARKLE_SHIFT)))
+        if ((os_x < 0) || (os_x > (SPARKLE_SPACE_W << SPARKLE_SHIFT)) || (os_y > (SPARKLE_SPACE_H << SPARKLE_SHIFT)))
             enabled = 0;
     }
 }
@@ -313,10 +313,10 @@ inline void Sparkle::DrawSparkle()
     int sx, sy, ex, ey;
     if (enabled && (sparkle_color < 12))
     {
-        sx = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT);
-        sy = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT);
-        ex = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (os_x >> SPARKLE_SHIFT);
-        ey = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (os_y >> SPARKLE_SHIFT);
+        sx = ((Iw2DGetSurfaceWidth() - SPARKLE_SPACE_W) >> 1) + (ss_x >> SPARKLE_SHIFT);
+        sy = ((Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) >> 1) + (ss_y >> SPARKLE_SHIFT);
+        ex = ((Iw2DGetSurfaceWidth() - SPARKLE_SPACE_W) >> 1) + (os_x >> SPARKLE_SHIFT);
+        ey = ((Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) >> 1) + (os_y >> SPARKLE_SHIFT);
         DrawSparklingLine(sx, sy, ex, ey, sparkle_color, sparkle_size);
     }
 }
@@ -649,4 +649,25 @@ void LightningManager::DrawSparkles()
     for (i = 0; i < MAX_SPARKLES; i++)
         sparkles[i].DrawSparkle();
     DoneSparklingLines();
+}
+
+void LightningManager::AddGenerator_SetXYT(int x, int y, int duration_ms, int intensity_is, int size)
+{
+    int internal_counter = 0;
+    while (generators[generator_counter].enabled == 1)
+    {
+        generator_counter = (generator_counter + 1) % MAX_GENERATORS;
+        internal_counter++;
+        // if all sparkles are already enabled, do nothing
+        if (internal_counter > MAX_GENERATORS)
+            return;
+    }
+    generators[generator_counter].StartGenerator_XYT(x, y, duration_ms, intensity_is, size, this);
+}
+
+void LightningManager::UpdateAllGenerators()
+{
+    int i;
+    for (i = 0; i < MAX_GENERATORS; i++)
+        generators[i].UpdateGenerator();
 }
