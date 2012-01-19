@@ -510,6 +510,14 @@ void CGame::Update_PLAY(int framex)
                                 grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
                                 add_color);
                             /*
+                            if ((rand() % 100) == 0)
+                            {
+                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
+                                    add_color, 1);
+                            }
+                            */
+                            /*
                             lightning->AddBranch_Generate(DEFAULT_LEN,
                                 grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
                                 grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
@@ -527,6 +535,14 @@ void CGame::Update_PLAY(int framex)
                                 grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
                                 add_color);
                             /*
+                            if ((rand() % 100) == 0)
+                            {
+                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
+                                    add_color, 1);
+                            }
+                            */
+                            /*
                             lightning->AddBranch_Generate(DEFAULT_LEN,
                                 grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
                                 grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
@@ -538,6 +554,14 @@ void CGame::Update_PLAY(int framex)
                     {
                         if ((game_table->get_grid_connector(i, j) & CB_LEFT) != 0)
                         {
+                            /*
+                            if ((rand() % 60) == 0)
+                            {
+                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
+                                    add_color, 1);
+                            }
+                            */
                             /*
                             lightning->AddBranch_Generate(DEFAULT_LEN,
                                 grid_positions[i][j].x, grid_positions[i][j].y + 16,
@@ -560,6 +584,14 @@ void CGame::Update_PLAY(int framex)
                     {
                         if ((game_table->get_grid_connector(i, j) & CB_RIGHT) != 0)
                         {
+                            /*
+                            if ((rand() % 100) == 0)
+                            {
+                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
+                                    add_color, 1);
+                            }
+                            */
                             /*
                             lightning->AddBranch_Generate(DEFAULT_LEN,
                                 grid_positions[i][j].x + 63, grid_positions[i][j].y + 16,
