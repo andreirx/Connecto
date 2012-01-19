@@ -141,6 +141,9 @@ public:
     int internal_frame, animation_frame;
     int send_anim_frame;
 
+    int touchdown_x, touchdown_y;
+    int touchdown;
+
     int game_state;
 
     GameLevel current_level;

@@ -317,6 +317,7 @@ CGame::CGame()
     bonus = 0;
     penalty = 0;
     last_sent = 0;
+    touchdown = 0;
     //
     table_x = (Iw2DGetSurfaceWidth() - 640) / 2;
     table_y = (Iw2DGetSurfaceHeight() - 640) / 2;
@@ -366,6 +367,9 @@ void CGame::Update_PLAY(int framex)
     update_worm();
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))// && (framex == 0))
     {
+        touchdown_x = s3ePointerGetX() - table_x;
+        touchdown_y = s3ePointerGetY() - table_y;
+        touchdown = 1;
         if((s3ePointerGetX() >= table_x) && (s3ePointerGetY() >= table_y) &&
             (s3ePointerGetX() <= table_x + 640) && (s3ePointerGetY() <= table_y + 640))
         {
@@ -450,6 +454,10 @@ void CGame::Update_PLAY(int framex)
                 }
             }
     }
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
+        touchdown = 1;
+    else
+        touchdown = 0;
     can_send = game_table->check_connections();
     //
     // make particles for destroyed tiles
@@ -573,6 +581,13 @@ void CGame::Update_PLAY(int framex)
                 }
             }
         }
+    }
+    if (touchdown)
+    {
+        lightning->AddBranch_Generate(DEFAULT_LEN,
+            touchdown_x + table_x, touchdown_y + table_y,
+            s3ePointerGetX(), s3ePointerGetY(),
+            0);
     }
 }
 
