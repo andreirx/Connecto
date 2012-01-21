@@ -1,6 +1,10 @@
 #ifndef GAMETABLE_H
 #define GAMETABLE_H
 
+
+#include "s3e.h"
+
+
 #define GRID_W 10
 #define GRID_H 10
 
@@ -56,6 +60,20 @@ public:
                 if (((gx == worm_x[i]) && (gy == worm_y[i])) ||
                     ((gx == worm_ox[i]) && (gy == worm_oy[i])))
                     return 0;
+        }
+
+        int touches_xy(int x, int y)
+        {
+            int i;
+            for (i = 0; i < worm_length; i++)
+                if ((worm_x[i] == x) && (worm_y[i] == y))
+                    return 1;
+            return 0;
+        }
+
+        inline int get_current_length()
+        {
+            return worm_length;
         }
 
         void update_worm();
@@ -143,6 +161,18 @@ public:
         worm_tfreq = tfreq;
         worm_timeout = timeout;
         the_worm.SetWorm(worm_wlen, worm_tfreq);
+    }
+
+    void update_the_worm()
+    {
+        the_worm.update_worm();
+        if (the_worm.get_current_length() <= 0)
+        {
+            if (((int)s3eTimerGetMs() - worm_wait_time) > worm_timeout)
+            {
+                the_worm.SetWorm(worm_wlen, worm_tfreq);
+            }
+        }
     }
 
     Worm the_worm;

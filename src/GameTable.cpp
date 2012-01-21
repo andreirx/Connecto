@@ -39,7 +39,9 @@ void GameTable::Worm::update_worm()
 {
     int move, i, j, ok_worm, whead;
     if (worm_length <= 0)
+    {
         return;
+    }
     if (moving > 0)
     {
         moving -= 2;
@@ -268,6 +270,13 @@ void GameTable::new_column(int x)
         grid_state[x][k] = CONNECT_NONE;
         grid_anim_frame[x][k] = FRAMES_DESTROY;
         grid_anim_type[x][k] = ANIM_DESTROY;
+        //
+        // kill the worm, set timeout
+        if (the_worm.touches_xy(x, k))
+        {
+            the_worm.SetWorm(0, 0);
+            worm_wait_time = (int)s3eTimerGetMs();
+        }
     }
     for (i = 0; i < GRID_W; i++)
         for (j = 0; j < GRID_H; j++)
@@ -314,6 +323,13 @@ int GameTable::send_connections()
         {
             if (grid_state[i][j] == CONNECT_OK)
             {
+                //
+                // kill the worm, set timeout
+                if (the_worm.touches_xy(i, j))
+                {
+                    the_worm.SetWorm(0, 0);
+                    worm_wait_time = (int)s3eTimerGetMs();
+                }
                 rVal += 0x000001;
                 if (i == (GRID_W - 1))
                     if (grid_connectors[i][j] & CB_RIGHT != 0)
@@ -351,6 +367,13 @@ void GameTable::bomb_table(int x, int y)
                 !((i == (x - 2)) && (j == y + 2)) &&
                 !((i == (x + 2)) && (j == y + 2)))
             {
+                //
+                // kill the worm, set timeout
+                if (the_worm.touches_xy(i, j))
+                {
+                    the_worm.SetWorm(0, 0);
+                    worm_wait_time = (int)s3eTimerGetMs();
+                }
                 // move one position down
                 for (k = j; k > 0; k--)
                 {

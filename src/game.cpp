@@ -189,7 +189,7 @@ void CGame::Update_PLAY(int framex)
     // for example, move a red square towards any touch event...
     if (game_table->is_animating())
         return;
-    game_table->the_worm.update_worm();
+    game_table->update_the_worm();
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))// && (framex == 0))
     {
         touchdown_x = s3ePointerGetX() - table_x;
