@@ -283,7 +283,7 @@ void CGame::Update_PLAY(int framex)
             {
                 if (game_table->the_worm.can_click(gx, gy))
                 {
-                    game_table->click_element(gx, gy);
+                    //game_table->click_element(gx, gy);
                     show_arrows = 1;
                     arrow_x = gx;
                     arrow_y = gy;
@@ -350,7 +350,41 @@ void CGame::Update_PLAY(int framex)
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
         touchdown = 1;
     else
+    {
+        if (touchdown)
+        {
+            // rotate that tile!
+            if (touchdown && (touchdown_x >= 0) && (touchdown_y >= 0) &&
+                (touchdown_x < 640) && (touchdown_y < 640))
+            {
+                int dx, dy, rotations = 0;
+                iwangle line_angle;
+                dx = touch_x - touchdown_x;
+                dy = touch_y - touchdown_y;
+                if (dx == 0 && dy == 0)
+                    line_angle = 0;
+                else
+                    line_angle = IwGeomAtan2(dy, dx);
+                i = touchdown_x / 64;
+                j = touchdown_y / 64;
+                if (game_table->the_worm.can_click(i, j))
+                {
+                    line_angle = (line_angle + 0x600) & 0x0fff;
+                    if ((line_angle >= 0x0000) && (line_angle < 0x0400))
+                        rotations = 0;
+                    if ((line_angle >= 0x0400) && (line_angle < 0x0800))
+                        rotations = 3;
+                    if ((line_angle >= 0x0800) && (line_angle < 0x0b00))
+                        rotations = 2;
+                    if ((line_angle >= 0x0c00) && (line_angle < 0x1000))
+                        rotations = 1;
+                    for (k = 0; k < rotations; k++)
+                        game_table->click_element(i, j);
+                }
+            }
+        }
         touchdown = 0;
+    }
     can_send = game_table->check_connections();
     //
     // make particles for destroyed tiles
@@ -635,7 +669,7 @@ void CGame::Render_PLAY(int framex)
             j = touchdown_y / 64;
             tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
             tex_p.y = (CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
-            myIwGxDrawTile(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32, tex_p, (line_angle + 0x400) % 0x1000);
+            myIwGxDrawTile(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32, tex_p, (line_angle + 0x400) & 0x0fff);
         }
     }
     if ((framex % 2) == 0)
