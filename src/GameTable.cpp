@@ -40,8 +40,19 @@ void GameTable::Worm::update_worm()
     int move, i, j, ok_worm, whead;
     if (worm_length <= 0)
         return;
+    if (moving > 0)
+    {
+        moving--;
+        return;
+    }
     if (rand() % 8 == 0)
     {
+        moving = 64;
+        for (i = 0; i < worm_length; i++)
+        {
+            worm_ox[i] = worm_x[i];
+            worm_oy[i] = worm_y[i];
+        }
         whead = 0;
         ok_worm = 0;
         while (!ok_worm)
@@ -197,8 +208,8 @@ void GameTable::Worm::draw_worm(int x, int y)
         }
         if (tcode == 0)
             tcode = 11;
-        scr_p.x = x + (worm_x[i] << 6);
-        scr_p.y = y + (worm_y[i] << 6);
+        scr_p.x = x + (worm_x[i] << 6) - (worm_x[i] - worm_ox[i]) * moving;
+        scr_p.y = y + (worm_y[i] << 6) - (worm_y[i] - worm_oy[i]) * moving;
         tex_p.x = (tcode << 6);
         tex_p.y = 256;
         Iw2DDrawImageRegion(g_tiles, scr_p,

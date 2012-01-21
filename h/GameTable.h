@@ -21,7 +21,7 @@
 #define FRAMES_DESTROY 8
 #define FRAMES_FALL    30
 
-#define MAX_WORM       15
+#define MAX_WORM       10
 
 
 class GameTable
@@ -30,7 +30,7 @@ public:
     class Worm
     {
     public:
-        Worm(void) {}
+        Worm(void) { SetWorm(0, 0); }
         ~Worm(void) {}
 
         void SetWorm(int wlen, int tfreq)
@@ -41,9 +41,10 @@ public:
             tile_interaction = tfreq;
             for (i = 0; i < worm_length; i++)
             {
-                worm_x[i] = 1 + i;
+                worm_x[i] = i;
                 worm_y[i] = 5;
             }
+            moving = 0;
         }
 
         int can_click(int gx, int gy)
