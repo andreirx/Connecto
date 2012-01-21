@@ -272,42 +272,7 @@ CIwSVec2 sparkles64[12] = {
     CIwSVec2(384, 256),
     CIwSVec2(448, 256),
 };
-/*
-inline void Sparkle::DrawSparkle()
-{
-    CIwSVec2 scr_p;
-    if (enabled && (sparkle_color < 12))
-    {
-        switch (sparkle_size)
-        {
-        case 1:
-            scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 8;
-            scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 8;
-            Iw2DDrawImageRegion(g_arrows,
-                scr_p,
-                sparkles16[sparkle_color],
-                dim16);
-            break;
-        case 2:
-            scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 16;
-            scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 16;
-            Iw2DDrawImageRegion(g_arrows,
-                scr_p,
-                sparkles32[sparkle_color],
-                dim32);
-            break;
-        case 3:
-            scr_p.x = ((SPARKLE_SPACE_W - Iw2DGetSurfaceWidth()) >> 1) + (ss_x >> SPARKLE_SHIFT) - 32;
-            scr_p.y = ((SPARKLE_SPACE_H - Iw2DGetSurfaceHeight()) >> 1) + (ss_y >> SPARKLE_SHIFT) - 32;
-            Iw2DDrawImageRegion(g_arrows,
-                scr_p,
-                sparkles64[sparkle_color],
-                dim64);
-            break;
-        }
-    }
-}
-*/
+
 inline void Sparkle::DrawSparkle()
 {
     int sx, sy, ex, ey;
@@ -323,12 +288,11 @@ inline void Sparkle::DrawSparkle()
 
 
 // vertex, strip, UV data
-uint16 tristrip[DGX_VERTICES];
+//uint16 tristrip[DGX_VERTICES];
 CIwSVec2 vertices[DGX_VERTICES];
 CIwSVec2 uvdata[DGX_VERTICES];
 uint32 send_vertices;
 CIwTexture* sparkling_texture = NULL;
-CIwMaterial* pMat;
 
 void InitSparklingLines()
 {
@@ -345,35 +309,6 @@ void PrepareSparklingLines()
     IwGxClear(IW_GX_DEPTH_BUFFER_F);
     send_vertices = 0;
 }
-
-/*
-add quads
-{
-// 0 = top-left
-// 1 = bottom-left
-// 2 = bottom-right
-// 3 = top-right
-screen_vertices = ...
-uv_coordinates = ...
-// colors = ...
-quads++
-}
-
-draw_quads
-{
-IwGxSetVertStreamScreenSpace( screen_vertices, quads * 4 );
-CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
-pMat->SetAlphaMode( CIwMaterial::ALPHA_BLEND );
-pMat->SetTexture( ... );
-pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
-IwGxSetMaterial( pMat );
-IwGxSetUVStream( uv_coordinates );
-// IwGxSetColStream( colors, quads * 4 );
-IwGxSetColStream( NULL );
-IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, quads * 4 );
-IwGxFlush();
-}
-*/
 
 void DrawSparklingLine(int sx, int sy, int ex, int ey, unsigned int lcolor, int size)
 {

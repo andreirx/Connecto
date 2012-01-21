@@ -35,7 +35,7 @@
 
 
 void bitmapStringAt(int x, int y, int padding, char *strw);
-//void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval);
+void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval);
 //void myIwGxDrawLetter(int x, int y, char c, int scale);
 
 

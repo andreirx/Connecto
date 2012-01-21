@@ -121,6 +121,75 @@ void bitmapStringAt(int x, int y, int padding, char *strw)
     }
 }
 
+
+// vertex, strip, UV data
+CIwSVec2 vertices[4];
+CIwSVec2 uvdata[4];
+uint32 send_vertices = 4;
+CIwTexture* tile_texture = NULL;
+
+void InitTileRotation()
+{
+    // Create empty texture object
+    tile_texture = new CIwTexture;
+    // Load image data from disk into texture
+    tile_texture->LoadFromFile("base_tiles.png");
+    // "Upload" texture to VRAM
+    tile_texture->Upload();
+}
+
+void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval)
+{
+    CIwMat2D transformMatrix;
+    int i;
+    //
+    IwGxClear(IW_GX_DEPTH_BUFFER_F);
+    send_vertices = 4;
+    //
+    transformMatrix = CIwMat2D::g_Identity;
+    transformMatrix.SetRot(rotval, CIwVec2(x, y));
+    //
+    // 0 = top-left
+    // 1 = bottom-left
+    // 2 = bottom-right
+    // 3 = top-right
+    //
+    vertices[0].x = x - 32;
+    vertices[0].y = y - 32;
+    vertices[1].x = x - 32;
+    vertices[1].y = y + 32;
+    vertices[2].x = x + 32;
+    vertices[2].y = y + 32;
+    vertices[3].x = x + 32;
+    vertices[3].y = y - 32;
+    //
+    uvdata[0].x = (texpos.x) << 3;
+    uvdata[0].y = (texpos.y) << 3;
+    uvdata[1].x = (texpos.x) << 3;
+    uvdata[1].y = (texpos.y + 64) << 3;
+    uvdata[2].x = (texpos.x + 64) << 3;
+    uvdata[2].y = (texpos.y + 64) << 3;
+    uvdata[3].x = (texpos.x + 64) << 3;
+    uvdata[3].y = (texpos.y) << 3;
+    //
+    for (i = 0; i < 4; i++)
+        vertices[i] = transformMatrix.TransformVec(vertices[i]);
+    //
+    IwGxSetScreenSpaceSlot(3);
+    IwGxSetVertStreamScreenSpace( vertices, send_vertices );
+    CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
+    pMat->SetAlphaMode( CIwMaterial::ALPHA_ADD );
+    pMat->SetTexture( tile_texture );
+    pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
+    IwGxSetMaterial( pMat );
+    IwGxSetUVStream( uvdata );
+    // IwGxSetColStream( colors, quads * 4 );
+    IwGxSetColStream( NULL );
+    IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, send_vertices );
+    IwGxFlush();
+}
+
+
 CGame::CGame()
 : m_Position(0,0)
 , m_Size(Iw2DGetSurfaceHeight() / 10, Iw2DGetSurfaceHeight() / 10)
