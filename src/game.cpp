@@ -361,7 +361,7 @@ void CGame::Update_PLAY(int framex)
                 iwangle line_angle;
                 dx = touch_x - touchdown_x;
                 dy = touch_y - touchdown_y;
-                if (dx == 0 && dy == 0)
+                if ((dx == 0 && dy == 0) || ((abs(dx) < 16) && (abs(dy) < 16)))
                     line_angle = 0x0800;
                 else
                     line_angle = IwGeomAtan2(dy, dx);
@@ -479,16 +479,38 @@ void CGame::Update_PLAY(int framex)
     //}
     if (touchdown)
     {
+        touch_x = s3ePointerGetX() - table_x;
+        touch_y = s3ePointerGetY() - table_y;
         //if (touchdown_branch >= 0)
         //{
         //    lightning->KillBranch(touchdown_branch);
         //}
+        if (abs(touchdown_x - touch_x) > abs(touchdown_y - touch_y))
+        {
+            int blen = abs(touchdown_x - touch_x) / 4;
+            if (blen < 4)
+                blen = 4;
+            touchdown_branch = lightning->AddBranch_Generate(blen,
+                touchdown_x + table_x, touchdown_y + table_y,
+                touch_x + table_x, touch_y + table_y,
+                0);
+        }
+        else
+        {
+            int blen = abs(touchdown_y - touch_y) / 4;
+            if (blen < 4)
+                blen = 4;
+            touchdown_branch = lightning->AddBranch_Generate(blen,
+                touchdown_x + table_x, touchdown_y + table_y,
+                touch_x + table_x, touch_y + table_y,
+                0);
+        }
+        /*
         touchdown_branch = lightning->AddBranch_Generate(DEFAULT_LEN,
             touchdown_x + table_x, touchdown_y + table_y,
-            s3ePointerGetX(), s3ePointerGetY(),
+            touch_x + table_x, touch_y + table_y,
             0);
-        touch_x = s3ePointerGetX() - table_x;
-        touch_y = s3ePointerGetY() - table_y;
+        */
     }
 }
 
@@ -661,7 +683,7 @@ void CGame::Render_PLAY(int framex)
             iwangle line_angle;
             dx = touch_x - touchdown_x;
             dy = touch_y - touchdown_y;
-            if (dx == 0 && dy == 0)
+            if ((dx == 0 && dy == 0) || ((abs(dx) < 16) && (abs(dy) < 16)))
                 line_angle = 0x800;
             else
                 line_angle = IwGeomAtan2(dy, dx);
