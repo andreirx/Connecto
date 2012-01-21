@@ -146,6 +146,7 @@ public:
     int send_anim_frame;
 
     int touchdown_x, touchdown_y;
+    int touch_x, touch_y;
     int touchdown;
 
     int game_state;

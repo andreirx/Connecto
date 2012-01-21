@@ -34,7 +34,16 @@ public:
     class Worm
     {
     public:
-        Worm(void) { SetWorm(0, 0); }
+        Worm(void)
+        {
+            int i;
+            SetWorm(0, 0);
+            for (i = 0; i < MAX_WORM; i++)
+            {
+                worm_x[i] = i;
+                worm_y[i] = 5;
+            }
+        }
         ~Worm(void) {}
 
         void SetWorm(int wlen, int tfreq)
@@ -43,11 +52,6 @@ public:
             if ((wlen >= 0) && (wlen <= MAX_WORM))
                 worm_length = wlen;
             tile_interaction = tfreq;
-            for (i = 0; i < worm_length; i++)
-            {
-                worm_x[i] = i;
-                worm_y[i] = 5;
-            }
             moving = 0;
         }
 

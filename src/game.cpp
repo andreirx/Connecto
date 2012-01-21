@@ -17,6 +17,7 @@
 #include "s3e.h"
 #include "Iw2D.h"
 #include "IwGx.h"
+#include "IwGeom.h"
 #include "game.h"
 #include "GameTable.h"
 
@@ -123,9 +124,9 @@ void bitmapStringAt(int x, int y, int padding, char *strw)
 
 
 // vertex, strip, UV data
-CIwSVec2 vertices[4];
-CIwSVec2 uvdata[4];
-uint32 send_vertices = 4;
+CIwSVec2 gvertices[4];
+CIwSVec2 guvdata[4];
+uint32 gsend_vertices = 4;
 CIwTexture* tile_texture = NULL;
 
 void InitTileRotation()
@@ -144,7 +145,7 @@ void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval)
     int i;
     //
     IwGxClear(IW_GX_DEPTH_BUFFER_F);
-    send_vertices = 4;
+    gsend_vertices = 4;
     //
     transformMatrix = CIwMat2D::g_Identity;
     transformMatrix.SetRot(rotval, CIwVec2(x, y));
@@ -154,38 +155,38 @@ void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval)
     // 2 = bottom-right
     // 3 = top-right
     //
-    vertices[0].x = x - 32;
-    vertices[0].y = y - 32;
-    vertices[1].x = x - 32;
-    vertices[1].y = y + 32;
-    vertices[2].x = x + 32;
-    vertices[2].y = y + 32;
-    vertices[3].x = x + 32;
-    vertices[3].y = y - 32;
+    gvertices[0].x = x - 64;
+    gvertices[0].y = y - 64;
+    gvertices[1].x = x - 64;
+    gvertices[1].y = y + 64;
+    gvertices[2].x = x + 64;
+    gvertices[2].y = y + 64;
+    gvertices[3].x = x + 64;
+    gvertices[3].y = y - 64;
     //
-    uvdata[0].x = (texpos.x) << 3;
-    uvdata[0].y = (texpos.y) << 3;
-    uvdata[1].x = (texpos.x) << 3;
-    uvdata[1].y = (texpos.y + 64) << 3;
-    uvdata[2].x = (texpos.x + 64) << 3;
-    uvdata[2].y = (texpos.y + 64) << 3;
-    uvdata[3].x = (texpos.x + 64) << 3;
-    uvdata[3].y = (texpos.y) << 3;
+    guvdata[0].x = (texpos.x) << 2;
+    guvdata[0].y = (texpos.y) << 3;
+    guvdata[1].x = (texpos.x) << 2;
+    guvdata[1].y = (texpos.y + 64) << 3;
+    guvdata[2].x = (texpos.x + 64) << 2;
+    guvdata[2].y = (texpos.y + 64) << 3;
+    guvdata[3].x = (texpos.x + 64) << 2;
+    guvdata[3].y = (texpos.y) << 3;
     //
     for (i = 0; i < 4; i++)
-        vertices[i] = transformMatrix.TransformVec(vertices[i]);
+        gvertices[i] = transformMatrix.TransformVec(gvertices[i]);
     //
     IwGxSetScreenSpaceSlot(3);
-    IwGxSetVertStreamScreenSpace( vertices, send_vertices );
+    IwGxSetVertStreamScreenSpace( gvertices, gsend_vertices );
     CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
-    pMat->SetAlphaMode( CIwMaterial::ALPHA_ADD );
+    pMat->SetAlphaMode( CIwMaterial::ALPHA_DEFAULT );
     pMat->SetTexture( tile_texture );
     pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
     IwGxSetMaterial( pMat );
-    IwGxSetUVStream( uvdata );
+    IwGxSetUVStream( guvdata );
     // IwGxSetColStream( colors, quads * 4 );
     IwGxSetColStream( NULL );
-    IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, send_vertices );
+    IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, gsend_vertices );
     IwGxFlush();
 }
 
@@ -217,6 +218,8 @@ CGame::CGame()
     penalty = 0;
     last_sent = 0;
     touchdown = 0;
+    //
+    InitTileRotation();
     //
     table_x = (Iw2DGetSurfaceWidth() - 640) / 2;
     table_y = (Iw2DGetSurfaceHeight() - 640) / 2;
@@ -265,7 +268,7 @@ void CGame::Update_PLAY(int framex)
         touchdown_y = s3ePointerGetY() - table_y;
         touchdown = 1;
         if((s3ePointerGetX() >= table_x) && (s3ePointerGetY() >= table_y) &&
-            (s3ePointerGetX() <= table_x + 640) && (s3ePointerGetY() <= table_y + 640))
+            (s3ePointerGetX() < table_x + 640) && (s3ePointerGetY() < table_y + 640))
         {
             // click on one square
             int gx = (s3ePointerGetX() - table_x) >> 6;
@@ -450,6 +453,8 @@ void CGame::Update_PLAY(int framex)
             touchdown_x + table_x, touchdown_y + table_y,
             s3ePointerGetX(), s3ePointerGetY(),
             0);
+        touch_x = s3ePointerGetX() - table_x;
+        touch_y = s3ePointerGetY() - table_y;
     }
 }
 
@@ -615,6 +620,23 @@ void CGame::Render_PLAY(int framex)
                     tex_p,
                     dimension64);
 			}
+        if (touchdown && (touchdown_x >= 0) && (touchdown_y >= 0) &&
+            (touchdown_x < 640) && (touchdown_y < 640))
+        {
+            int dx, dy;
+            iwangle line_angle;
+            dx = touch_x - touchdown_x;
+            dy = touch_y - touchdown_y;
+            if (dx == 0 && dy == 0)
+                line_angle = 0;
+            else
+                line_angle = IwGeomAtan2(dy, dx);
+            i = touchdown_x / 64;
+            j = touchdown_y / 64;
+            tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
+            tex_p.y = (CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
+            myIwGxDrawTile(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32, tex_p, (line_angle + 0x400) % 0x1000);
+        }
     }
     if ((framex % 2) == 0)
         game_table->update_color_shifts();
