@@ -21,6 +21,10 @@
 #include "game.h"
 #include "GameTable.h"
 
+
+#define SEND_MULTIPLIER 8
+
+
 extern CIw2DImage* g_tiles;
 extern CIw2DImage* g_emoticons;
 extern CIw2DImage* g_send;
@@ -40,6 +44,9 @@ unsigned char left_set[GRID_H];
 unsigned char right_set[GRID_H];
 int right_multiplier[GRID_H];
 int touchdown_branch = -1;
+int send_frame_zero = -1;
+int could_send = 0;
+int rotated = 0;
 
 
 class MySprite
@@ -284,12 +291,15 @@ void CGame::Update_PLAY(int framex)
                 if (game_table->the_worm.can_click(gx, gy))
                 {
                     //game_table->click_element(gx, gy);
-                    show_arrows = 1;
+                    //show_arrows = 1;
                     arrow_x = gx;
                     arrow_y = gy;
                 }
             }
         }
+    }
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    {
         if((s3ePointerGetX() >= table_x) && (s3ePointerGetY() >= table_y + 640) &&
             (s3ePointerGetX() <= table_x + 640) && (s3ePointerGetY() <= table_y + 640 + 64))
         {
@@ -297,10 +307,15 @@ void CGame::Update_PLAY(int framex)
             int gx = (s3ePointerGetX() - table_x) >> 6;
             game_table->new_column(gx);
         }
+    }
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED) ||
+        ((framex - send_frame_zero) >= 12 * SEND_MULTIPLIER))
+    {
         if (can_send)
-            if ((s3ePointerGetX() >= 10) && (s3ePointerGetX() <= 118) &&
+            if (((s3ePointerGetX() >= 10) && (s3ePointerGetX() <= 118) &&
                 (s3ePointerGetY() >= Iw2DGetSurfaceHeight() - 118) &&
-                (s3ePointerGetY() <= Iw2DGetSurfaceHeight() - 10))
+                (s3ePointerGetY() <= Iw2DGetSurfaceHeight() - 10)) ||
+                ((framex - send_frame_zero) >= 12 * SEND_MULTIPLIER))
             {
                 int i, j, k;
                 bonus = 0;
@@ -326,7 +341,11 @@ void CGame::Update_PLAY(int framex)
                 current_score = game_table->send_connections();
                 total_score += (current_score & 0x00ffff) * bonus;
                 last_sent = ((current_score & 0xff0000) >> 16);
+                can_send = 0;
             }
+    }
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    {
         if (can_bomb || bombing)
             if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) &&
                 (s3ePointerGetX() <= Iw2DGetSurfaceWidth() - 10) &&
@@ -347,6 +366,7 @@ void CGame::Update_PLAY(int framex)
                 }
             }
     }
+    rotated = 0;
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
         touchdown = 1;
     else
@@ -380,12 +400,20 @@ void CGame::Update_PLAY(int framex)
                         rotations = 1;
                     for (k = 0; k < rotations; k++)
                         game_table->click_element(i, j);
+                    rotated = 1;
                 }
             }
         }
         touchdown = 0;
     }
+    if (can_send == 0)
+        could_send = can_send;
     can_send = game_table->check_connections();
+    if (can_send && (!could_send))
+        send_frame_zero = framex;
+    if (can_send && rotated)
+        send_frame_zero = framex;
+    could_send = can_send;
     //
     // make particles for destroyed tiles
     for (i = 0; i < GRID_W; i++)
@@ -423,7 +451,7 @@ void CGame::Update_PLAY(int framex)
                 }
                 if (game_table->get_grid_state(i, j) == CONNECT_OK)
                 {
-                    add_color = 4;//0xff00bf00;
+                    add_color = ((framex - send_frame_zero) / SEND_MULTIPLIER) % 12;//0xff00bf00;
                 }
                 if (add_color != 0)
                 {
