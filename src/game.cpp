@@ -39,11 +39,6 @@ unsigned char left_set[GRID_H];
 unsigned char right_set[GRID_H];
 int right_multiplier[GRID_H];
 
-// HARDCODED???
-int worm_length = 5;
-int worm_x[10];
-int worm_y[10];
-
 
 class MySprite
 {
@@ -86,178 +81,11 @@ MySprite power_sprites[10] =
 };
 
 
-void update_worm()
-{
-    int move, i, j, ok_worm, whead;
-    if (rand() % 8 == 0)
-    {
-        whead = 0;
-        ok_worm = 0;
-        while (!ok_worm)
-        {
-            whead = rand() % 2;
-            move = (1 << (rand() % 4));
-            ok_worm = !(((worm_x[whead * (worm_length - 1)] == 0) && (move == CB_LEFT)) ||
-                ((worm_x[whead * (worm_length - 1)] == GRID_W - 1) && (move == CB_RIGHT)) ||
-                ((worm_y[whead * (worm_length - 1)] == 0) && (move == CB_UP)) ||
-                ((worm_y[whead * (worm_length - 1)] == GRID_H - 1) && (move == CB_DOWN)));
-            switch(move)
-            {
-            case CB_LEFT:
-                for (i = 0; i < worm_length; i++)
-                    if ((worm_x[whead * (worm_length - 1)] - 1 == worm_x[i]) &&
-                        (worm_y[whead * (worm_length - 1)] == worm_y[i]))
-                        ok_worm = 0;
-                break;
-            case CB_RIGHT:
-                for (i = 0; i < worm_length; i++)
-                    if ((worm_x[whead * (worm_length - 1)] + 1 == worm_x[i]) &&
-                        (worm_y[whead * (worm_length - 1)] == worm_y[i]))
-                        ok_worm = 0;
-                break;
-            case CB_UP:
-                for (i = 0; i < worm_length; i++)
-                    if ((worm_y[whead * (worm_length - 1)] - 1 == worm_y[i]) &&
-                        (worm_x[whead * (worm_length - 1)] == worm_x[i]))
-                        ok_worm = 0;
-                break;
-            case CB_DOWN:
-                for (i = 0; i < worm_length; i++)
-                    if ((worm_y[whead * (worm_length - 1)] + 1 == worm_y[i]) &&
-                        (worm_x[whead * (worm_length - 1)] == worm_x[i]))
-                        ok_worm = 0;
-                break;
-            }
-        }
-        if (!whead)
-        {
-            // move head
-            for (i = worm_length - 1; i > 0; i--)
-            {
-                worm_x[i] = worm_x[i - 1];
-                worm_y[i] = worm_y[i - 1];
-            }
-            switch (move)
-            {
-            case CB_LEFT:
-                worm_x[0] = worm_x[0] - 1;
-                worm_y[0] = worm_y[0];
-                break;
-            case CB_RIGHT:
-                worm_x[0] = worm_x[0] + 1;
-                worm_y[0] = worm_y[0];
-                break;
-            case CB_UP:
-                worm_x[0] = worm_x[0];
-                worm_y[0] = worm_y[0] - 1;
-                break;
-            case CB_DOWN:
-                worm_x[0] = worm_x[0];
-                worm_y[0] = worm_y[0] + 1;
-                break;
-            }
-        }
-        else
-        {
-            // move tail
-            for (i = 0; i < worm_length - 1; i++)
-            {
-                worm_x[i] = worm_x[i + 1];
-                worm_y[i] = worm_y[i + 1];
-            }
-            switch (move)
-            {
-            case CB_LEFT:
-                worm_x[worm_length - 1] = worm_x[worm_length - 1] - 1;
-                worm_y[worm_length - 1] = worm_y[worm_length - 1];
-                break;
-            case CB_RIGHT:
-                worm_x[worm_length - 1] = worm_x[worm_length - 1] + 1;
-                worm_y[worm_length - 1] = worm_y[worm_length - 1];
-                break;
-            case CB_UP:
-                worm_x[worm_length - 1] = worm_x[worm_length - 1];
-                worm_y[worm_length - 1] = worm_y[worm_length - 1] - 1;
-                break;
-            case CB_DOWN:
-                worm_x[worm_length - 1] = worm_x[worm_length - 1];
-                worm_y[worm_length - 1] = worm_y[worm_length - 1] + 1;
-                break;
-            }
-        }
-    }
-}
-
 CIwSVec2 dimension32 = CIwSVec2(32, 32);
 CIwSVec2 dimension64 = CIwSVec2(64, 64);
 CIwSVec2 dimension128 = CIwSVec2(128, 128);
 CIwSVec2 dimension512 = CIwSVec2(512, 512);
 CIwSVec2 zerozero = CIwSVec2(0, 0);
-
-void draw_worm(int x, int y)
-{
-    int i, tcode;
-	CIwSVec2 scr_p, tex_p;
-    Iw2DSetColour(0xffffffff);
-    for (i = 0; i < worm_length; i++)
-    {
-        tcode = 0;
-        if (i == 0)
-        {
-            if ((worm_x[0] == worm_x[1]) && (worm_y[0] < worm_y[1]))
-                tcode = 13;
-            if ((worm_x[0] == worm_x[1]) && (worm_y[0] > worm_y[1]))
-                tcode = 15;
-            if ((worm_y[0] == worm_y[1]) && (worm_x[0] > worm_x[1]))
-                tcode = 14;
-            if ((worm_y[0] == worm_y[1]) && (worm_x[0] < worm_x[1]))
-                tcode = 12;
-        }
-        if (i == worm_length - 1)
-        {
-            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) &&
-                (worm_y[worm_length - 1] < worm_y[worm_length - 2]))
-                tcode = 13;
-            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) &&
-                (worm_y[worm_length - 1] > worm_y[worm_length - 2]))
-                tcode = 15;
-            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) &&
-                (worm_x[worm_length - 1] < worm_x[worm_length - 2]))
-                tcode = 12;
-            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) &&
-                (worm_x[worm_length - 1] > worm_x[worm_length - 2]))
-                tcode = 14;
-        }
-        if ((i > 0) && (i < worm_length - 1))
-        {
-            if ((worm_x[i - 1] == worm_x[i]) && (worm_x[i + 1] == worm_x[i]))
-                tcode = 2;
-            if ((worm_y[i - 1] == worm_y[i]) && (worm_y[i + 1] == worm_y[i]))
-                tcode = 1;
-            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] < worm_y[i])) ||
-                ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
-                tcode = 4;
-            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] > worm_y[i])) ||
-                ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
-                tcode = 3;
-            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] < worm_y[i])) ||
-                ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
-                tcode = 5;
-            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] > worm_y[i])) ||
-                ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
-                tcode = 6;
-        }
-        if (tcode == 0)
-            tcode = 11;
-		scr_p.x = x + (worm_x[i] << 6);
-		scr_p.y = y + (worm_y[i] << 6);
-		tex_p.x = (tcode << 6);
-		tex_p.y = 256;
-        Iw2DDrawImageRegion(g_tiles, scr_p,
-            tex_p,
-            dimension64);
-    }
-}
 
 CIwSVec2 destroy_frame[6] = 
 {
@@ -301,6 +129,7 @@ CGame::CGame()
     animation_frame = 0;
     game_table = new GameTable();
     game_table->reset_table(10);
+    game_table->the_worm.SetWorm(7, 0);
     can_send = 0;
     can_bomb = 1;
     bombing = 0;
@@ -336,11 +165,6 @@ CGame::CGame()
                 (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 640 - ((GRID_H - j) << 6));
             anim_positions[i][j] = alt_positions[i][j];
         }
-    for (i = 0; i < worm_length; i++)
-    {
-        worm_x[i] = 1 + i;
-        worm_y[i] = 5;
-    }
     //
     for (i = 0; i < FPS_AVERAGE; i++)
     {
@@ -364,7 +188,7 @@ void CGame::Update_PLAY(int framex)
     // for example, move a red square towards any touch event...
     if (game_table->is_animating())
         return;
-    update_worm();
+    game_table->the_worm.update_worm();
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))// && (framex == 0))
     {
         touchdown_x = s3ePointerGetX() - table_x;
@@ -384,11 +208,7 @@ void CGame::Update_PLAY(int framex)
             }
             else
             {
-                int can_click = 1, i;
-                for (i = 0; i < worm_length; i++)
-                    if ((gx == worm_x[i]) && (gy == worm_y[i]))
-                        can_click = 0;
-                if (can_click)
+                if (game_table->the_worm.can_click(gx, gy))
                 {
                     game_table->click_element(gx, gy);
                     show_arrows = 1;
@@ -488,7 +308,7 @@ void CGame::Update_PLAY(int framex)
                 add_color = 0;
                 if (game_table->get_grid_state(i, j) == CONNECT_LEFT)
                 {
-                    add_color = 7;//0xffff9955;
+                    add_color = 8;//0xffff9955;
                 }
                 if (game_table->get_grid_state(i, j) == CONNECT_RIGHT)
                 {
@@ -509,20 +329,6 @@ void CGame::Update_PLAY(int framex)
                                 grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
                                 grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
                                 add_color);
-                            /*
-                            if ((rand() % 100) == 0)
-                            {
-                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
-                                    add_color, 1);
-                            }
-                            */
-                            /*
-                            lightning->AddBranch_Generate(DEFAULT_LEN,
-                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                grid_positions[i + 1][j].x + 32, grid_positions[i + 1][j].y + 32,
-                                add_color);
-                            */
                         }
                     }
                     if (j < GRID_H - 1)
@@ -534,80 +340,26 @@ void CGame::Update_PLAY(int framex)
                                 grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
                                 grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
                                 add_color);
-                            /*
-                            if ((rand() % 100) == 0)
-                            {
-                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
-                                    add_color, 1);
-                            }
-                            */
-                            /*
-                            lightning->AddBranch_Generate(DEFAULT_LEN,
-                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                grid_positions[i][j + 1].x + 32, grid_positions[i][j + 1].y + 32,
-                                add_color);
-                            */
                         }
                     }
                     if (i == 0)
                     {
                         if ((game_table->get_grid_connector(i, j) & CB_LEFT) != 0)
                         {
-                            /*
-                            if ((rand() % 60) == 0)
-                            {
-                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
-                                    add_color, 1);
-                            }
-                            */
-                            /*
-                            lightning->AddBranch_Generate(DEFAULT_LEN,
-                                grid_positions[i][j].x, grid_positions[i][j].y + 16,
-                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                add_color);
-                            */
                             lightning->AddBranch_Generate(DEFAULT_LEN / 2,
                                 grid_positions[i][j].x, grid_positions[i][j].y + 32,
                                 grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
                                 add_color);
-                            /*
-                            lightning->AddBranch_Generate(DEFAULT_LEN,
-                                grid_positions[i][j].x, grid_positions[i][j].y + 48,
-                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                add_color);
-                            */
                         }
                     }
                     if (i == GRID_W - 1)
                     {
                         if ((game_table->get_grid_connector(i, j) & CB_RIGHT) != 0)
                         {
-                            /*
-                            if ((rand() % 100) == 0)
-                            {
-                                lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
-                                    add_color, 1);
-                            }
-                            */
-                            /*
-                            lightning->AddBranch_Generate(DEFAULT_LEN,
-                                grid_positions[i][j].x + 63, grid_positions[i][j].y + 16,
-                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                add_color);
-                            */
                             lightning->AddBranch_Generate(DEFAULT_LEN / 2,
                                 grid_positions[i][j].x + 63, grid_positions[i][j].y + 32,
                                 grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
                                 add_color);
-                            /*
-                            lightning->AddBranch_Generate(DEFAULT_LEN,
-                                grid_positions[i][j].x + 63, grid_positions[i][j].y + 48,
-                                grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                                add_color);
-                            */
                         }
                     }
                 }
@@ -857,7 +609,7 @@ void CGame::Render_PLAY(int framex)
     //
 
     // draw worm
-    draw_worm((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() - 640) / 2);
+    game_table->the_worm.draw_worm((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() - 640) / 2);
 
     // draw buttons
     Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);

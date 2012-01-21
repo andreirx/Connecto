@@ -566,9 +566,9 @@ LightningManager::LightningManager(int sW, int sH)
 
 LightningManager::~LightningManager(void)
 {
+    delete sparkling_texture;
     delete destImage;
     delete destSurface;
-    delete sparkling_texture;
 }
 
 void LightningManager::AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor)

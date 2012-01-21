@@ -5,6 +5,7 @@
 #include "Iw2D.h"
 #include "IwGx.h"
 
+
 int grid_anim_frame[10] =
 {
     1, 1, 2, 2, 3, 3, 2, 2, 1, 1,
@@ -32,6 +33,181 @@ int get_grid_anim_frame2(int i)
 }
 
 
+extern CIw2DImage* g_tiles;
+
+void GameTable::Worm::update_worm()
+{
+    int move, i, j, ok_worm, whead;
+    if (worm_length <= 0)
+        return;
+    if (rand() % 8 == 0)
+    {
+        whead = 0;
+        ok_worm = 0;
+        while (!ok_worm)
+        {
+            whead = rand() % 2;
+            move = (1 << (rand() % 4));
+            ok_worm = !(((worm_x[whead * (worm_length - 1)] == 0) && (move == CB_LEFT)) ||
+                ((worm_x[whead * (worm_length - 1)] == GRID_W - 1) && (move == CB_RIGHT)) ||
+                ((worm_y[whead * (worm_length - 1)] == 0) && (move == CB_UP)) ||
+                ((worm_y[whead * (worm_length - 1)] == GRID_H - 1) && (move == CB_DOWN)));
+            switch(move)
+            {
+            case CB_LEFT:
+                for (i = 0; i < worm_length; i++)
+                    if ((worm_x[whead * (worm_length - 1)] - 1 == worm_x[i]) &&
+                        (worm_y[whead * (worm_length - 1)] == worm_y[i]))
+                        ok_worm = 0;
+                break;
+            case CB_RIGHT:
+                for (i = 0; i < worm_length; i++)
+                    if ((worm_x[whead * (worm_length - 1)] + 1 == worm_x[i]) &&
+                        (worm_y[whead * (worm_length - 1)] == worm_y[i]))
+                        ok_worm = 0;
+                break;
+            case CB_UP:
+                for (i = 0; i < worm_length; i++)
+                    if ((worm_y[whead * (worm_length - 1)] - 1 == worm_y[i]) &&
+                        (worm_x[whead * (worm_length - 1)] == worm_x[i]))
+                        ok_worm = 0;
+                break;
+            case CB_DOWN:
+                for (i = 0; i < worm_length; i++)
+                    if ((worm_y[whead * (worm_length - 1)] + 1 == worm_y[i]) &&
+                        (worm_x[whead * (worm_length - 1)] == worm_x[i]))
+                        ok_worm = 0;
+                break;
+            }
+        }
+        if (!whead)
+        {
+            // move head
+            for (i = worm_length - 1; i > 0; i--)
+            {
+                worm_x[i] = worm_x[i - 1];
+                worm_y[i] = worm_y[i - 1];
+            }
+            switch (move)
+            {
+            case CB_LEFT:
+                worm_x[0] = worm_x[0] - 1;
+                worm_y[0] = worm_y[0];
+                break;
+            case CB_RIGHT:
+                worm_x[0] = worm_x[0] + 1;
+                worm_y[0] = worm_y[0];
+                break;
+            case CB_UP:
+                worm_x[0] = worm_x[0];
+                worm_y[0] = worm_y[0] - 1;
+                break;
+            case CB_DOWN:
+                worm_x[0] = worm_x[0];
+                worm_y[0] = worm_y[0] + 1;
+                break;
+            }
+        }
+        else
+        {
+            // move tail
+            for (i = 0; i < worm_length - 1; i++)
+            {
+                worm_x[i] = worm_x[i + 1];
+                worm_y[i] = worm_y[i + 1];
+            }
+            switch (move)
+            {
+            case CB_LEFT:
+                worm_x[worm_length - 1] = worm_x[worm_length - 1] - 1;
+                worm_y[worm_length - 1] = worm_y[worm_length - 1];
+                break;
+            case CB_RIGHT:
+                worm_x[worm_length - 1] = worm_x[worm_length - 1] + 1;
+                worm_y[worm_length - 1] = worm_y[worm_length - 1];
+                break;
+            case CB_UP:
+                worm_x[worm_length - 1] = worm_x[worm_length - 1];
+                worm_y[worm_length - 1] = worm_y[worm_length - 1] - 1;
+                break;
+            case CB_DOWN:
+                worm_x[worm_length - 1] = worm_x[worm_length - 1];
+                worm_y[worm_length - 1] = worm_y[worm_length - 1] + 1;
+                break;
+            }
+        }
+    }
+}
+
+void GameTable::Worm::draw_worm(int x, int y)
+{
+    int i, tcode;
+    CIwSVec2 scr_p, tex_p;
+    CIwSVec2 dimension64 = CIwSVec2(64, 64);
+    if (worm_length <= 0)
+        return;
+    Iw2DSetColour(0xffffffff);
+    for (i = 0; i < worm_length; i++)
+    {
+        tcode = 0;
+        if (i == 0)
+        {
+            if ((worm_x[0] == worm_x[1]) && (worm_y[0] < worm_y[1]))
+                tcode = 13;
+            if ((worm_x[0] == worm_x[1]) && (worm_y[0] > worm_y[1]))
+                tcode = 15;
+            if ((worm_y[0] == worm_y[1]) && (worm_x[0] > worm_x[1]))
+                tcode = 14;
+            if ((worm_y[0] == worm_y[1]) && (worm_x[0] < worm_x[1]))
+                tcode = 12;
+        }
+        if (i == worm_length - 1)
+        {
+            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) &&
+                (worm_y[worm_length - 1] < worm_y[worm_length - 2]))
+                tcode = 13;
+            if ((worm_x[worm_length - 1] == worm_x[worm_length - 2]) &&
+                (worm_y[worm_length - 1] > worm_y[worm_length - 2]))
+                tcode = 15;
+            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) &&
+                (worm_x[worm_length - 1] < worm_x[worm_length - 2]))
+                tcode = 12;
+            if ((worm_y[worm_length - 1] == worm_y[worm_length - 2]) &&
+                (worm_x[worm_length - 1] > worm_x[worm_length - 2]))
+                tcode = 14;
+        }
+        if ((i > 0) && (i < worm_length - 1))
+        {
+            if ((worm_x[i - 1] == worm_x[i]) && (worm_x[i + 1] == worm_x[i]))
+                tcode = 2;
+            if ((worm_y[i - 1] == worm_y[i]) && (worm_y[i + 1] == worm_y[i]))
+                tcode = 1;
+            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] < worm_y[i])) ||
+                ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
+                tcode = 4;
+            if (((worm_x[i - 1] < worm_x[i]) && (worm_y[i + 1] > worm_y[i])) ||
+                ((worm_x[i + 1] < worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
+                tcode = 3;
+            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] < worm_y[i])) ||
+                ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] < worm_y[i])))
+                tcode = 5;
+            if (((worm_x[i - 1] > worm_x[i]) && (worm_y[i + 1] > worm_y[i])) ||
+                ((worm_x[i + 1] > worm_x[i]) && (worm_y[i - 1] > worm_y[i])))
+                tcode = 6;
+        }
+        if (tcode == 0)
+            tcode = 11;
+        scr_p.x = x + (worm_x[i] << 6);
+        scr_p.y = y + (worm_y[i] << 6);
+        tex_p.x = (tcode << 6);
+        tex_p.y = 256;
+        Iw2DDrawImageRegion(g_tiles, scr_p,
+            tex_p,
+            dimension64);
+    }
+}
+
+
 GameTable::GameTable(void)
 {
     new_elements = 0;
@@ -40,6 +216,7 @@ GameTable::GameTable(void)
     fall_finished = 0;
     trigger_anim = -1;
     trigger_circle = -1;
+    the_worm.SetWorm(0, 0);
 }
 
 GameTable::~GameTable(void)

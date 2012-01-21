@@ -21,9 +21,56 @@
 #define FRAMES_DESTROY 8
 #define FRAMES_FALL    30
 
+#define MAX_WORM       15
+
+
 class GameTable
 {
 public:
+    class Worm
+    {
+    public:
+        Worm(void) {}
+        ~Worm(void) {}
+
+        void SetWorm(int wlen, int tfreq)
+        {
+            int i;
+            if ((wlen >= 0) && (wlen <= MAX_WORM))
+                worm_length = wlen;
+            tile_interaction = tfreq;
+            for (i = 0; i < worm_length; i++)
+            {
+                worm_x[i] = 1 + i;
+                worm_y[i] = 5;
+            }
+        }
+
+        int can_click(int gx, int gy)
+        {
+            int i;
+            if (worm_length <= 0)
+                return 1;
+            for (i = 0; i < worm_length; i++)
+                if ((gx == worm_x[i]) && (gy == worm_y[i]))
+                    return 0;
+        }
+
+        void update_worm();
+        void draw_worm(int x, int y);
+
+    private:
+        int worm_length;
+        int moving;
+        int tile_interaction;
+        //
+        int worm_x[MAX_WORM];
+        int worm_y[MAX_WORM];
+        int worm_ox[MAX_WORM];
+        int worm_oy[MAX_WORM];
+    };
+
+
     GameTable(void);
     ~GameTable(void);
 
@@ -87,6 +134,8 @@ public:
     //unsigned char grid_codep[16];// = {0, 12, 15, 5, 14, 1, 4, 7, 13, 6, 2, 8, 3, 9, 10, 11};
     unsigned char grid_anim_frame[GRID_W][GRID_H];
     unsigned char grid_anim_type[GRID_W][GRID_H];
+
+    Worm the_worm;
 
 private:
     unsigned char grid_connectors[GRID_W][GRID_H];
