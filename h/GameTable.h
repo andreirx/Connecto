@@ -58,8 +58,9 @@ public:
                 return 1;
             for (i = 0; i < worm_length; i++)
                 if (((gx == worm_x[i]) && (gy == worm_y[i])) ||
-                    ((gx == worm_ox[i]) && (gy == worm_oy[i])))
+                    ((gx == worm_ox[i]) && (gy == worm_oy[i]) && moving))
                     return 0;
+            return 1;
         }
 
         int touches_xy(int x, int y)
