@@ -362,7 +362,7 @@ void CGame::Update_PLAY(int framex)
                 dx = touch_x - touchdown_x;
                 dy = touch_y - touchdown_y;
                 if (dx == 0 && dy == 0)
-                    line_angle = 0;
+                    line_angle = 0x0800;
                 else
                     line_angle = IwGeomAtan2(dy, dx);
                 i = touchdown_x / 64;
@@ -662,7 +662,7 @@ void CGame::Render_PLAY(int framex)
             dx = touch_x - touchdown_x;
             dy = touch_y - touchdown_y;
             if (dx == 0 && dy == 0)
-                line_angle = 0;
+                line_angle = 0x800;
             else
                 line_angle = IwGeomAtan2(dy, dx);
             i = touchdown_x / 64;
