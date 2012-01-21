@@ -164,7 +164,8 @@ public:
     s3eSurfaceInfo dsInfo;
 
     void ResetBranches();
-    void AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor);
+    int AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor);
+    void KillBranch(int which_branch);
     void UpdateAllBranches(int update_much);
     void DrawLightning(int size);
 

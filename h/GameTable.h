@@ -53,7 +53,8 @@ public:
             if (worm_length <= 0)
                 return 1;
             for (i = 0; i < worm_length; i++)
-                if ((gx == worm_x[i]) && (gy == worm_y[i]))
+                if (((gx == worm_x[i]) && (gy == worm_y[i])) ||
+                    ((gx == worm_ox[i]) && (gy == worm_oy[i])))
                     return 0;
         }
 
@@ -136,6 +137,14 @@ public:
     unsigned char grid_anim_frame[GRID_W][GRID_H];
     unsigned char grid_anim_type[GRID_W][GRID_H];
 
+    void SetWormParams(int wlen, int tfreq, int timeout)
+    {
+        worm_wlen = wlen;
+        worm_tfreq = tfreq;
+        worm_timeout = timeout;
+        the_worm.SetWorm(worm_wlen, worm_tfreq);
+    }
+
     Worm the_worm;
 
 private:
@@ -143,6 +152,11 @@ private:
     unsigned char grid_clickable[GRID_W][GRID_H];
     unsigned char grid_state[GRID_W][GRID_H];
     unsigned char grid_color_shift[GRID_W][GRID_H];
+
+    int worm_wait_time;
+    int worm_timeout;
+    int worm_wlen;
+    int worm_tfreq;
 
     int can_send_connections;
     int missing_links;

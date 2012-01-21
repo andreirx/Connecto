@@ -38,6 +38,7 @@ int grid_shift[GRID_W][GRID_H];
 unsigned char left_set[GRID_H];
 unsigned char right_set[GRID_H];
 int right_multiplier[GRID_H];
+int touchdown_branch = -1;
 
 
 class MySprite
@@ -129,7 +130,7 @@ CGame::CGame()
     animation_frame = 0;
     game_table = new GameTable();
     game_table->reset_table(10);
-    game_table->the_worm.SetWorm(7, 0);
+    game_table->SetWormParams(7, 0, 10000);
     can_send = 0;
     can_bomb = 1;
     bombing = 0;
@@ -298,7 +299,7 @@ void CGame::Update_PLAY(int framex)
     //
     // OK NOW make some lightning
     //
-    //if (show_arrows || framex == 0 || internal_frame == 0)
+    //if (show_arrows || game_table->is_animating())
     {
         lightning->ResetBranches();
         for (i = 0; i < GRID_W; i++)
@@ -366,9 +367,17 @@ void CGame::Update_PLAY(int framex)
             }
         }
     }
+    //else
+    //{
+    //    lightning->UpdateAllBranches(UPDATE_STRIKE - (UPDATE_STRIKE / 4));
+    //}
     if (touchdown)
     {
-        lightning->AddBranch_Generate(DEFAULT_LEN,
+        //if (touchdown_branch >= 0)
+        //{
+        //    lightning->KillBranch(touchdown_branch);
+        //}
+        touchdown_branch = lightning->AddBranch_Generate(DEFAULT_LEN,
             touchdown_x + table_x, touchdown_y + table_y,
             s3ePointerGetX(), s3ePointerGetY(),
             0);

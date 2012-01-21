@@ -571,7 +571,7 @@ LightningManager::~LightningManager(void)
     delete destSurface;
 }
 
-void LightningManager::AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor)
+int LightningManager::AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor)
 {
     if (total_branches < MAX_BRANCHES)
     {
@@ -581,7 +581,16 @@ void LightningManager::AddBranch_Generate(int branch_len, int sx, int sy, int ex
         }
         lightning_branches[total_branches].GenerateBranch(sx, sy, ex, ey, bcolor);
         total_branches++;
+        return (total_branches - 1);
     }
+    else
+        return -1;
+}
+
+void LightningManager::KillBranch(int which_branch)
+{
+    if ((which_branch >= 0) && (which_branch < MAX_BRANCHES) && (which_branch == total_branches))
+        total_branches--;
 }
 
 void LightningManager::ResetBranches()
