@@ -27,11 +27,27 @@
 #define FRAMES_FALL    30
 
 #define MAX_WORM       10
+#define MAX_BONUS      32
+
+#define BONUS_NONE     0
+#define BONUS_CLOCK    1
+#define BONUS_BOMB     2
+#define BONUS_CHARGE1  10
+#define BONUS_CHARGE2  11
+#define BONUS_CHARGE3  12
+
+
+void myIwGxInitBonus();
+void myIwGxPrepareBonus();
+void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval);
+void myIwGxDoneBonus();
 
 
 class BonusItem
 {
 public:
+    int enabled;
+
     BonusItem(void);
     ~BonusItem(void);
 
@@ -40,7 +56,6 @@ public:
     void DrawBonusItem();
 
 private:
-    int enabled;
     int falling_frame;
     int glowing_frame;
     int target_i, target_j;
@@ -202,6 +217,23 @@ public:
         }
     }
 
+    void AddBonusItem(int ti, int tj, int btype)
+    {
+        int internal_counter = 0;
+        while (bonuses[bonus_counter].enabled == 1)
+        {
+            bonus_counter = (bonus_counter + 1) % MAX_BONUS;
+            internal_counter++;
+            // if all sparkles are already enabled, do nothing
+            if (internal_counter > MAX_BONUS)
+                return;
+        }
+        bonuses[bonus_counter].SetBonusItem(ti, tj, btype);
+    }
+
+    void UpdateBonusItems();
+    void DrawBonusItems();
+
     Worm the_worm;
 
 private:
@@ -209,6 +241,9 @@ private:
     unsigned char grid_clickable[GRID_W][GRID_H];
     unsigned char grid_state[GRID_W][GRID_H];
     unsigned char grid_color_shift[GRID_W][GRID_H];
+
+    BonusItem bonuses[MAX_BONUS];
+    int bonus_counter;
 
     int worm_wait_time;
     int worm_timeout;

@@ -186,7 +186,7 @@ void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval)
     IwGxSetScreenSpaceSlot(3);
     IwGxSetVertStreamScreenSpace( gvertices, gsend_vertices );
     CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
-    pMat->SetAlphaMode( CIwMaterial::ALPHA_DEFAULT );
+    pMat->SetAlphaMode( CIwMaterial::ALPHA_BLEND );
     pMat->SetTexture( tile_texture );
     pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
     IwGxSetMaterial( pMat );
@@ -255,6 +255,7 @@ CGame::CGame()
 
 CGame::~CGame()
 {
+    delete tile_texture;
     delete game_table;
     delete lightning;
 }
@@ -727,6 +728,8 @@ void CGame::Render_PLAY(int framex)
         {
             int dx, dy;
             iwangle line_angle;
+            Iw2DFinishDrawing();
+            IwGxSetScissorScreenSpace(0, 0, Iw2DGetSurfaceWidth(), Iw2DGetSurfaceHeight());
             dx = touch_x - touchdown_x;
             dy = touch_y - touchdown_y;
             if ((dx == 0 && dy == 0) || ((abs(dx) < 16) && (abs(dy) < 16)))
@@ -736,7 +739,7 @@ void CGame::Render_PLAY(int framex)
             i = touchdown_x / 64;
             j = touchdown_y / 64;
             tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
-            tex_p.y = (CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
+            tex_p.y = (0) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
             myIwGxDrawTile(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32, tex_p, (line_angle + 0x400) & 0x0fff);
         }
     }

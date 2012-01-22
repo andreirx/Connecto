@@ -33,6 +33,91 @@ int get_grid_anim_frame2(int i)
 }
 
 
+// vertex, strip, UV data
+CIwSVec2 bvertices[MAX_BONUS * 4];
+CIwSVec2 buvdata[MAX_BONUS * 4];
+uint32 bsend_vertices = 0;
+CIwTexture* bonus_texture = NULL;
+
+void myIwGxInitBonus()
+{
+    // Create empty texture object
+    bonus_texture = new CIwTexture;
+    // Load image data from disk into texture
+    bonus_texture->LoadFromFile("arrows.png");
+    // "Upload" texture to VRAM
+    bonus_texture->Upload();
+    //
+    bsend_vertices = 0;
+}
+
+void myIwGxPrepareBonus()
+{
+    Iw2DFinishDrawing();
+    IwGxClear(IW_GX_DEPTH_BUFFER_F);
+    //
+    bsend_vertices = 0;
+}
+
+void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval)
+{
+    CIwMat2D transformMatrix;
+    int i;
+    //
+    if (bsend_vertices + 4 > (MAX_BONUS * 4))
+    {
+        myIwGxDoneBonus();
+        bsend_vertices = 0;
+    }
+    transformMatrix = CIwMat2D::g_Identity;
+    transformMatrix.SetRot(rotval, CIwVec2(x, y));
+    //
+    // 0 = top-left
+    // 1 = bottom-left
+    // 2 = bottom-right
+    // 3 = top-right
+    //
+    bvertices[0].x = x - 32;
+    bvertices[0].y = y - 32;
+    bvertices[1].x = x - 32;
+    bvertices[1].y = y + 32;
+    bvertices[2].x = x + 32;
+    bvertices[2].y = y + 32;
+    bvertices[3].x = x + 32;
+    bvertices[3].y = y - 32;
+    //
+    buvdata[0].x = (texpos.x) << 3;
+    buvdata[0].y = (texpos.y) << 3;
+    buvdata[1].x = (texpos.x) << 3;
+    buvdata[1].y = (texpos.y + 64) << 3;
+    buvdata[2].x = (texpos.x + 64) << 3;
+    buvdata[2].y = (texpos.y + 64) << 3;
+    buvdata[3].x = (texpos.x + 64) << 3;
+    buvdata[3].y = (texpos.y) << 3;
+    //
+    for (i = 0; i < 4; i++)
+        bvertices[bsend_vertices + i] = transformMatrix.TransformVec(bvertices[bsend_vertices + i]);
+    bsend_vertices += 4;
+    //
+}
+
+void myIwGxDoneBonus()
+{
+    IwGxSetScreenSpaceSlot(3);
+    IwGxSetVertStreamScreenSpace( bvertices, bsend_vertices );
+    CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
+    pMat->SetAlphaMode( CIwMaterial::ALPHA_BLEND );
+    pMat->SetTexture( bonus_texture );
+    pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
+    IwGxSetMaterial( pMat );
+    IwGxSetUVStream( buvdata );
+    // IwGxSetColStream( colors, quads * 4 );
+    IwGxSetColStream( NULL );
+    IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, bsend_vertices );
+    IwGxFlush();
+}
+
+
 extern CIw2DImage* g_tiles;
 
 void GameTable::Worm::update_worm()
@@ -230,10 +315,13 @@ GameTable::GameTable(void)
     trigger_anim = -1;
     trigger_circle = -1;
     the_worm.SetWorm(0, 0);
+    myIwGxInitBonus();
+    bonus_counter = 0;
 }
 
 GameTable::~GameTable(void)
 {
+    delete bonus_texture;
 }
 
 void GameTable::reset_table(int percent_missing_links)
