@@ -266,8 +266,42 @@ void CGame::Update_PLAY(int framex)
     unsigned int add_color = 0;
     // game logic goes here
     // for example, move a red square towards any touch event...
+    //
+    // kill existing lightning
+    lightning->ResetBranches();
+    //
     if (game_table->is_animating())
+    {
+        // don't take input, but update the necessary tasks
+        //
+        add_color = 0;
+        // make particles for destroyed tiles
+        for (i = 0; i < GRID_W; i++)
+        {
+            for (j = 0; j < GRID_H; j++)
+            {
+                if (game_table->grid_anim_type[i][j] == ANIM_DESTROY)
+                {
+                    //for (k = 0; k < 2; k++)
+                        lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
+                        (rand() % 5120) - 2560, (rand() % 5120) - 3840,
+                        ((rand() % 3) + 11) % 12,
+                        (rand() % 2) + 1);
+                    lightning->AddBranch_Generate(DEFAULT_LEN / 2,
+                        grid_positions[i][j].x, grid_positions[i][j].y,
+                        grid_positions[i][j].x + 64, grid_positions[i][j].y + 64,
+                        add_color);
+                    lightning->AddBranch_Generate(DEFAULT_LEN / 2,
+                        grid_positions[i][j].x + 64, grid_positions[i][j].y,
+                        grid_positions[i][j].x, grid_positions[i][j].y + 64,
+                        add_color);
+                }
+            }
+        }
+        //
+        touchdown = 0;
         return;
+    }
     game_table->update_the_worm();
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))// && (framex == 0))
     {
@@ -415,27 +449,11 @@ void CGame::Update_PLAY(int framex)
         send_frame_zero = framex;
     could_send = can_send;
     //
-    // make particles for destroyed tiles
-    for (i = 0; i < GRID_W; i++)
-    {
-        for (j = 0; j < GRID_H; j++)
-        {
-            if (game_table->grid_anim_type[i][j] == ANIM_DESTROY)
-            {
-                for (k = 0; k < 3; k++)
-                    lightning->AddSparkle_SetXYCS(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32,
-                    (rand() % 5120) - 2560, (rand() % 5120) - 3840,
-                    ((rand() % 3) + 11) % 12,
-                    (rand() % 2) + 1);
-            }
-        }
-    }
-    //
     // OK NOW make some lightning
     //
     //if (show_arrows || game_table->is_animating())
+    if (game_table->is_animating() == ANIM_NONE)
     {
-        lightning->ResetBranches();
         for (i = 0; i < GRID_W; i++)
         {
             for (j = 0; j < GRID_H; j++)
@@ -782,7 +800,7 @@ void CGame::Render_PLAY(int framex)
 
     //
     // draw some lightning
-    if (game_table->is_animating() == ANIM_NONE)
+    //if (game_table->is_animating() == ANIM_NONE)
     {
         //Iw2DSetColour(0xffffffff);
         //Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);

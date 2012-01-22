@@ -44,7 +44,7 @@ void GameTable::Worm::update_worm()
     }
     if (moving > 0)
     {
-        moving -= 2;
+        moving -= 4;
         return;
     }
     if (rand() % 8 == 0)
