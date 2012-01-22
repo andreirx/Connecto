@@ -51,9 +51,9 @@ public:
     BonusItem(void);
     ~BonusItem(void);
 
-    void SetBonusItem(int ti, int tj, int btype);
-    void UpdateBonusItem();
-    void DrawBonusItem();
+    void SetBonusItem(int ti, int tj, int btype);//TODO
+    void UpdateBonusItem();//TODO
+    void DrawBonusItem();//TODO
 
 private:
     int falling_frame;
@@ -231,8 +231,8 @@ public:
         bonuses[bonus_counter].SetBonusItem(ti, tj, btype);
     }
 
-    void UpdateBonusItems();
-    void DrawBonusItems();
+    void UpdateBonusItems();//TODO
+    void DrawBonusItems();//TODO
 
     Worm the_worm;
 
