@@ -3,6 +3,7 @@
 
 
 #include "s3e.h"
+#include "IwGeom.h"
 
 
 #define GRID_W 10
@@ -26,6 +27,27 @@
 #define FRAMES_FALL    30
 
 #define MAX_WORM       10
+
+
+class BonusItem
+{
+public:
+    BonusItem(void);
+    ~BonusItem(void);
+
+    void SetBonusItem(int ti, int tj, int btype);
+    void UpdateBonusItem();
+    void DrawBonusItem();
+
+private:
+    int enabled;
+    int falling_frame;
+    int glowing_frame;
+    int target_i, target_j;
+    iwangle rot;
+    int time_appeared;
+    int timeout;
+};
 
 
 class GameTable
