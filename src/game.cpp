@@ -23,7 +23,7 @@
 
 
 #define SEND_MULTIPLIER 8
-#define TOTAL_RANKS     30
+#define TOTAL_RANKS     35
 
 
 extern CIw2DImage* g_tiles;
@@ -85,7 +85,13 @@ const char* const rank_list[TOTAL_RANKS] = {
     "Chosen wizard",
     "Chosen prince",
     "Chosen supreme agent",
+    "Swiftest blast champion",
+
+    "Supreme arc champion",
+    "Commander of the champions",
+    "Champion demigod",
     "God of pipes and charges",
+    "Champion of the gods",
 };
 
 
