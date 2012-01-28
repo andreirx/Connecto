@@ -68,8 +68,8 @@ public:
             ox = oi * 64 + 32;
             tx = target_i * 64 + 32;
             //
-            if ((falling_frame >= 0) && (falling_frame < FRAMES_FALL))
-                return ox + ((tx - ox) * falling_frame) / FRAMES_FALL;
+            if ((falling_frame >= 0) && (falling_frame < (FRAMES_FALL * 2)))
+                return ox + ((tx - ox) * falling_frame) / (FRAMES_FALL * 2);
             return tx;
         }
 
@@ -80,8 +80,8 @@ public:
             oy = oj * 64 + 32;
             ty = target_j * 64 + 32;
             //
-            if ((falling_frame >= 0) && (falling_frame < FRAMES_FALL))
-                return oy + ((ty - oy) * falling_frame) / FRAMES_FALL;
+            if ((falling_frame >= 0) && (falling_frame < (FRAMES_FALL * 2)))
+                return oy + ((ty - oy) * falling_frame) / (FRAMES_FALL * 2);
             return ty;
         }
 

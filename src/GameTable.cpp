@@ -157,7 +157,7 @@ void GameTable::BonusItem::UpdateBonusItem()
     if (falling_frame >= 0)
     {
         falling_frame++;
-        if (falling_frame >= FRAMES_FALL)
+        if (falling_frame >= (FRAMES_FALL * 2))
             falling_frame = -1;
     }
     if (glowing_frame >= 0)
