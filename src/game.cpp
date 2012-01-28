@@ -79,7 +79,7 @@ const char* const rank_list[TOTAL_RANKS] = {
     "Wizard of the pipes",
     "Prince of the charges",
     "Supreme agent of the charge",
-    "Saint Charger",
+    "Ruler of the electrons",
 
     "Chosen chief",
     "Chosen wizard",
@@ -92,6 +92,19 @@ const char* const rank_list[TOTAL_RANKS] = {
     "Champion demigod",
     "God of pipes and charges",
     "Champion of the gods",
+};
+
+int generate_bonuses[10][3] = {
+    { 1, 0, 0, }, // 1
+    { 1, 1, 0, }, // 3
+    { 2, 2, 0, }, // 6
+    { 2, 2, 1, }, // 11
+    { 2, 3, 2, }, // 18
+    { 3, 4, 3, }, // 26
+    { 4, 5, 4, }, // 34
+    { 0, 7, 7, }, // 49
+    { 0, 9, 9, }, // 63
+    { 0, 0, 16, }, // 80
 };
 
 
@@ -422,66 +435,16 @@ void CGame::Update_PLAY(int framex)
                 total_score += (current_score & 0x0000ff) * bonus;
                 charges += ((current_score & 0x00ff00) >> 8);
                 last_sent = ((current_score & 0xff0000) >> 16);
-                if (last_sent <= 1)
-                {
+                //
+                for (i = 0; i < generate_bonuses[last_sent - 1][0]; i++)
                     game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
-                }
-                else if (last_sent <= 2)
-                {
+                //
+                for (i = 0; i < generate_bonuses[last_sent - 1][1]; i++)
                     game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
-                }
-                else if (last_sent <= 3)
-                {
+                //
+                for (i = 0; i < generate_bonuses[last_sent - 1][2]; i++)
                     game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                }
-                else if (last_sent <= 4)
-                {
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                }
-                else if (last_sent <= 5)
-                {
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                }
-                else if (last_sent <= 6)
-                {
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                }
-                else if (last_sent <= 7)
-                {
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                }
-                else if (last_sent <= 10)
-                {
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
-                }
+                //
                 can_send = 0;
             }
     }
