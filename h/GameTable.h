@@ -66,7 +66,7 @@ public:
             int ox, tx;
             //
             ox = oi * 64 + 32;
-            tx = target_i * 64 + 42;
+            tx = target_i * 64 + 32;
             //
             if ((falling_frame >= 0) && (falling_frame < FRAMES_FALL))
                 return ox + ((tx - ox) * falling_frame) / FRAMES_FALL;
@@ -78,7 +78,7 @@ public:
             int oy, ty;
             //
             oy = oj * 64 + 32;
-            ty = target_j * 64 + 42;
+            ty = target_j * 64 + 32;
             //
             if ((falling_frame >= 0) && (falling_frame < FRAMES_FALL))
                 return oy + ((ty - oy) * falling_frame) / FRAMES_FALL;

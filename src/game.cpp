@@ -268,6 +268,7 @@ CGame::CGame()
     touchdown = 0;
     //
     InitTileRotation();
+    myIwGxInitBonus();
     //
     table_x = (Iw2DGetSurfaceWidth() - 640) / 2;
     table_y = (Iw2DGetSurfaceHeight() - 640) / 2;
@@ -415,6 +416,66 @@ void CGame::Update_PLAY(int framex)
                 total_score += (current_score & 0x0000ff) * bonus;
                 charges += ((current_score & 0x00ff00) >> 8);
                 last_sent = ((current_score & 0xff0000) >> 16);
+                if (last_sent <= 1)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
+                }
+                else if (last_sent <= 2)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
+                }
+                else if (last_sent <= 3)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                }
+                else if (last_sent <= 4)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                }
+                else if (last_sent <= 5)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                }
+                else if (last_sent <= 6)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                }
+                else if (last_sent <= 7)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE2, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                }
+                else if (last_sent <= 10)
+                {
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                    game_table->AddBonusItem(BONUS_CHARGE3, 60000 - (rand() % 10000));
+                }
                 can_send = 0;
             }
     }
@@ -846,15 +907,18 @@ void CGame::Render_PLAY(int framex)
 
     //
     // draw some lightning
-    //if (game_table->is_animating() == ANIM_NONE)
-    {
-        //Iw2DSetColour(0xffffffff);
-        //Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-        lightning->DrawLightning(1);
-        //Iw2DDrawImage(lightning->destImage, CIwSVec2(0, 0), CIwSVec2(1024, 1024));
-        //Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
-    }
+    lightning->DrawLightning(1);
     //
+    // draw bonuses
+    myIwGxPrepareBonus();
+    for (j = 0; j < MAX_BONUS; j++)
+    {
+        GameTable::BonusItem *curr;
+        curr = game_table->GetBonusItem(j);
+        if (curr->enabled)
+            curr->DrawBonusItem(table_x + curr->getOffsetX(), table_y + curr->getOffsetY());
+    }
+    myIwGxDoneBonus();
 
     // draw worm
     game_table->the_worm.draw_worm((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() - 640) / 2);
@@ -925,6 +989,12 @@ void CGame::Render_PLAY(int framex)
     Iw2DSetColour(0xffff7040);
     sprintf(strbuf, "Level %d", level);
     bitmapStringAt(16, 0, 20, strbuf);
+    Iw2DSetColour(0xffffa080);
+    sprintf(strbuf, "Charges %d", charges);
+    bitmapStringAt(Iw2DGetSurfaceWidth() / 2, 0, 20, strbuf);
+    Iw2DSetColour(0xffffa080);
+    sprintf(strbuf, "Last sent %d", last_sent);
+    bitmapStringAt(Iw2DGetSurfaceWidth() / 2, 32, 20, strbuf);
     Iw2DSetColour(0xffffffff);
     sprintf(strbuf, "Score %d", total_score);
     bitmapStringAt(16, 32, 20, strbuf);

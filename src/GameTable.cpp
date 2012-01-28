@@ -121,13 +121,12 @@ void myIwGxDoneBonus()
     IwGxSetScreenSpaceSlot(3);
     IwGxSetVertStreamScreenSpace( bvertices, bsend_vertices );
     CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
-    pMat->SetAlphaMode( CIwMaterial::ALPHA_BLEND );
+    pMat->SetAlphaMode( CIwMaterial::ALPHA_ADD );
     pMat->SetTexture( bonus_texture );
     pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
     IwGxSetMaterial( pMat );
     IwGxSetUVStream( buvdata );
-    // IwGxSetColStream( colors, quads * 4 );
-    IwGxSetColStream( NULL );
+    IwGxSetColStream( bcolors, bsend_vertices );
     IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, bsend_vertices );
     IwGxFlush();
 }
@@ -146,7 +145,7 @@ void GameTable::BonusItem::SetBonusItem(int ti, int tj, int btype, int timeout_m
         rot = 0;
         time_appeared = (int)s3eTimerGetMs();
         timeout = timeout_ms;
-        oi = GRID_W - 1;
+        oi = -1;
         oj = -1;
     }
 }
@@ -166,6 +165,10 @@ void GameTable::BonusItem::UpdateBonusItem()
         glowing_frame++;
         if (glowing_frame >= FRAMES_GLOW)
             glowing_frame = -1;
+    }
+    else if ((rand() % 256) == 0)
+    {
+        glowing_frame = 0;
     }
     rot = rot + 0x0f;
     rot = rot & 0x0fff;
