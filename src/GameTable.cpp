@@ -121,7 +121,7 @@ void myIwGxDoneBonus()
     IwGxSetScreenSpaceSlot(3);
     IwGxSetVertStreamScreenSpace( bvertices, bsend_vertices );
     CIwMaterial *pMat = IW_GX_ALLOC_MATERIAL();
-    pMat->SetAlphaMode( CIwMaterial::ALPHA_ADD );
+    pMat->SetAlphaMode( CIwMaterial::ALPHA_BLEND );
     pMat->SetTexture( bonus_texture );
     pMat->SetColAmbient( 0xFF, 0xFF, 0xFF, 0xFF );
     IwGxSetMaterial( pMat );
