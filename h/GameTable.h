@@ -25,16 +25,18 @@
 #define ANIM_DESTROY   102
 #define FRAMES_DESTROY 8
 #define FRAMES_FALL    30
+#define FRAMES_GLOW    10
 
 #define MAX_WORM       10
 #define MAX_BONUS      32
 
-#define BONUS_NONE     0
-#define BONUS_CLOCK    1
-#define BONUS_BOMB     2
-#define BONUS_CHARGE1  10
-#define BONUS_CHARGE2  11
-#define BONUS_CHARGE3  12
+#define BONUS_NONE     (-1)
+#define BONUS_CLOCK    0
+#define BONUS_BOMB     1
+#define BONUS_CHARGE1  2
+#define BONUS_CHARGE2  3
+#define BONUS_CHARGE3  4
+#define BONUS_TYPES    5
 
 
 void myIwGxInitBonus();
@@ -43,31 +45,32 @@ void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval);
 void myIwGxDoneBonus();
 
 
-class BonusItem
-{
-public:
-    int enabled;
-
-    BonusItem(void);
-    ~BonusItem(void);
-
-    void SetBonusItem(int ti, int tj, int btype);//TODO
-    void UpdateBonusItem();//TODO
-    void DrawBonusItem();//TODO
-
-private:
-    int falling_frame;
-    int glowing_frame;
-    int target_i, target_j;
-    iwangle rot;
-    int time_appeared;
-    int timeout;
-};
-
-
 class GameTable
 {
 public:
+    class BonusItem
+    {
+    public:
+        int enabled;
+
+        BonusItem(void) { enabled = 0; rot = 0; }
+        ~BonusItem(void) {}
+
+        void SetBonusItem(int ti, int tj, int btype, int timeout_ms);
+        void UpdateBonusItem();
+        void DrawBonusItem(int x, int y);
+
+    private:
+        int falling_frame;
+        int glowing_frame;
+        int target_i, target_j;
+        int bonus_type;
+        iwangle rot;
+        int time_appeared;
+        int timeout;
+    };
+
+
     class Worm
     {
     public:
@@ -217,7 +220,7 @@ public:
         }
     }
 
-    void AddBonusItem(int ti, int tj, int btype)
+    void AddBonusItem(int ti, int tj, int btype, int timeout)
     {
         int internal_counter = 0;
         while (bonuses[bonus_counter].enabled == 1)
@@ -228,11 +231,25 @@ public:
             if (internal_counter > MAX_BONUS)
                 return;
         }
-        bonuses[bonus_counter].SetBonusItem(ti, tj, btype);
+        bonuses[bonus_counter].SetBonusItem(ti, tj, btype, timeout);
     }
 
-    void UpdateBonusItems();//TODO
-    void DrawBonusItems();//TODO
+    void UpdateBonusItems()
+    {
+        int i;
+        for (i = 0; i < MAX_BONUS; i++)
+            bonuses[i].UpdateBonusItem();
+    }
+
+    BonusItem GetBonusItem(int i)
+    {
+        int k = i;
+        if (k < 0)
+            k = 0;
+        if (k >= MAX_BONUS)
+            k = MAX_BONUS - 1;
+        return bonuses[k];
+    }
 
     Worm the_worm;
 

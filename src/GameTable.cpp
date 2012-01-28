@@ -6,7 +6,7 @@
 #include "IwGx.h"
 
 
-int grid_anim_frame[10] =
+int grid_anim_frame[FRAMES_GLOW] =
 {
     1, 1, 2, 2, 3, 3, 2, 2, 1, 1,
 };
@@ -33,9 +33,19 @@ int get_grid_anim_frame2(int i)
 }
 
 
+// bonus texture positions
+CIwSVec2 btexpos[BONUS_TYPES] = {
+    CIwSVec2(256, 64),
+    CIwSVec2(320, 64),
+    CIwSVec2(0, 128),
+    CIwSVec2(0, 192),
+    CIwSVec2(0, 256),
+};
+
 // vertex, strip, UV data
 CIwSVec2 bvertices[MAX_BONUS * 4];
 CIwSVec2 buvdata[MAX_BONUS * 4];
+CIwColour bcolors[MAX_BONUS * 4];
 uint32 bsend_vertices = 0;
 CIwTexture* bonus_texture = NULL;
 
@@ -59,7 +69,7 @@ void myIwGxPrepareBonus()
     bsend_vertices = 0;
 }
 
-void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval)
+void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval, int alphaf)
 {
     CIwMat2D transformMatrix;
     int i;
@@ -77,23 +87,28 @@ void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval)
     // 2 = bottom-right
     // 3 = top-right
     //
-    bvertices[0].x = x - 32;
-    bvertices[0].y = y - 32;
-    bvertices[1].x = x - 32;
-    bvertices[1].y = y + 32;
-    bvertices[2].x = x + 32;
-    bvertices[2].y = y + 32;
-    bvertices[3].x = x + 32;
-    bvertices[3].y = y - 32;
+    bvertices[bsend_vertices + 0].x = x - 32;
+    bvertices[bsend_vertices + 0].y = y - 32;
+    bvertices[bsend_vertices + 1].x = x - 32;
+    bvertices[bsend_vertices + 1].y = y + 32;
+    bvertices[bsend_vertices + 2].x = x + 32;
+    bvertices[bsend_vertices + 2].y = y + 32;
+    bvertices[bsend_vertices + 3].x = x + 32;
+    bvertices[bsend_vertices + 3].y = y - 32;
     //
-    buvdata[0].x = (texpos.x) << 3;
-    buvdata[0].y = (texpos.y) << 3;
-    buvdata[1].x = (texpos.x) << 3;
-    buvdata[1].y = (texpos.y + 64) << 3;
-    buvdata[2].x = (texpos.x + 64) << 3;
-    buvdata[2].y = (texpos.y + 64) << 3;
-    buvdata[3].x = (texpos.x + 64) << 3;
-    buvdata[3].y = (texpos.y) << 3;
+    buvdata[bsend_vertices + 0].x = (texpos.x) << 3;
+    buvdata[bsend_vertices + 0].y = (texpos.y) << 3;
+    buvdata[bsend_vertices + 1].x = (texpos.x) << 3;
+    buvdata[bsend_vertices + 1].y = (texpos.y + 64) << 3;
+    buvdata[bsend_vertices + 2].x = (texpos.x + 64) << 3;
+    buvdata[bsend_vertices + 2].y = (texpos.y + 64) << 3;
+    buvdata[bsend_vertices + 3].x = (texpos.x + 64) << 3;
+    buvdata[bsend_vertices + 3].y = (texpos.y) << 3;
+    //
+    bcolors[bsend_vertices + 0].Set(0xFF, 0xFF, 0xFF, (uint8)(alphaf));
+    bcolors[bsend_vertices + 1].Set(0xFF, 0xFF, 0xFF, (uint8)(alphaf));
+    bcolors[bsend_vertices + 2].Set(0xFF, 0xFF, 0xFF, (uint8)(alphaf));
+    bcolors[bsend_vertices + 3].Set(0xFF, 0xFF, 0xFF, (uint8)(alphaf));
     //
     for (i = 0; i < 4; i++)
         bvertices[bsend_vertices + i] = transformMatrix.TransformVec(bvertices[bsend_vertices + i]);
@@ -115,6 +130,68 @@ void myIwGxDoneBonus()
     IwGxSetColStream( NULL );
     IwGxDrawPrims( IW_GX_QUAD_LIST, NULL, bsend_vertices );
     IwGxFlush();
+}
+
+
+void GameTable::BonusItem::SetBonusItem(int ti, int tj, int btype, int timeout_ms)
+{
+    if ((btype >= 0) && (btype < BONUS_TYPES))
+    {
+        enabled = 1;
+        target_i = ti;
+        target_j = tj;
+        bonus_type = btype;
+        falling_frame = 0;
+        glowing_frame = -1;
+        rot = 0;
+        time_appeared = (int)s3eTimerGetMs();
+        timeout = timeout_ms;
+    }
+}
+
+void GameTable::BonusItem::UpdateBonusItem()
+{
+    if (enabled <= 0)
+        return;
+    if (falling_frame >= 0)
+    {
+        falling_frame++;
+        if (falling_frame >= FRAMES_FALL)
+            falling_frame = -1;
+    }
+    if (glowing_frame >= 0)
+    {
+        glowing_frame++;
+        if (glowing_frame >= FRAMES_GLOW)
+            glowing_frame = -1;
+    }
+    rot = rot + 0x0f;
+    rot = rot & 0x0fff;
+    if (((int)s3eTimerGetMs() - time_appeared) > timeout)
+        enabled = 0;
+}
+
+void GameTable::BonusItem::DrawBonusItem(int x, int y)
+{
+    CIwSVec2 texpos = btexpos[bonus_type];
+    int alphaf = 0xff;
+    //
+    if (enabled <= 0)
+        return;
+    //
+    // adjust texture for glowing
+    if ((glowing_frame >= 0) && (glowing_frame < FRAMES_GLOW) &&
+        (bonus_type >= BONUS_CHARGE1) && (bonus_type <= BONUS_CHARGE3))
+        texpos.x = texpos.x + get_grid_anim_frame(glowing_frame) * 64;
+    //
+    if (((int)s3eTimerGetMs() - time_appeared) > (timeout - 8192))
+        alphaf = (time_appeared + timeout - (int)s3eTimerGetMs()) >> 5;
+    if (alphaf > 0xff)
+        alphaf = 0xff;
+    if (alphaf < 0)
+        alphaf = 0;
+    //
+    myIwGxDrawBonus(x, y, texpos, rot, alphaf);
 }
 
 

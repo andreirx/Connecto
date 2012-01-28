@@ -162,14 +162,14 @@ void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval)
     // 2 = bottom-right
     // 3 = top-right
     //
-    gvertices[0].x = x - 64;
-    gvertices[0].y = y - 64;
-    gvertices[1].x = x - 64;
-    gvertices[1].y = y + 64;
-    gvertices[2].x = x + 64;
-    gvertices[2].y = y + 64;
-    gvertices[3].x = x + 64;
-    gvertices[3].y = y - 64;
+    gvertices[0].x = x - 40;
+    gvertices[0].y = y - 40;
+    gvertices[1].x = x - 40;
+    gvertices[1].y = y + 40;
+    gvertices[2].x = x + 40;
+    gvertices[2].y = y + 40;
+    gvertices[3].x = x + 40;
+    gvertices[3].y = y - 40;
     //
     guvdata[0].x = (texpos.x) << 2;
     guvdata[0].y = (texpos.y) << 3;
@@ -717,6 +717,10 @@ void CGame::Render_PLAY(int framex)
         for (j = 0; j < GRID_H; j++)
             for (i = 0; i < GRID_W; i++)
 			{
+                if (touchdown && (touchdown_x >= 0) && (touchdown_y >= 0) &&
+                    (touchdown_x < 640) && (touchdown_y < 640) &&
+                    ((touchdown_x / 64) == i) && ((touchdown_y / 64) == j))
+                    continue;
 				tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
 				tex_p.y = (CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
                 Iw2DDrawImageRegion(g_tiles, grid_positions[i][j],
