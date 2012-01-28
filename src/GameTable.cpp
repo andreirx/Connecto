@@ -146,6 +146,8 @@ void GameTable::BonusItem::SetBonusItem(int ti, int tj, int btype, int timeout_m
         rot = 0;
         time_appeared = (int)s3eTimerGetMs();
         timeout = timeout_ms;
+        oi = GRID_W - 1;
+        oj = -1;
     }
 }
 
@@ -423,12 +425,16 @@ void GameTable::reset_table(int percent_missing_links)
             grid_anim_type[i][j] = ANIM_FALL;
             grid_color_shift[i][j] = 0;
         }
+    for (i = 0; i < MAX_BONUS; i++)
+        bonuses[i].enabled = 0;
 }
 
 // public function for returning new elements on a column
 void GameTable::new_column(int x)
 {
     int k, i, j;
+    BonusItem *cross;
+    //
     for (k = 0; k < GRID_H; k++)
     {
         grid_connectors[x][k] = get_new_element();
@@ -442,6 +448,11 @@ void GameTable::new_column(int x)
             the_worm.SetWorm(0, 0);
             worm_wait_time = (int)s3eTimerGetMs();
         }
+        //
+        // if there's a bonus item, destroy it
+        cross = GetBonusItemAt(x, k);
+        if (cross != NULL)
+            cross->enabled = 0;
     }
     for (i = 0; i < GRID_W; i++)
         for (j = 0; j < GRID_H; j++)
@@ -480,6 +491,8 @@ int GameTable::send_connections()
 {
     int i, j, k;
     int rVal = 0;
+    BonusItem *cross;
+    //
     if (!can_send_connections)
         return rVal;
     for (i = 0; i < GRID_W; i++)
@@ -495,6 +508,31 @@ int GameTable::send_connections()
                     the_worm.SetWorm(0, 0);
                     worm_wait_time = (int)s3eTimerGetMs();
                 }
+                //
+                // if there's a bonus item, GET it
+                cross = GetBonusItemAt(i, j);
+                if (cross != NULL)
+                {
+                    switch (cross->bonus_type)
+                    {
+                    case BONUS_CLOCK:
+                        // TODO: see what you can do with the clock
+                        break;
+                    case BONUS_BOMB:
+                        // TODO: see what you can do with the bomb
+                        break;
+                    case BONUS_CHARGE1:
+                        rVal += 0x000100;
+                        break;
+                    case BONUS_CHARGE2:
+                        rVal += 0x000200;
+                        break;
+                    case BONUS_CHARGE3:
+                        rVal += 0x000500;
+                        break;
+                    }
+                    cross->enabled = 0;
+                }
                 rVal += 0x000001;
                 if (i == (GRID_W - 1))
                     if (grid_connectors[i][j] & CB_RIGHT != 0)
@@ -504,6 +542,19 @@ int GameTable::send_connections()
                 {
                     grid_connectors[i][k] = grid_connectors[i][k - 1];
                     grid_state[i][k] = grid_state[i][k - 1];
+                    //
+                    // also move bonuses down
+                    cross = GetBonusItemAt(i, k);
+                    if (cross != NULL)
+                    {
+                        if (cross->falling_frame < 0)
+                        {
+                            cross->falling_frame = 0;
+                            cross->oi = i;
+                            cross->oj = k;
+                        }
+                        cross->target_j++;
+                    }
                 }
                 grid_anim_frame[i][j] = FRAMES_DESTROY;
                 grid_anim_type[i][j] = ANIM_DESTROY;
@@ -522,6 +573,8 @@ int GameTable::send_connections()
 void GameTable::bomb_table(int x, int y)
 {
     int i, j, k;
+    BonusItem *cross;
+    //
     for (i = (x - 2); i <= (x + 2); i++)
         for (j = (y - 2); j <= (y + 2); j++)
         {
@@ -539,11 +592,29 @@ void GameTable::bomb_table(int x, int y)
                     the_worm.SetWorm(0, 0);
                     worm_wait_time = (int)s3eTimerGetMs();
                 }
+                //
+                // if there's a bonus item, destroy it
+                cross = GetBonusItemAt(i, j);
+                if (cross != NULL)
+                    cross->enabled = 0;
                 // move one position down
                 for (k = j; k > 0; k--)
                 {
                     grid_connectors[i][k] = grid_connectors[i][k - 1];
                     grid_state[i][k] = grid_state[i][k - 1];
+                    //
+                    // also move bonuses down
+                    cross = GetBonusItemAt(i, k);
+                    if (cross != NULL)
+                    {
+                        if (cross->falling_frame < 0)
+                        {
+                            cross->falling_frame = 0;
+                            cross->oi = i;
+                            cross->oj = k;
+                        }
+                        cross->target_j++;
+                    }
                 }
                 grid_anim_frame[i][j] = FRAMES_DESTROY;
                 grid_anim_type[i][j] = ANIM_DESTROY;

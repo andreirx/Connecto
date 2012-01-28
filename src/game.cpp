@@ -221,6 +221,7 @@ CGame::CGame()
     level_score = 0;
     total_score = 0;
     current_score = 0;
+    charges = 0;
     bonus = 0;
     penalty = 0;
     last_sent = 0;
@@ -266,10 +267,12 @@ void CGame::Update_PLAY(int framex)
     int i, j, k;
     unsigned int add_color = 0;
     // game logic goes here
-    // for example, move a red square towards any touch event...
     //
     // kill existing lightning
     lightning->ResetBranches();
+    //
+    // update bonus items
+    game_table->UpdateBonusItems();
     //
     if (game_table->is_animating())
     {
@@ -368,13 +371,9 @@ void CGame::Update_PLAY(int framex)
                             (rand() % 3) + 1);
                     }
                 }
-                /*
-                for (j = 0; j < GRID_H; j++)
-                    for (i = 0; i < GRID_W; i++)
-                        if (game_table->get_grid_state(i, j) == CONNECT_OK)
-                            */
                 current_score = game_table->send_connections();
-                total_score += (current_score & 0x00ffff) * bonus;
+                total_score += (current_score & 0x0000ff) * bonus;
+                charges += ((current_score & 0x00ff00) >> 8);
                 last_sent = ((current_score & 0xff0000) >> 16);
                 can_send = 0;
             }

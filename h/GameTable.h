@@ -51,6 +51,7 @@ public:
     class BonusItem
     {
     public:
+        friend class GameTable;
         int enabled;
 
         BonusItem(void) { enabled = 0; rot = 0; }
@@ -60,9 +61,34 @@ public:
         void UpdateBonusItem();
         void DrawBonusItem(int x, int y);
 
+        int getOffsetX()
+        {
+            int ox, tx;
+            //
+            ox = oi * 64 + 32;
+            tx = target_i * 64 + 42;
+            //
+            if ((falling_frame >= 0) && (falling_frame < FRAMES_FALL))
+                return ox + ((tx - ox) * falling_frame) / FRAMES_FALL;
+            return tx;
+        }
+
+        int getOffsetY()
+        {
+            int oy, ty;
+            //
+            oy = oj * 64 + 32;
+            ty = target_j * 64 + 42;
+            //
+            if ((falling_frame >= 0) && (falling_frame < FRAMES_FALL))
+                return oy + ((ty - oy) * falling_frame) / FRAMES_FALL;
+            return ty;
+        }
+
     private:
         int falling_frame;
         int glowing_frame;
+        int oi, oj;
         int target_i, target_j;
         int bonus_type;
         iwangle rot;
@@ -220,17 +246,35 @@ public:
         }
     }
 
-    void AddBonusItem(int ti, int tj, int btype, int timeout)
+    void AddBonusItem(int btype, int timeout)
     {
+        // add a certain bonus, with a certain timeout value, at a random position
+        //
         int internal_counter = 0;
+        int ti, tj;
+        int already_taken = 1;
+        //
         while (bonuses[bonus_counter].enabled == 1)
         {
             bonus_counter = (bonus_counter + 1) % MAX_BONUS;
             internal_counter++;
-            // if all sparkles are already enabled, do nothing
+            // if all bonuses are already enabled, do nothing
             if (internal_counter > MAX_BONUS)
                 return;
         }
+        //
+        while (already_taken)
+        {
+            already_taken = 0;
+            ti = rand() % GRID_W;
+            tj = rand() % GRID_H;
+            for (internal_counter = 0; internal_counter < MAX_BONUS; internal_counter++)
+                if (bonuses[internal_counter].enabled &&
+                    (bonuses[internal_counter].target_i == ti) &&
+                    (bonuses[internal_counter].target_j == tj))
+                    already_taken = 1;
+        }
+        //
         bonuses[bonus_counter].SetBonusItem(ti, tj, btype, timeout);
     }
 
@@ -241,14 +285,27 @@ public:
             bonuses[i].UpdateBonusItem();
     }
 
-    BonusItem GetBonusItem(int i)
+    BonusItem *GetBonusItem(int i)
     {
         int k = i;
         if (k < 0)
             k = 0;
         if (k >= MAX_BONUS)
             k = MAX_BONUS - 1;
-        return bonuses[k];
+        return bonuses + k;
+    }
+
+    BonusItem *GetBonusItemAt(int ti, int tj)
+    {
+        BonusItem *rVal = NULL;
+        int i;
+        for (i = 0; i < MAX_BONUS; i++)
+            if (bonuses[i].enabled && (bonuses[i].target_i == ti) && (bonuses[i].target_j == tj))
+            {
+                rVal = bonuses + i;
+                break;
+            }
+        return rVal;
     }
 
     Worm the_worm;

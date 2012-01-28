@@ -152,7 +152,7 @@ public:
     int game_state;
 
     GameLevel current_level;
-    int level, level_score, total_score, current_score, bonus, penalty, last_sent;
+    int level, level_score, total_score, current_score, bonus, penalty, last_sent, charges;
 
     void get_anim_fall_y();
 
