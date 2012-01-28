@@ -23,6 +23,7 @@
 
 
 #define SEND_MULTIPLIER 8
+#define TOTAL_RANKS     30
 
 
 extern CIw2DImage* g_tiles;
@@ -47,6 +48,45 @@ int touchdown_branch = -1;
 int send_frame_zero = -1;
 int could_send = 0;
 int rotated = 0;
+
+
+const char* const rank_list[TOTAL_RANKS] = {
+    "Short-circuit",
+    "Searcher of the path",
+    "Student of the charge",
+    "Bronze charge student",
+    "Silver charge student",
+
+    "Gold charge student",
+    "Platinum charge student",
+    "Most promising student",
+    "Engineer of the charge",
+    "Perfect engineer",
+
+    "Master of the charge",
+    "Swift virtual master",
+    "Select pipe master",
+    "Most excellent master",
+    "Perfect charge master",
+
+    "Illustrious master of the pipes",
+    "Grand master charge blaster",
+    "Sublime master",
+    "Exalted zone master",
+    "Supreme grand master",
+
+    "Chief of the charges",
+    "Wizard of the pipes",
+    "Prince of the charges",
+    "Supreme agent of the charge",
+    "Saint Charger",
+
+    "Chosen chief",
+    "Chosen wizard",
+    "Chosen prince",
+    "Chosen supreme agent",
+    "God of pipes and charges",
+};
 
 
 class MySprite
