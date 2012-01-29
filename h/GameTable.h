@@ -23,8 +23,8 @@
 #define ANIM_NONE      0
 #define ANIM_FALL      101
 #define ANIM_DESTROY   102
-#define FRAMES_DESTROY 8
-#define FRAMES_FALL    30
+#define FRAMES_DESTROY 4
+#define FRAMES_FALL    26
 #define FRAMES_GLOW    10
 
 #define MAX_WORM       10
