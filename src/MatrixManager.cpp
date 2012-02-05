@@ -144,7 +144,9 @@ void MatrixManager::Star::DrawStar(int alphaf)
     if (enabled <= 0)
         return;
     //
-    myIwGxDrawStar(fx / FIELD_DIV, fy / FIELD_DIV, texpos, multiplier, rot, alphaf);
+    myIwGxDrawStar((Iw2DGetSurfaceWidth() - FIELD_SIZE) / 2 + fx / FIELD_DIV,
+        (Iw2DGetSurfaceHeight() - FIELD_SIZE) / 2 + fy / FIELD_DIV,
+        texpos, multiplier, rot, alphaf);
 }
 
 void MatrixManager::Star::MoveStar(int dx)

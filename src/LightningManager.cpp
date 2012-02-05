@@ -113,14 +113,14 @@ void LightningBranch::DrawBranch_as_Lines()
     }
 }
 
-void LightningBranch::DrawBranch_as_Sparkles(unsigned int bcolor, int size)
+void LightningBranch::DrawBranch_as_Sparkles(unsigned int bcolor, int size, int shift)
 {
     int j;
     for (j = 1; j < len_strike; j++)
     {
-        DrawSparklingLine((strike_x[j - 1] >> 8),
+        DrawSparklingLine((strike_x[j - 1] >> 8) + shift,
             (strike_y[j - 1] >> 8),
-            (strike_x[j] >> 8),
+            (strike_x[j] >> 8) + shift,
             (strike_y[j] >> 8),
             lightning_color, size);
     }
@@ -273,7 +273,7 @@ CIwSVec2 sparkles64[12] = {
     CIwSVec2(448, 256),
 };
 
-inline void Sparkle::DrawSparkle()
+inline void Sparkle::DrawSparkle(int shift)
 {
     int sx, sy, ex, ey;
     if (enabled && (sparkle_color < 12))
@@ -282,7 +282,7 @@ inline void Sparkle::DrawSparkle()
         sy = ((Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) >> 1) + (ss_y >> SPARKLE_SHIFT);
         ex = ((Iw2DGetSurfaceWidth() - SPARKLE_SPACE_W) >> 1) + (os_x >> SPARKLE_SHIFT);
         ey = ((Iw2DGetSurfaceHeight() - SPARKLE_SPACE_H) >> 1) + (os_y >> SPARKLE_SHIFT);
-        DrawSparklingLine(sx, sy, ex, ey, sparkle_color, sparkle_size);
+        DrawSparklingLine(sx + shift, sy, ex + shift, ey, sparkle_color, sparkle_size);
     }
 }
 
@@ -544,7 +544,7 @@ void LightningManager::UpdateAllBranches(int update_much)
     }
 }
 
-void LightningManager::DrawLightning(int size)
+void LightningManager::DrawLightning(int size, int shift)
 {
     int i, j, k;
     //CIw2DSurface *oldSurface = Iw2DGetSurface();
@@ -558,7 +558,7 @@ void LightningManager::DrawLightning(int size)
     for (i = 0; i < total_branches; i++)
     {
         //lightning_branches[i].DrawBranch_as_Lines();
-        lightning_branches[i].DrawBranch_as_Sparkles(4, size);
+        lightning_branches[i].DrawBranch_as_Sparkles(4, size, shift);
     }
     DoneSparklingLines();
     //
@@ -587,12 +587,12 @@ void LightningManager::UpdateAllSparkles()
         sparkles[i].UpdateSparkle();
 }
 
-void LightningManager::DrawSparkles()
+void LightningManager::DrawSparkles(int shift)
 {
     int i;
     PrepareSparklingLines();
     for (i = 0; i < MAX_SPARKLES; i++)
-        sparkles[i].DrawSparkle();
+        sparkles[i].DrawSparkle(shift);
     DoneSparklingLines();
 }
 

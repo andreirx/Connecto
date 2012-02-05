@@ -705,7 +705,7 @@ void CGame::Render_PLAY(int framex, int shift)
     //
     // draw the tiles
     Iw2DFinishDrawing();
-    IwGxSetScissorScreenSpace(table_x, table_y, 640, 640);
+    IwGxSetScissorScreenSpace(table_x + shift, table_y, 640, 640);
     //Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
     switch (game_table->is_animating())
     {
@@ -732,9 +732,9 @@ void CGame::Render_PLAY(int framex, int shift)
             {
 				tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
 				tex_p.y = (game_table->get_grid_state(i, j)) << 6;
-                Iw2DDrawImageRegion(g_tiles, alt_positions[i][j],
-                    tex_p,
-                    dimension64);
+                scr_p.x = alt_positions[i][j].x + shift;
+                scr_p.y = alt_positions[i][j].y;
+                Iw2DDrawImageRegion(g_tiles, scr_p, tex_p, dimension64);
                 /*
                 if (game_table->grid_anim_type[i][j] == ANIM_DESTROY)
                     Iw2DDrawImageRegion(g_arrows, grid_positions[i][j],
@@ -757,17 +757,17 @@ void CGame::Render_PLAY(int framex, int shift)
                         (alt_positions[i][j].y - grid_positions[i][j].y) / (FRAMES_FALL * FRAMES_FALL);
 					tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
 					tex_p.y = (game_table->get_grid_state(i, j)) << 6;
-                    Iw2DDrawImageRegion(g_tiles, anim_positions[i][j],
-                        tex_p,
-                        dimension64);
+                    scr_p.x = anim_positions[i][j].x + shift;
+                    scr_p.y = anim_positions[i][j].y;
+                    Iw2DDrawImageRegion(g_tiles, scr_p, tex_p, dimension64);
                 }
                 else
 				{
 					tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
 					tex_p.y = (game_table->get_grid_state(i, j)) << 6;
-                    Iw2DDrawImageRegion(g_tiles, grid_positions[i][j],
-                        tex_p,
-                        dimension64);
+                    scr_p.x = grid_positions[i][j].x + shift;
+                    scr_p.y = grid_positions[i][j].y;
+                    Iw2DDrawImageRegion(g_tiles, scr_p, tex_p, dimension64);
 				}
         game_table->update_anims();
         break;
@@ -781,10 +781,10 @@ void CGame::Render_PLAY(int framex, int shift)
                     ((touchdown_x / 64) == i) && ((touchdown_y / 64) == j))
                     continue;
 				tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
-				tex_p.y = (CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
-                Iw2DDrawImageRegion(g_tiles, grid_positions[i][j],
-                    tex_p,
-                    dimension64);
+				tex_p.y = (CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;
+                scr_p.x = grid_positions[i][j].x + shift;
+                scr_p.y = grid_positions[i][j].y;
+                Iw2DDrawImageRegion(g_tiles, scr_p, tex_p, dimension64);
 			}
         if (touchdown && (touchdown_x >= 0) && (touchdown_y >= 0) &&
             (touchdown_x < 640) && (touchdown_y < 640))
@@ -802,8 +802,10 @@ void CGame::Render_PLAY(int framex, int shift)
             i = touchdown_x / 64;
             j = touchdown_y / 64;
             tex_p.x = (grid_codep[game_table->get_grid_connector(i, j)]) << 6;
-            tex_p.y = (0) << 6;//CONNECT_NONE << 6; //(game_table->get_grid_state(i, j)) << 6;
-            myIwGxDrawTile(grid_positions[i][j].x + 32, grid_positions[i][j].y + 32, tex_p, (line_angle + 0x400) & 0x0fff);
+            tex_p.y = (0) << 6;
+            myIwGxDrawTile(grid_positions[i][j].x + 32 + shift,
+                grid_positions[i][j].y + 32,
+                tex_p, (line_angle + 0x400) & 0x0fff);
         }
     }
     if ((framex % 2) == 0)
@@ -817,7 +819,7 @@ void CGame::Render_PLAY(int framex, int shift)
     {
         c = left_set[j];
         Iw2DSetColour(0xffffffff);
-		scr_p.x = (Iw2DGetSurfaceWidth() - 640) / 2 - 64 - 32;
+		scr_p.x = (Iw2DGetSurfaceWidth() - 640) / 2 - 64 - 32 + shift;
 		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32;
 		tex_p.x = 384;
 		tex_p.y = 0;
@@ -827,7 +829,7 @@ void CGame::Render_PLAY(int framex, int shift)
             dimension128);
         Iw2DSetColour(0xffffffff);
         c = right_set[j];
-		scr_p.x = (Iw2DGetSurfaceWidth() + 640) / 2 - 32;
+		scr_p.x = (Iw2DGetSurfaceWidth() + 640) / 2 - 32 + shift;
 		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32;
 		tex_p.x = 384;
 		tex_p.y = 0;
@@ -842,7 +844,7 @@ void CGame::Render_PLAY(int framex, int shift)
     // draw the arrows
     for (j = 0; j < GRID_W; j++)
     {
-		scr_p.x = (j << 6) + (Iw2DGetSurfaceWidth() - 640) / 2;
+		scr_p.x = (j << 6) + (Iw2DGetSurfaceWidth() - 640) / 2 + shift;
 		scr_p.y = (Iw2DGetSurfaceHeight() + 640) / 2;
 		tex_p.x = 128;
 		tex_p.y = 0;
@@ -855,18 +857,15 @@ void CGame::Render_PLAY(int framex, int shift)
     // draw other elements
     if (show_arrows)
     {
-		scr_p.x = (arrow_x << 6) - 32 + (Iw2DGetSurfaceWidth() - 640) / 2;
+		scr_p.x = (arrow_x << 6) - 32 + (Iw2DGetSurfaceWidth() - 640) / 2 + shift;
 		scr_p.y = (arrow_y << 6) - 32 + (Iw2DGetSurfaceHeight() - 640) / 2;
-        Iw2DDrawImageRegion(g_arrows,
-            scr_p,
-            zerozero,
-			dimension128);
+        Iw2DDrawImageRegion(g_arrows, scr_p, zerozero, dimension128);
         show_arrows = 0;
     }
 
     //
     // draw some lightning
-    lightning->DrawLightning(1);
+    lightning->DrawLightning(1, shift);
     //
     // draw bonuses
     myIwGxPrepareBonus();
@@ -875,12 +874,12 @@ void CGame::Render_PLAY(int framex, int shift)
         GameTable::BonusItem *curr;
         curr = game_table->GetBonusItem(j);
         if (curr->enabled)
-            curr->DrawBonusItem(table_x + curr->getOffsetX(), table_y + curr->getOffsetY());
+            curr->DrawBonusItem(table_x + curr->getOffsetX() + shift, table_y + curr->getOffsetY());
     }
     myIwGxDoneBonus();
 
     // draw worm
-    game_table->the_worm.draw_worm((Iw2DGetSurfaceWidth() - 640) / 2, (Iw2DGetSurfaceHeight() - 640) / 2);
+    game_table->the_worm.draw_worm((Iw2DGetSurfaceWidth() - 640) / 2 + shift, (Iw2DGetSurfaceHeight() - 640) / 2);
 
     // draw buttons
     Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
@@ -888,14 +887,14 @@ void CGame::Render_PLAY(int framex, int shift)
     {
         c = ((internal_frame & 0x0f) << 4);
         Iw2DSetColour(0xff000000 + (c << 16) + (c << 8) + c);
-		scr_p.x = 0;
+		scr_p.x = 0 + shift;
 		scr_p.y = Iw2DGetSurfaceHeight() - 128;
         Iw2DDrawImageRegion(g_send, scr_p, zerozero, dimension128);
         Iw2DSetColour(0xffffffff);
     }
     else
 	{
-		scr_p.x = 0;
+		scr_p.x = 0 + shift;
 		scr_p.y = Iw2DGetSurfaceHeight() - 128;
 		tex_p.x = 128;
 		tex_p.y = 0;
@@ -904,7 +903,7 @@ void CGame::Render_PLAY(int framex, int shift)
 
     if (can_bomb)
 	{
-		scr_p.x = Iw2DGetSurfaceWidth() - 128;
+		scr_p.x = Iw2DGetSurfaceWidth() - 128 + shift;
 		scr_p.y = Iw2DGetSurfaceHeight() - 128;
 		tex_p.x = 256;
 		tex_p.y = 0;
@@ -912,7 +911,7 @@ void CGame::Render_PLAY(int framex, int shift)
 	}
     else
 	{
-		scr_p.x = Iw2DGetSurfaceWidth() - 128;
+		scr_p.x = Iw2DGetSurfaceWidth() - 128 + shift;
 		scr_p.y = Iw2DGetSurfaceHeight() - 128;
         if (bombing)
         {
@@ -937,7 +936,7 @@ void CGame::Render_PLAY(int framex, int shift)
         (rand() % 12));
     */
     lightning->UpdateAllSparkles();
-    lightning->DrawSparkles();
+    lightning->DrawSparkles(shift);
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 
     // draw the top bar
@@ -947,21 +946,22 @@ void CGame::Render_PLAY(int framex, int shift)
     // draw the strings
     Iw2DSetColour(0xffff7040);
     sprintf(strbuf, "Level %d", level);
-    bitmapStringAt(16, 0, 20, strbuf);
+    bitmapStringAt(16 + shift, 0, 20, strbuf);
     Iw2DSetColour(0xffffa080);
     sprintf(strbuf, "Charges %d", charges);
-    bitmapStringAt(Iw2DGetSurfaceWidth() / 2, 0, 20, strbuf);
+    bitmapStringAt(Iw2DGetSurfaceWidth() / 2 + shift, 0, 20, strbuf);
     Iw2DSetColour(0xffffa080);
     sprintf(strbuf, "Last sent %d", last_sent);
-    bitmapStringAt(Iw2DGetSurfaceWidth() / 2, 32, 20, strbuf);
+    bitmapStringAt(Iw2DGetSurfaceWidth() / 2 + shift, 32, 20, strbuf);
     Iw2DSetColour(0xffffffff);
     sprintf(strbuf, "Score %d", total_score);
-    bitmapStringAt(16, 32, 20, strbuf);
+    bitmapStringAt(16 + shift, 32, 20, strbuf);
     Iw2DSetColour(0xff60ff60);
     for (j = 0; j < GRID_H; j++)
     {
         sprintf(strbuf, "x%d", right_multiplier[j]);
-        bitmapStringAt(32 + (Iw2DGetSurfaceWidth() + 640) / 2, 16 + (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2, 20, strbuf);
+        bitmapStringAt(16 + (Iw2DGetSurfaceWidth() + 640) / 2 + shift,
+            16 + (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2, 20, strbuf);
     }
 }
 

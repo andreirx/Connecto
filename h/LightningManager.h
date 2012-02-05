@@ -59,7 +59,7 @@ public:
     void GenerateBranch(int sx, int sy, int ex, int ey, unsigned int bcolor, int update_much = UPDATE_ALL);
     void UpdateBranch(int update_much);
     void DrawBranch_as_Lines();
-    void DrawBranch_as_Sparkles(unsigned int bcolor, int size);
+    void DrawBranch_as_Sparkles(unsigned int bcolor, int size, int shift);
 
 private:
     int osx, osy, oex, oey;
@@ -84,7 +84,7 @@ public:
 
     void Enable_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size);
     void UpdateSparkle();
-    void DrawSparkle();
+    void DrawSparkle(int shift = 0);
 
 private:
     unsigned int sparkle_color;
@@ -167,11 +167,11 @@ public:
     int AddBranch_Generate(int branch_len, int sx, int sy, int ex, int ey, unsigned int bcolor);
     void KillBranch(int which_branch);
     void UpdateAllBranches(int update_much);
-    void DrawLightning(int size);
+    void DrawLightning(int size, int shift = 0);
 
     void AddSparkle_SetXYCS(int px, int py, int vx, int vy, unsigned int scolor, int size);
     void UpdateAllSparkles();
-    void DrawSparkles();
+    void DrawSparkles(int shift = 0);
 
     void AddGenerator_SetXYT(int x, int y, int duration_ms, int intensity_is, int size);
     void UpdateAllGenerators();
