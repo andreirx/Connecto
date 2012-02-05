@@ -154,6 +154,7 @@ void GameTable::BonusItem::UpdateBonusItem()
 {
     if (enabled <= 0)
         return;
+    //
     if (falling_frame >= 0)
     {
         falling_frame++;

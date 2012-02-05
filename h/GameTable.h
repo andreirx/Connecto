@@ -41,7 +41,7 @@
 
 void myIwGxInitBonus();
 void myIwGxPrepareBonus();
-void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval);
+void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval, int alphaf);
 void myIwGxDoneBonus();
 
 
