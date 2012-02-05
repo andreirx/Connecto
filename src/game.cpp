@@ -823,20 +823,14 @@ void CGame::Render_PLAY(int framex, int shift)
 		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32;
 		tex_p.x = 384;
 		tex_p.y = 0;
-        Iw2DDrawImageRegion(g_arrows,//g_emoticons,
-            scr_p,
-            tex_p,
-            dimension128);
+        Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
         Iw2DSetColour(0xffffffff);
         c = right_set[j];
 		scr_p.x = (Iw2DGetSurfaceWidth() + 640) / 2 - 32 + shift;
 		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32;
 		tex_p.x = 384;
 		tex_p.y = 0;
-        Iw2DDrawImageRegion(g_arrows,
-            scr_p,
-            tex_p,
-            dimension128);
+        Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
         Iw2DSetColour(0xffffffff);
     }
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
@@ -848,10 +842,7 @@ void CGame::Render_PLAY(int framex, int shift)
 		scr_p.y = (Iw2DGetSurfaceHeight() + 640) / 2;
 		tex_p.x = 128;
 		tex_p.y = 0;
-        Iw2DDrawImageRegion(g_arrows,
-            scr_p,
-            tex_p,
-			dimension64);
+        Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension64);
     }
 
     // draw other elements
@@ -929,20 +920,15 @@ void CGame::Render_PLAY(int framex, int shift)
             Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
 		}
 	}
-    // add some particles and draw
-    /*
-    lightning->AddSparkle_SetXYC(Iw2DGetSurfaceWidth() / 2, Iw2DGetSurfaceHeight() / 2,
-        (rand() % 5120) - 2560, (rand() % 5120) - 2560,
-        (rand() % 12));
-    */
+    //  draw sparkles
     lightning->UpdateAllSparkles();
     lightning->DrawSparkles(shift);
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
-
+    //
     // draw the top bar
     Iw2DSetColour(0xff000000);
     // Iw2DFillRect(zerozero, CIwSVec2(Iw2DGetSurfaceWidth(), (Iw2DGetSurfaceHeight() - 640) / 2));
-
+    //
     // draw the strings
     Iw2DSetColour(0xffff7040);
     sprintf(strbuf, "Level %d", level);
@@ -960,7 +946,7 @@ void CGame::Render_PLAY(int framex, int shift)
     for (j = 0; j < GRID_H; j++)
     {
         sprintf(strbuf, "x%d", right_multiplier[j]);
-        bitmapStringAt(16 + (Iw2DGetSurfaceWidth() + 640) / 2 + shift,
+        bitmapStringAt(2 + (Iw2DGetSurfaceWidth() + 640) / 2 + shift,
             16 + (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2, 20, strbuf);
     }
 }
