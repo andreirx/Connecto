@@ -144,7 +144,7 @@ void MatrixManager::Star::DrawStar(int alphaf)
     if (enabled <= 0)
         return;
     //
-    myIwGxDrawStar(fx >> 4, fy >> 4, texpos, multiplier, rot, alphaf);
+    myIwGxDrawStar(fx / FIELD_DIV, fy / FIELD_DIV, texpos, multiplier, rot, alphaf);
 }
 
 void MatrixManager::Star::MoveStar(int dx)
@@ -200,6 +200,7 @@ MatrixManager::MatrixManager(void)
     }
     //
     star_counter = 0;
+    internal_mover = 0;
     //
     myIwGxInitStars();
 }
@@ -261,6 +262,16 @@ void MatrixManager::AddStar()
     starfield[star_counter].SetStar();
 }
 
+void MatrixManager::MoveStars(int dx)
+{
+    int i;
+    //
+    for (i = 0; i < MAX_STARS; i++)
+    {
+        starfield[i].MoveStar(dx);
+    }
+}
+
 void MatrixManager::UpdateMatrix()
 {
     int i, j;
@@ -271,7 +282,6 @@ void MatrixManager::UpdateMatrix()
     for (i = 0; i < MAX_STARS; i++)
     {
         starfield[i].UpdateStar();
-        starfield[i].MoveStar(1);
     }
     //
     /*

@@ -21,7 +21,9 @@
 #define MAX_STARS        0x00800
 #define MX_VERTICES      (2048)
 
-#define FIELD_RES        16384
+#define FIELD_RES        65536
+#define FIELD_SIZE       1024
+#define FIELD_DIV        (FIELD_RES / FIELD_SIZE)
 
 
 void myIwGxInitStars();
@@ -68,6 +70,7 @@ public:
     void ClearMarkings();
     //
     void AddStar();
+    void MoveStars(int dx);
     void UpdateMatrix();
     void DrawMatrix();
 
@@ -75,6 +78,7 @@ private:
     //
     Star starfield[MAX_STARS];
     int star_counter;
+    int internal_mover;
     //
     unsigned int matrix_color;
     //

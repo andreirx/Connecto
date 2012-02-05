@@ -1093,3 +1093,21 @@ void CGame::Update_DEBRIEF(int framex)
 void CGame::Render_DEBRIEF(int framex)
 {
 }
+
+void CGame::Update_GAMEOVER(int framex)
+{
+}
+
+void CGame::Render_GAMEOVER(int framex)
+{
+}
+
+void CGame::Update_TRANSITION(int framex)
+{
+}
+
+void CGame::Render_TRANSITION(int framex)
+{
+    int trans_from = (game_state & 0x00f0) >> 4;
+    int trans_to = (game_state & 0x000f);
+}

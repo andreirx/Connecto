@@ -26,12 +26,14 @@
 
 #define LEVEL_TIME_RESOLUTION 4096
 
-#define GAMESTATE_SPLASH      0
-#define GAMESTATE_MAINMENU    10
-#define GAMESTATE_LEVELSCREEN 20
-#define GAMESTATE_PLAY        30
-#define GAMESTATE_PAUSE       40
-#define GAMESTATE_DEBRIEF     50
+#define GAMESTATE_SPLASH      0x01
+#define GAMESTATE_MAINMENU    0x02
+#define GAMESTATE_LEVELSCREEN 0x03
+#define GAMESTATE_PLAY        0x04
+#define GAMESTATE_PAUSE       0x05
+#define GAMESTATE_DEBRIEF     0x06
+#define GAMESTATE_GAMEOVER    0x07
+#define TRANSITION            0x0100
 
 
 void bitmapStringAt(int x, int y, int padding, char *strw);
@@ -180,7 +182,11 @@ public:
         case GAMESTATE_DEBRIEF:
             Update_DEBRIEF(framex);
             break;
+        case GAMESTATE_GAMEOVER:
+            Update_GAMEOVER(framex);
+            break;
         default:
+            Update_TRANSITION(framex);
             break;
         }
     }
@@ -226,7 +232,11 @@ public:
         case GAMESTATE_DEBRIEF:
             Render_DEBRIEF(framex);
             break;
+        case GAMESTATE_GAMEOVER:
+            Render_GAMEOVER(framex);
+            break;
         default:
+            Render_TRANSITION(framex);
             break;
         }
         Iw2DSetColour(0xff7040bf);
@@ -245,33 +255,39 @@ public:
         {
         case GAMESTATE_SPLASH:
             if (new_game_state == GAMESTATE_MAINMENU)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             break;
         case GAMESTATE_MAINMENU:
             if (new_game_state == GAMESTATE_LEVELSCREEN)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             break;
         case GAMESTATE_LEVELSCREEN:
             if (new_game_state == GAMESTATE_PLAY)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             break;
         case GAMESTATE_PLAY:
             if (new_game_state == GAMESTATE_PAUSE)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             if (new_game_state == GAMESTATE_DEBRIEF)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
+            if (new_game_state == GAMESTATE_GAMEOVER)
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             break;
         case GAMESTATE_PAUSE:
             if (new_game_state == GAMESTATE_PLAY)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             if (new_game_state == GAMESTATE_MAINMENU)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             break;
         case GAMESTATE_DEBRIEF:
             if (new_game_state == GAMESTATE_LEVELSCREEN)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
+            break;
+        case GAMESTATE_GAMEOVER:
+            if (new_game_state == GAMESTATE_LEVELSCREEN)
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             if (new_game_state == GAMESTATE_MAINMENU)
-                game_state = new_game_state;
+                game_state = TRANSITION + (game_state << 4) + new_game_state;
             break;
         default:
             break;
@@ -301,6 +317,12 @@ private:
 
     void Update_DEBRIEF(int framex);
     void Render_DEBRIEF(int framex);
+
+    void Update_GAMEOVER(int framex);
+    void Render_GAMEOVER(int framex);
+
+    void Update_TRANSITION(int framex);
+    void Render_TRANSITION(int framex);
 };
 
 #endif
