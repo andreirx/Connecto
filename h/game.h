@@ -35,6 +35,9 @@
 #define GAMESTATE_GAMEOVER    0x07
 #define TRANSITION            0x0100
 
+#define TRANSITION_TIME       2000
+#define TRANSITION_IN         1000
+
 
 void bitmapStringAt(int x, int y, int padding, char *strw);
 void myIwGxDrawTile(int x, int y, CIwSVec2 texpos, iwangle rotval);
@@ -212,6 +215,13 @@ public:
         {
             FPS = 0;
         }
+        //
+        // draw the background, whatever the game state is
+        //
+        Iw2DSurfaceClear(0xff000000);
+        matrix_text->UpdateMatrix();
+        matrix_text->DrawMatrix();
+        //
         switch (game_state)
         {
         case GAMESTATE_SPLASH:
@@ -292,34 +302,41 @@ public:
         default:
             break;
         }
+        //
+        transition_start = (int)s3eTimerGetMs();
+        transition_update = 1;
     }
 
 private:
     CIwFVec2 m_Position;
     CIwSVec2 m_Size;
     int timeout;
+    int transition_start;
+    int transition_update;
+    int transition_shift;
+    //
     int FPS_frames[FPS_AVERAGE];
 
     void Update_SPLASH(int framex);
-    void Render_SPLASH(int framex);
+    void Render_SPLASH(int framex, int shift = 0);
 
     void Update_MAINMENU(int framex);
-    void Render_MAINMENU(int framex);
+    void Render_MAINMENU(int framex, int shift = 0);
 
     void Update_LEVELSCREEN(int framex);
-    void Render_LEVELSCREEN(int framex);
+    void Render_LEVELSCREEN(int framex, int shift = 0);
 
     void Update_PLAY(int framex);
-    void Render_PLAY(int framex);
+    void Render_PLAY(int framex, int shift = 0);
 
     void Update_PAUSE(int framex);
-    void Render_PAUSE(int framex);
+    void Render_PAUSE(int framex, int shift = 0);
 
     void Update_DEBRIEF(int framex);
-    void Render_DEBRIEF(int framex);
+    void Render_DEBRIEF(int framex, int shift = 0);
 
     void Update_GAMEOVER(int framex);
-    void Render_GAMEOVER(int framex);
+    void Render_GAMEOVER(int framex, int shift = 0);
 
     void Update_TRANSITION(int framex);
     void Render_TRANSITION(int framex);

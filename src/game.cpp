@@ -654,7 +654,7 @@ void CGame::get_anim_fall_y()
     }
 }
 
-void CGame::Render_PLAY(int framex)
+void CGame::Render_PLAY(int framex, int shift)
 {
     // game render goes here
     int i, j, k, c, start_destroy, end_destroy;
@@ -694,15 +694,6 @@ void CGame::Render_PLAY(int framex)
 		}
 	}
 	//
-    // for example, clear to black (the order of components is ABGR)
-    Iw2DSurfaceClear(0xff000000);
-    //
-    // draw and update matrix text effect
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-    matrix_text->UpdateMatrix();
-    matrix_text->DrawMatrix();
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
-
     Iw2DSetColour(0xffffffff);
 
     for (j = 0; j < GRID_H; j++)
@@ -983,17 +974,9 @@ void CGame::Update_SPLASH(int framex)
     }
 }
 
-void CGame::Render_SPLASH(int framex)
+void CGame::Render_SPLASH(int framex, int shift)
 {
     CIwSVec2 scr_p, tex_p;
-    //
-    Iw2DSurfaceClear(0xff000000);
-    //
-    // draw and update matrix text effect
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-    matrix_text->UpdateMatrix();
-    matrix_text->DrawMatrix();
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //
     Iw2DSetColour(0xffffffff);
     scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
@@ -1016,17 +999,10 @@ void CGame::Update_MAINMENU(int framex)
     }
 }
 
-void CGame::Render_MAINMENU(int framex)
+void CGame::Render_MAINMENU(int framex, int shift)
 {
     CIwSVec2 scr_p, tex_p;
     //
-    Iw2DSurfaceClear(0xff000000);
-    //
-    // draw and update matrix text effect
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-    matrix_text->UpdateMatrix();
-    matrix_text->DrawMatrix();
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //
     Iw2DSetColour(0xffffffff);
     scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
@@ -1049,17 +1025,10 @@ void CGame::Update_LEVELSCREEN(int framex)
     }
 }
 
-void CGame::Render_LEVELSCREEN(int framex)
+void CGame::Render_LEVELSCREEN(int framex, int shift)
 {
     CIwSVec2 scr_p, tex_p;
     //
-    Iw2DSurfaceClear(0xff000000);
-    //
-    // draw and update matrix text effect
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
-    matrix_text->UpdateMatrix();
-    matrix_text->DrawMatrix();
-    // Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //
     Iw2DSetColour(0xffffffff);
     scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
@@ -1082,7 +1051,7 @@ void CGame::Update_PAUSE(int framex)
     }
 }
 
-void CGame::Render_PAUSE(int framex)
+void CGame::Render_PAUSE(int framex, int shift)
 {
 }
 
@@ -1090,7 +1059,7 @@ void CGame::Update_DEBRIEF(int framex)
 {
 }
 
-void CGame::Render_DEBRIEF(int framex)
+void CGame::Render_DEBRIEF(int framex, int shift)
 {
 }
 
@@ -1098,16 +1067,100 @@ void CGame::Update_GAMEOVER(int framex)
 {
 }
 
-void CGame::Render_GAMEOVER(int framex)
+void CGame::Render_GAMEOVER(int framex, int shift)
 {
 }
 
 void CGame::Update_TRANSITION(int framex)
 {
+    int trans_to = (game_state & 0x000f);
+    int trans_moment = ((int)s3eTimerGetMs() - transition_start);
+    //
+    if (trans_moment < TRANSITION_TIME / 4)
+    {
+        transition_update = trans_moment * 16 / (TRANSITION_TIME / 4);
+        transition_shift = -trans_moment * 1024 / (TRANSITION_TIME / 4);
+    }
+    else if (trans_moment < 3 * TRANSITION_TIME / 4)
+    {
+        transition_update = 16;
+    }
+    else
+    {
+        transition_update = (TRANSITION_TIME - trans_moment) * 16 / (TRANSITION_TIME / 4);
+        transition_shift = (TRANSITION_TIME - trans_moment) * 1024 / (TRANSITION_TIME / 4);
+    }
+    //
+    matrix_text->MoveStars(-transition_update);
+    //
+    if (trans_moment > TRANSITION_TIME)
+    {
+        game_state = trans_to;
+    }
 }
 
 void CGame::Render_TRANSITION(int framex)
 {
     int trans_from = (game_state & 0x00f0) >> 4;
     int trans_to = (game_state & 0x000f);
+    int trans_moment = ((int)s3eTimerGetMs() - transition_start);
+    //
+    if (trans_moment < TRANSITION_TIME / 4)
+    {
+        switch (trans_from)
+        {
+        case GAMESTATE_SPLASH:
+            Render_SPLASH(framex, transition_shift);
+            break;
+        case GAMESTATE_MAINMENU:
+            Render_MAINMENU(framex, transition_shift);
+            break;
+        case GAMESTATE_LEVELSCREEN:
+            Render_LEVELSCREEN(framex, transition_shift);
+            break;
+        case GAMESTATE_PLAY:
+            Render_PLAY(framex, transition_shift);
+            break;
+        case GAMESTATE_PAUSE:
+            Render_PAUSE(framex, transition_shift);
+            break;
+        case GAMESTATE_DEBRIEF:
+            Render_DEBRIEF(framex, transition_shift);
+            break;
+        case GAMESTATE_GAMEOVER:
+            Render_GAMEOVER(framex, transition_shift);
+            break;
+        }
+    }
+    else if (trans_moment < 3 * TRANSITION_TIME / 4)
+    {
+    }
+    else
+    {
+        switch (trans_to)
+        {
+        case GAMESTATE_SPLASH:
+            Render_SPLASH(framex, transition_shift);
+            break;
+        case GAMESTATE_MAINMENU:
+            Render_MAINMENU(framex, transition_shift);
+            break;
+        case GAMESTATE_LEVELSCREEN:
+            Render_LEVELSCREEN(framex, transition_shift);
+            break;
+        case GAMESTATE_PLAY:
+            Render_PLAY(framex, transition_shift);
+            break;
+        case GAMESTATE_PAUSE:
+            Render_PAUSE(framex, transition_shift);
+            break;
+        case GAMESTATE_DEBRIEF:
+            Render_DEBRIEF(framex, transition_shift);
+            break;
+        case GAMESTATE_GAMEOVER:
+            Render_GAMEOVER(framex, transition_shift);
+            break;
+        }
+    }
+    //
 }
