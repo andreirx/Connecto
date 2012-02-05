@@ -695,7 +695,6 @@ void CGame::Render_PLAY(int framex, int shift)
 	}
 	//
     Iw2DSetColour(0xffffffff);
-
     for (j = 0; j < GRID_H; j++)
     {
         if ((rand() & 0x1f) == 0)
@@ -811,31 +810,31 @@ void CGame::Render_PLAY(int framex, int shift)
         game_table->update_color_shifts();
     Iw2DFinishDrawing();
     IwGxSetScissorScreenSpace(0, 0, Iw2DGetSurfaceWidth(), Iw2DGetSurfaceHeight());
-    //Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
-    // draw the smileys and arrows
-    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    // draw the left and right connectors
+    //Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
     for (j = 0; j < GRID_H; j++)
     {
         c = left_set[j];
         Iw2DSetColour(0xffffffff);
-		scr_p.x = (Iw2DGetSurfaceWidth() - 640) / 2 - 64;
-		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2;
-		tex_p.x = (c & 0x07) << 6;
-		tex_p.y = (c >> 3) << 6;
-        Iw2DDrawImageRegion(g_emoticons,
+		scr_p.x = (Iw2DGetSurfaceWidth() - 640) / 2 - 64 - 32;
+		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32;
+		tex_p.x = 384;
+		tex_p.y = 0;
+        Iw2DDrawImageRegion(g_arrows,//g_emoticons,
             scr_p,
             tex_p,
-            dimension64);
+            dimension128);
         Iw2DSetColour(0xffffffff);
         c = right_set[j];
-		scr_p.x = (Iw2DGetSurfaceWidth() + 640) / 2;
-		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2;
-		tex_p.x = 256;
+		scr_p.x = (Iw2DGetSurfaceWidth() + 640) / 2 - 32;
+		scr_p.y = (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32;
+		tex_p.x = 384;
 		tex_p.y = 0;
         Iw2DDrawImageRegion(g_arrows,
             scr_p,
             tex_p,
-            dimension64);
+            dimension128);
         Iw2DSetColour(0xffffffff);
     }
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
@@ -979,7 +978,7 @@ void CGame::Render_SPLASH(int framex, int shift)
     CIwSVec2 scr_p, tex_p;
     //
     Iw2DSetColour(0xffffffff);
-    scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
+    scr_p.x = shift + (Iw2DGetSurfaceWidth() - 512) / 2;
     scr_p.y = (Iw2DGetSurfaceHeight() - 512) / 2;
     tex_p.x = 0;
     tex_p.y = 0;
@@ -1005,7 +1004,7 @@ void CGame::Render_MAINMENU(int framex, int shift)
     //
     //
     Iw2DSetColour(0xffffffff);
-    scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
+    scr_p.x = shift + (Iw2DGetSurfaceWidth() - 512) / 2;
     scr_p.y = (Iw2DGetSurfaceHeight() - 512) / 2;
     tex_p.x = 512;
     tex_p.y = 0;
@@ -1031,7 +1030,7 @@ void CGame::Render_LEVELSCREEN(int framex, int shift)
     //
     //
     Iw2DSetColour(0xffffffff);
-    scr_p.x = (Iw2DGetSurfaceWidth() - 512) / 2;
+    scr_p.x = shift + (Iw2DGetSurfaceWidth() - 512) / 2;
     scr_p.y = (Iw2DGetSurfaceHeight() - 512) / 2;
     tex_p.x = 0;
     tex_p.y = 512;
@@ -1079,7 +1078,6 @@ void CGame::Update_TRANSITION(int framex)
     if (trans_moment < TRANSITION_TIME / 4)
     {
         transition_update = trans_moment * 16 / (TRANSITION_TIME / 4);
-        transition_shift = -trans_moment * 1024 / (TRANSITION_TIME / 4);
     }
     else if (trans_moment < 3 * TRANSITION_TIME / 4)
     {
@@ -1088,7 +1086,15 @@ void CGame::Update_TRANSITION(int framex)
     else
     {
         transition_update = (TRANSITION_TIME - trans_moment) * 16 / (TRANSITION_TIME / 4);
-        transition_shift = (TRANSITION_TIME - trans_moment) * 1024 / (TRANSITION_TIME / 4);
+    }
+    //
+    if (trans_moment < TRANSITION_TIME / 2)
+    {
+        transition_shift = -trans_moment * 1024 / (TRANSITION_TIME / 2);
+    }
+    else
+    {
+        transition_shift = (TRANSITION_TIME - trans_moment) * 1024 / (TRANSITION_TIME / 2);
     }
     //
     matrix_text->MoveStars(-transition_update);
@@ -1105,7 +1111,7 @@ void CGame::Render_TRANSITION(int framex)
     int trans_to = (game_state & 0x000f);
     int trans_moment = ((int)s3eTimerGetMs() - transition_start);
     //
-    if (trans_moment < TRANSITION_TIME / 4)
+    if (trans_moment < TRANSITION_TIME / 2)
     {
         switch (trans_from)
         {
@@ -1131,9 +1137,6 @@ void CGame::Render_TRANSITION(int framex)
             Render_GAMEOVER(framex, transition_shift);
             break;
         }
-    }
-    else if (trans_moment < 3 * TRANSITION_TIME / 4)
-    {
     }
     else
     {

@@ -171,7 +171,7 @@ void GameTable::BonusItem::UpdateBonusItem()
     {
         glowing_frame = 0;
     }
-    rot = rot + 0x0f;
+    rot = rot + 0x1f;
     rot = rot & 0x0fff;
     if (((int)s3eTimerGetMs() - time_appeared) > timeout)
         enabled = 0;

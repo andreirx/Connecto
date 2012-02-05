@@ -306,6 +306,7 @@ void InitSparklingLines()
 
 void PrepareSparklingLines()
 {
+    Iw2DFinishDrawing();
     IwGxClear(IW_GX_DEPTH_BUFFER_F);
     send_vertices = 0;
 }
