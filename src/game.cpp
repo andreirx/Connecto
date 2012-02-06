@@ -1060,6 +1060,30 @@ void CGame::Update_TRANSITION(int framex)
 {
     int trans_to = (game_state & 0x000f);
     int trans_moment = ((int)s3eTimerGetMs() - transition_start);
+    int pointer_dx;
+    //
+    // make the stars move with your finger when pressing
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    {
+        touchdown_x = s3ePointerGetX();
+        touchdown_y = s3ePointerGetY();
+        touchdown = 1;
+    }
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
+    {
+        pointer_dx = s3ePointerGetX() - touchdown_x;
+        touchdown_x = s3ePointerGetX();
+        touchdown_y = s3ePointerGetY();
+        touchdown = 1;
+        if (trans_moment > TRANSITION_TIME / 2)
+        {
+            transition_start = (int)s3eTimerGetMs() - (TRANSITION_TIME / 2);
+        }
+    }
+    else
+    {
+        touchdown = 0;
+    }
     //
     if (trans_moment < TRANSITION_TIME / 4)
     {
@@ -1083,7 +1107,14 @@ void CGame::Update_TRANSITION(int framex)
         transition_shift = (TRANSITION_TIME - trans_moment) * 1024 / (TRANSITION_TIME / 2);
     }
     //
-    matrix_text->MoveStars(-transition_update);
+    if (touchdown)
+    {
+        matrix_text->MoveStars(pointer_dx * 2);
+    }
+    else
+    {
+        matrix_text->MoveStars(-transition_update);
+    }
     //
     if (trans_moment > TRANSITION_TIME)
     {
