@@ -1063,6 +1063,7 @@ void CGame::Render_PAUSE(int framex, int shift)
 {
     CIwSVec2 scr_p, tex_p;
     //
+    Iw2DSetColour(0xffffffff);
     // PAUSE
     {
         scr_p.x = Iw2DGetSurfaceWidth() - 128 + shift;
@@ -1097,26 +1098,30 @@ void CGame::Update_TRANSITION(int framex)
     int pointer_dx;
     //
     // make the stars move with your finger when pressing
-    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+    touchdown = 0;
+    if (trans_moment > (TRANSITION_TIME / 10))
     {
-        touchdown_x = s3ePointerGetX();
-        touchdown_y = s3ePointerGetY();
-        touchdown = 1;
-    }
-    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
-    {
-        pointer_dx = s3ePointerGetX() - touchdown_x;
-        touchdown_x = s3ePointerGetX();
-        touchdown_y = s3ePointerGetY();
-        touchdown = 1;
-        if (trans_moment > TRANSITION_TIME / 2)
+        if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
         {
-            transition_start = (int)s3eTimerGetMs() - (TRANSITION_TIME / 2);
+            touchdown_x = s3ePointerGetX();
+            touchdown_y = s3ePointerGetY();
+            touchdown = 1;
         }
-    }
-    else
-    {
-        touchdown = 0;
+        if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
+        {
+            pointer_dx = s3ePointerGetX() - touchdown_x;
+            touchdown_x = s3ePointerGetX();
+            touchdown_y = s3ePointerGetY();
+            touchdown = 1;
+            if (trans_moment > TRANSITION_TIME / 2)
+            {
+                transition_start = (int)s3eTimerGetMs() - (TRANSITION_TIME / 2);
+            }
+        }
+        else
+        {
+            touchdown = 0;
+        }
     }
     //
     if (trans_moment < TRANSITION_TIME / 4)
