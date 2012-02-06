@@ -470,6 +470,14 @@ void CGame::Update_PLAY(int framex)
                 }
             }
     }
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+        if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) &&
+            (s3ePointerGetX() <= Iw2DGetSurfaceWidth() - 10) &&
+            (s3ePointerGetY() >= 10) &&
+            (s3ePointerGetY() <= 118))
+        {
+            SwitchGameState(GAMESTATE_PAUSE);
+        }
     rotated = 0;
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
         touchdown = 1;
@@ -873,7 +881,8 @@ void CGame::Render_PLAY(int framex, int shift)
     game_table->the_worm.draw_worm((Iw2DGetSurfaceWidth() - 640) / 2 + shift, (Iw2DGetSurfaceHeight() - 640) / 2);
 
     // draw buttons
-    Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    // SEND
     if (can_send)
     {
         c = ((internal_frame & 0x0f) << 4);
@@ -891,7 +900,7 @@ void CGame::Render_PLAY(int framex, int shift)
 		tex_p.y = 0;
         Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
 	}
-
+    // BOMB
     if (can_bomb)
 	{
 		scr_p.x = Iw2DGetSurfaceWidth() - 128 + shift;
@@ -920,6 +929,14 @@ void CGame::Render_PLAY(int framex, int shift)
             Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
 		}
 	}
+    // PAUSE
+    {
+        scr_p.x = Iw2DGetSurfaceWidth() - 128 + shift;
+        scr_p.y = 0;
+        tex_p.x = 0;
+        tex_p.y = 128;
+        Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
+    }
     //  draw sparkles
     lightning->UpdateAllSparkles();
     lightning->DrawSparkles(shift);
@@ -1030,14 +1047,30 @@ void CGame::Render_LEVELSCREEN(int framex, int shift)
 
 void CGame::Update_PAUSE(int framex)
 {
+    matrix_text->MoveStars(-16);
+    //
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
-    {
-        SwitchGameState(GAMESTATE_PLAY);
-    }
+        if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) &&
+            (s3ePointerGetX() <= Iw2DGetSurfaceWidth() - 10) &&
+            (s3ePointerGetY() >= 10) &&
+            (s3ePointerGetY() <= 118))
+        {
+            SwitchGameState(GAMESTATE_PLAY);
+        }
 }
 
 void CGame::Render_PAUSE(int framex, int shift)
 {
+    CIwSVec2 scr_p, tex_p;
+    //
+    // PAUSE
+    {
+        scr_p.x = Iw2DGetSurfaceWidth() - 128 + shift;
+        scr_p.y = 0;
+        tex_p.x = 128;
+        tex_p.y = 128;
+        Iw2DDrawImageRegion(g_send, scr_p, tex_p, dimension128);
+    }
 }
 
 void CGame::Update_DEBRIEF(int framex)
@@ -1058,6 +1091,7 @@ void CGame::Render_GAMEOVER(int framex, int shift)
 
 void CGame::Update_TRANSITION(int framex)
 {
+    int trans_from = (game_state & 0x00f0) >> 4;
     int trans_to = (game_state & 0x000f);
     int trans_moment = ((int)s3eTimerGetMs() - transition_start);
     int pointer_dx;
@@ -1087,7 +1121,10 @@ void CGame::Update_TRANSITION(int framex)
     //
     if (trans_moment < TRANSITION_TIME / 4)
     {
-        transition_update = trans_moment * 16 / (TRANSITION_TIME / 4);
+        if (trans_from != GAMESTATE_PAUSE)
+            transition_update = trans_moment * 16 / (TRANSITION_TIME / 4);
+        else
+            transition_update = 16;
     }
     else if (trans_moment < 3 * TRANSITION_TIME / 4)
     {
@@ -1095,7 +1132,10 @@ void CGame::Update_TRANSITION(int framex)
     }
     else
     {
-        transition_update = (TRANSITION_TIME - trans_moment) * 16 / (TRANSITION_TIME / 4);
+        if (trans_to != GAMESTATE_PAUSE)
+            transition_update = (TRANSITION_TIME - trans_moment) * 16 / (TRANSITION_TIME / 4);
+        else
+            transition_update = 16;
     }
     //
     if (trans_moment < TRANSITION_TIME / 2)

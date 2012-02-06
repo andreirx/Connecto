@@ -35,8 +35,8 @@
 #define GAMESTATE_GAMEOVER    0x07
 #define TRANSITION            0x0100
 
-#define TRANSITION_TIME       2000
-#define TRANSITION_IN         1000
+#define TRANSITION_TIME       1500
+#define TRANSITION_IN         (TRANSITION_TIME / 2)
 
 
 void bitmapStringAt(int x, int y, int padding, char *strw);
