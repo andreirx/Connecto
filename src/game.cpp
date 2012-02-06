@@ -1047,7 +1047,7 @@ void CGame::Render_LEVELSCREEN(int framex, int shift)
 
 void CGame::Update_PAUSE(int framex)
 {
-    matrix_text->MoveStars(-16);
+    matrix_text->MoveStars(-8);
     //
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
         if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) &&
@@ -1095,7 +1095,7 @@ void CGame::Update_TRANSITION(int framex)
     int trans_from = (game_state & 0x00f0) >> 4;
     int trans_to = (game_state & 0x000f);
     int trans_moment = ((int)s3eTimerGetMs() - transition_start);
-    int pointer_dx;
+    int pointer_dx = 0;
     //
     // make the stars move with your finger when pressing
     touchdown = 0;
