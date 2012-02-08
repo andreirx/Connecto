@@ -38,6 +38,8 @@
 #define BONUS_CHARGE3  4
 #define BONUS_TYPES    5
 
+#define BIT_FRAMES     10
+
 
 void myIwGxInitBonus();
 void myIwGxPrepareBonus();
@@ -48,6 +50,48 @@ void myIwGxDoneBonus();
 class GameTable
 {
 public:
+    class LeftConnector
+    {
+    public:
+        friend class GameTable;
+        int enabled;
+
+        LeftConnector() { enabled = 1; }
+        ~LeftConnector() {}
+
+        void Reset_acc()
+        {
+            accumulator = 0;
+        }
+        void Set_SC(int spd, int cap)
+        {
+            accumulator = 0;
+            speed = spd;
+            capacity = cap;
+        }
+
+    private:
+        int frames_incoming;
+        int accumulator;
+        int speed;
+        int capacity;
+    };
+
+    class RightConnector
+    {
+    public:
+        friend class GameTable;
+        int enabled;
+
+        RightConnector() { enabled = 1; }
+        ~RightConnector() {}
+
+    private:
+        int frames_sending;
+        int still_to_send;
+        int capacity;
+    };
+
     class BonusItem
     {
     public:
