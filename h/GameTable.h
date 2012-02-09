@@ -68,15 +68,41 @@ public:
         {
             accumulator = 0;
             frames_incoming = -1;
+            frames_sending = -1;
             speed = spd;
+            if (speed > (1000 / BIT_FRAMES))
+                speed = (1000 / BIT_FRAMES);
             capacity = cap;
         }
-
-        void UpdateConnectorL();
+        void SetupSending()
+        {
+            frames_sending = accumulator;
+            Reset_acc();
+        }
+        void UpdateConnectorL()
+        {
+            int recv_interval;
+            //
+            if (frames_incoming >= 0)
+                frames_incoming--;
+            if (frames_sending >= 0)
+                frames_sending--;
+            //
+            if ((frames_sending < 0) && (frames_incoming < 0) && (accumulator < capacity))
+            {
+                recv_interval = 1000 / (speed * BIT_FRAMES);
+                if ((rand() % recv_interval) == 0)
+                {
+                    frames_incoming = BIT_FRAMES;
+                    accumulator++;
+                }
+            }
+        }
         void RenderConnectorL();
 
     private:
         int frames_incoming;
+        int frames_sending;
         int accumulator;
         int speed;
         int capacity;
