@@ -56,19 +56,24 @@ public:
         friend class GameTable;
         int enabled;
 
-        LeftConnector() { enabled = 1; }
+        LeftConnector() { enabled = 1;frames_incoming = -1; }
         ~LeftConnector() {}
 
         void Reset_acc()
         {
             accumulator = 0;
+            frames_incoming = -1;
         }
         void Set_SC(int spd, int cap)
         {
             accumulator = 0;
+            frames_incoming = -1;
             speed = spd;
             capacity = cap;
         }
+
+        void UpdateConnectorL();
+        void RenderConnectorL();
 
     private:
         int frames_incoming;
@@ -83,8 +88,17 @@ public:
         friend class GameTable;
         int enabled;
 
-        RightConnector() { enabled = 1; }
+        RightConnector() { enabled = 1;frames_sending = -1;still_to_send = 0; }
         ~RightConnector() {}
+
+        void Reset()
+        {
+            frames_sending = -1;
+            still_to_send = -1;
+        }
+
+        void UpdateConnectorR();
+        void RenderConnectorR();
 
     private:
         int frames_sending;

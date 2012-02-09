@@ -1099,6 +1099,8 @@ void CGame::Update_TRANSITION(int framex)
     //
     // make the stars move with your finger when pressing
     touchdown = 0;
+    /*
+    // MAYBE
     if (trans_moment > (TRANSITION_TIME / 10))
     {
         if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
@@ -1123,6 +1125,7 @@ void CGame::Update_TRANSITION(int framex)
             touchdown = 0;
         }
     }
+    */
     //
     if (trans_moment < TRANSITION_TIME / 4)
     {
