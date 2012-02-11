@@ -370,6 +370,11 @@ void CGame::Update_PLAY(int framex)
     // update game table stuff
     //
     game_table->update_the_worm();
+    for (j = 0; j < GRID_H; j++)
+    {
+        game_table->LC[j].UpdateConnectorL();
+        game_table->RC[j].UpdateConnectorR();
+    }
     //
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))// && (framex == 0))
     {
@@ -829,6 +834,14 @@ void CGame::Render_PLAY(int framex, int shift)
     //Iw2DSetAlphaMode(IW_2D_ALPHA_ADD);
     for (j = 0; j < GRID_H; j++)
     {
+        game_table->LC[j].RenderConnectorL((Iw2DGetSurfaceWidth() - 640) / 2 - 64 - 32 + shift,
+            (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32);
+        game_table->RC[j].RenderConnectorR((Iw2DGetSurfaceWidth() + 640) / 2 - 32 + shift,
+            (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2 - 32);
+    }
+    /*
+    for (j = 0; j < GRID_H; j++)
+    {
         c = left_set[j];
         Iw2DSetColour(0xffffffff);
 		scr_p.x = (Iw2DGetSurfaceWidth() - 640) / 2 - 64 - 32 + shift;
@@ -845,6 +858,7 @@ void CGame::Render_PLAY(int framex, int shift)
         Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
         Iw2DSetColour(0xffffffff);
     }
+    */
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 
     // draw the arrows

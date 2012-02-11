@@ -57,7 +57,7 @@ public:
         //friend class GameTable;
         int enabled;
 
-        LeftConnector() { enabled = 1;frames_incoming = -1;frames_sending = -1;capacity = 4;speed = 1;display_bit[1] = 0; }
+        LeftConnector() { enabled = 1;frames_incoming = -1;frames_sending = -1;capacity = 4;speed = 1;accumulator = 0;display_bit[1] = 0; }
         ~LeftConnector() {}
 
         void Reset_acc()
@@ -103,6 +103,11 @@ public:
             if (frames_sending >= 0)
                 frames_sending--;
             //
+            if (accumulator >= capacity)
+            {
+                accumulator = capacity;
+                return;
+            }
             if ((frames_sending < 0) && (frames_incoming < 0) && (accumulator < capacity))
             {
                 recv_interval = 1000 / (speed * BIT_FRAMES);
