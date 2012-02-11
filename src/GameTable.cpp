@@ -4,6 +4,7 @@
 #include "s3e.h"
 #include "Iw2D.h"
 #include "IwGx.h"
+#include "game.h"
 
 
 int grid_anim_frame[FRAMES_GLOW] =
@@ -34,7 +35,7 @@ int get_grid_anim_frame2(int i)
 
 
 extern CIw2DImage* g_arrows;
-CIwSVec2 dimension128 = CIwSVec2(128, 128);
+extern CIwSVec2 dimension128;
 
 void GameTable::LeftConnector::RenderConnectorL(int x, int y)
 {
@@ -52,13 +53,19 @@ void GameTable::LeftConnector::RenderConnectorL(int x, int y)
     // gold texcoord
     tex_p.x = 384;
     tex_p.y = 0;
-    Iw2DSetColour(0x00ffffff + ((capacity * 0xff / MAX_CAPACITY) << 24));
+    Iw2DSetColour(0x00ffffff + ((capacity * 0xff / (MAX_CAPACITY / 4)) << 24));
     Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
     // red texcoord
     tex_p.x = 256;
     tex_p.y = 320;
     Iw2DSetColour(0x00ffffff + ((accumulator * 0xff / capacity) << 24));
     Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
+    //
+    if (frames_incoming >= 0)
+    {
+        Iw2DSetColour(0xff00ff00);
+        bitmapStringAt(x + 68 - frames_incoming * 4, y + 32, 20, display_bit);
+    }
 }
 
 void GameTable::RightConnector::RenderConnectorR(int x, int y)
@@ -79,6 +86,12 @@ void GameTable::RightConnector::RenderConnectorR(int x, int y)
     tex_p.y = 0;
     Iw2DSetColour(0x00ffffff + ((capacity * 0xff / MAX_CAPACITY) << 24));
     Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
+    //
+    if (frames_sending >= 0)
+    {
+        Iw2DSetColour(0xff00ff00);
+        bitmapStringAt(x + 68 - frames_sending * 4, y + 32, 20, display_bit);
+    }
 }
 
 

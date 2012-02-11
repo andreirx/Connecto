@@ -54,10 +54,10 @@ public:
     class LeftConnector
     {
     public:
-        friend class GameTable;
+        //friend class GameTable;
         int enabled;
 
-        LeftConnector() { enabled = 1;frames_incoming = -1; }
+        LeftConnector() { enabled = 1;frames_incoming = -1;frames_sending = -1;capacity = 4;speed = 1;display_bit[1] = 0; }
         ~LeftConnector() {}
 
         void Reset_acc()
@@ -74,8 +74,8 @@ public:
             if (speed > (1000 / BIT_FRAMES))
                 speed = (1000 / BIT_FRAMES);
             capacity = cap;
-            if (capacity > MAX_CAPACITY)
-                capacity = MAX_CAPACITY;
+            if (capacity > MAX_CAPACITY / 4)
+                capacity = MAX_CAPACITY / 4;
         }
         void IncrementSpeed()
         {
@@ -86,8 +86,8 @@ public:
         void IncrementCapacity()
         {
             capacity++;
-            if (capacity > MAX_CAPACITY)
-                capacity = MAX_CAPACITY;
+            if (capacity > MAX_CAPACITY / 4)
+                capacity = MAX_CAPACITY / 4;
         }
         void SetupSending()
         {
@@ -110,14 +110,14 @@ public:
                 {
                     frames_incoming = BIT_FRAMES;
                     accumulator++;
-                    display_bit = (rand() % 2) + "0";
+                    display_bit[0] = (char)(rand() % 2) + (char)48;
                 }
             }
         }
         void RenderConnectorL(int x, int y);
 
     private:
-        char display_bit;
+        char display_bit[2];
         int frames_incoming;
         int frames_sending;
         int accumulator;
@@ -125,13 +125,14 @@ public:
         int capacity;
     };
 
+
     class RightConnector
     {
     public:
-        friend class GameTable;
+        //friend class GameTable;
         int enabled;
 
-        RightConnector() { enabled = 1;frames_sending = -1;still_to_send = 0; }
+        RightConnector() { enabled = 1;frames_sending = -1;still_to_send = 0;capacity = 4;display_bit[1] = 0; }
         ~RightConnector() {}
 
         void Reset()
@@ -152,30 +153,31 @@ public:
             still_to_send = to_send;
             if (still_to_send > capacity)
                 still_to_send = capacity;
-            display_bit = (rand() % 2) + "0";
+            display_bit[0] = (char)(rand() % 2) + (char)48;
             //
             // return unsent bits
-            return to_send - still_to_send;
+            return (to_send - still_to_send);
         }
         void UpdateConnectorR()
         {
             if (frames_sending >= 0)
                 frames_sending--;
-            if ((frames_sending < 0) && (still_to_send >= 0)
+            if ((frames_sending < 0) && (still_to_send > 0))
             {
                 still_to_send--;
                 frames_sending = BIT_FRAMES;
-                display_bit = (rand() % 2) + "0";
+                display_bit[0] = (char)(rand() % 2) + (char)48;
             }
         }
         void RenderConnectorR(int x, int y);
 
     private:
-        char display_bit;
+        char display_bit[2];
         int frames_sending;
         int still_to_send;
         int capacity;
     };
+
 
     class BonusItem
     {
@@ -438,6 +440,8 @@ public:
     }
 
     Worm the_worm;
+    LeftConnector LC[GRID_H];
+    RightConnector RC[GRID_H];
 
 private:
     unsigned char grid_connectors[GRID_W][GRID_H];

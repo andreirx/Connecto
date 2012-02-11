@@ -366,7 +366,11 @@ void CGame::Update_PLAY(int framex)
         touchdown = 0;
         return;
     }
+    //
+    // update game table stuff
+    //
     game_table->update_the_worm();
+    //
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))// && (framex == 0))
     {
         touchdown_x = s3ePointerGetX() - table_x;
