@@ -33,6 +33,55 @@ int get_grid_anim_frame2(int i)
 }
 
 
+extern CIw2DImage* g_arrows;
+CIwSVec2 dimension128 = CIwSVec2(128, 128);
+
+void GameTable::LeftConnector::RenderConnectorL(int x, int y)
+{
+    CIwSVec2 scr_p, tex_p;
+    //
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
+    scr_p.x = x;
+    scr_p.y = y;
+    // BW texcoord
+    tex_p.x = 128;
+    tex_p.y = 320;
+    Iw2DSetColour(0xffffffff);
+    Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
+    // gold texcoord
+    tex_p.x = 384;
+    tex_p.y = 0;
+    Iw2DSetColour(0x00ffffff + ((capacity * 0xff / MAX_CAPACITY) << 24));
+    Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
+    // red texcoord
+    tex_p.x = 256;
+    tex_p.y = 320;
+    Iw2DSetColour(0x00ffffff + ((accumulator * 0xff / capacity) << 24));
+    Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
+}
+
+void GameTable::RightConnector::RenderConnectorR(int x, int y)
+{
+    CIwSVec2 scr_p, tex_p;
+    //
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
+    scr_p.x = x;
+    scr_p.y = y;
+    // BW texcoord
+    tex_p.x = 128;
+    tex_p.y = 320;
+    Iw2DSetColour(0xffffffff);
+    Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
+    // gold texcoord
+    tex_p.x = 384;
+    tex_p.y = 0;
+    Iw2DSetColour(0x00ffffff + ((capacity * 0xff / MAX_CAPACITY) << 24));
+    Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
+}
+
+
 // bonus texture positions
 CIwSVec2 btexpos[BONUS_TYPES] = {
     CIwSVec2(256, 64),

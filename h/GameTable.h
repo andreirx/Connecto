@@ -39,6 +39,7 @@
 #define BONUS_TYPES    5
 
 #define BIT_FRAMES     10
+#define MAX_CAPACITY   1024
 
 
 void myIwGxInitBonus();
@@ -73,6 +74,20 @@ public:
             if (speed > (1000 / BIT_FRAMES))
                 speed = (1000 / BIT_FRAMES);
             capacity = cap;
+            if (capacity > MAX_CAPACITY)
+                capacity = MAX_CAPACITY;
+        }
+        void IncrementSpeed()
+        {
+            speed++;
+            if (speed > (1000 / BIT_FRAMES))
+                speed = (1000 / BIT_FRAMES);
+        }
+        void IncrementCapacity()
+        {
+            capacity++;
+            if (capacity > MAX_CAPACITY)
+                capacity = MAX_CAPACITY;
         }
         void SetupSending()
         {
@@ -95,12 +110,14 @@ public:
                 {
                     frames_incoming = BIT_FRAMES;
                     accumulator++;
+                    display_bit = (rand() % 2) + "0";
                 }
             }
         }
-        void RenderConnectorL();
+        void RenderConnectorL(int x, int y);
 
     private:
+        char display_bit;
         int frames_incoming;
         int frames_sending;
         int accumulator;
@@ -123,10 +140,38 @@ public:
             still_to_send = -1;
         }
 
-        void UpdateConnectorR();
-        void RenderConnectorR();
+        void IncrementCapacity()
+        {
+            capacity++;
+            if (capacity > MAX_CAPACITY)
+                capacity = MAX_CAPACITY;
+        }
+        int SetupSending(int to_send)
+        {
+            frames_sending = BIT_FRAMES;
+            still_to_send = to_send;
+            if (still_to_send > capacity)
+                still_to_send = capacity;
+            display_bit = (rand() % 2) + "0";
+            //
+            // return unsent bits
+            return to_send - still_to_send;
+        }
+        void UpdateConnectorR()
+        {
+            if (frames_sending >= 0)
+                frames_sending--;
+            if ((frames_sending < 0) && (still_to_send >= 0)
+            {
+                still_to_send--;
+                frames_sending = BIT_FRAMES;
+                display_bit = (rand() % 2) + "0";
+            }
+        }
+        void RenderConnectorR(int x, int y);
 
     private:
+        char display_bit;
         int frames_sending;
         int still_to_send;
         int capacity;
