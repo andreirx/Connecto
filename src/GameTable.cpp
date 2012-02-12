@@ -53,7 +53,7 @@ void GameTable::LeftConnector::RenderConnectorL(int x, int y)
     // gold texcoord
     tex_p.x = 384;
     tex_p.y = 0;
-    Iw2DSetColour(0x00ffffff + ((capacity * 0xff / (MAX_CAPACITY / 4)) << 24));
+    Iw2DSetColour(0x00ffffff + ((capacity * 0xff / (MAX_CAPACITY)) << 24));
     Iw2DDrawImageRegion(g_arrows, scr_p, tex_p, dimension128);
     // red texcoord
     tex_p.x = 256;

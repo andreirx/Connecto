@@ -39,7 +39,7 @@
 #define BONUS_TYPES    5
 
 #define BIT_FRAMES     10
-#define MAX_CAPACITY   1024
+#define MAX_CAPACITY   256
 
 
 void myIwGxInitBonus();
@@ -57,7 +57,16 @@ public:
         //friend class GameTable;
         int enabled;
 
-        LeftConnector() { enabled = 1;frames_incoming = -1;frames_sending = -1;capacity = 4;speed = 1;accumulator = 0;display_bit[1] = 0; }
+        LeftConnector()
+        {
+            enabled = 1;
+            frames_incoming = -1;
+            frames_sending = -1;
+            capacity = 8;
+            speed = 1;
+            accumulator = 0;
+            display_bit[1] = 0;
+        }
         ~LeftConnector() {}
 
         void Reset_acc()
@@ -71,23 +80,23 @@ public:
             frames_incoming = -1;
             frames_sending = -1;
             speed = spd;
-            if (speed > (1000 / BIT_FRAMES))
-                speed = (1000 / BIT_FRAMES);
+            if (speed > (4000 / BIT_FRAMES))
+                speed = (4000 / BIT_FRAMES);
             capacity = cap;
-            if (capacity > MAX_CAPACITY / 4)
-                capacity = MAX_CAPACITY / 4;
+            if (capacity > MAX_CAPACITY)
+                capacity = MAX_CAPACITY;
         }
         void IncrementSpeed()
         {
             speed++;
-            if (speed > (1000 / BIT_FRAMES))
-                speed = (1000 / BIT_FRAMES);
+            if (speed > (4000 / BIT_FRAMES))
+                speed = (4000 / BIT_FRAMES);
         }
         void IncrementCapacity()
         {
             capacity++;
-            if (capacity > MAX_CAPACITY / 4)
-                capacity = MAX_CAPACITY / 4;
+            if (capacity > MAX_CAPACITY)
+                capacity = MAX_CAPACITY;
         }
         void SetupSending()
         {
@@ -110,7 +119,7 @@ public:
             }
             if ((frames_sending < 0) && (frames_incoming < 0) && (accumulator < capacity))
             {
-                recv_interval = 1000 / (speed * BIT_FRAMES);
+                recv_interval = 4000 / (speed * BIT_FRAMES);
                 if ((rand() % recv_interval) == 0)
                 {
                     frames_incoming = BIT_FRAMES;
@@ -137,7 +146,14 @@ public:
         //friend class GameTable;
         int enabled;
 
-        RightConnector() { enabled = 1;frames_sending = -1;still_to_send = 0;capacity = 4;display_bit[1] = 0; }
+        RightConnector()
+        {
+            enabled = 1;
+            frames_sending = -1;
+            still_to_send = 0;
+            capacity = 4;
+            display_bit[1] = 0;
+        }
         ~RightConnector() {}
 
         void Reset()

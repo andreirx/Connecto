@@ -899,6 +899,7 @@ void CGame::Render_PLAY(int framex, int shift)
     game_table->the_worm.draw_worm((Iw2DGetSurfaceWidth() - 640) / 2 + shift, (Iw2DGetSurfaceHeight() - 640) / 2);
 
     // draw buttons
+    Iw2DSetColour(0xffffffff);
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     // SEND
     if (can_send)
