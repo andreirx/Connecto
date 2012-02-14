@@ -25,6 +25,9 @@
 #define SEND_MULTIPLIER 8
 #define TOTAL_RANKS     35
 
+#define SPLASH_H        6
+#define SPLASH_W        10
+
 
 extern CIw2DImage* g_tiles;
 extern CIw2DImage* g_emoticons;
@@ -92,6 +95,15 @@ const char* const rank_list[TOTAL_RANKS] = {
     "Champion demigod",
     "God of pipes and charges",
     "Champion of the gods",
+};
+
+unsigned char splash_grid[SPLASH_H][SPLASH_W] = {
+    { 0,  0,  9,  3,  9, 12,  9, 14,  0,  0, },
+    { 0,  0,  8, 10,  2,  0,  2,  0,  0,  0, },
+    { 0,  0,  7,  4,  7,  0,  7,  0,  0,  0, },
+    { 9,  3,  9,  0,  9,  3,  9,  1,  6, 14, },
+    { 8,  4,  2,  0,  8,  4,  8, 14,  5,  3, },
+    { 7,  0,  7,  0,  7,  0,  7,  1, 12,  4, },
 };
 
 int generate_bonuses[10][3] = {
@@ -998,8 +1010,10 @@ void CGame::Update_SPLASH(int framex)
 void CGame::Render_SPLASH(int framex, int shift)
 {
     CIwSVec2 scr_p, tex_p;
+    int i, j;
     //
     Iw2DSetColour(0xffffffff);
+    /*
     scr_p.x = shift + (Iw2DGetSurfaceWidth() - 512) / 2;
     scr_p.y = (Iw2DGetSurfaceHeight() - 512) / 2;
     tex_p.x = 0;
@@ -1009,7 +1023,18 @@ void CGame::Render_SPLASH(int framex, int shift)
         scr_p,
         tex_p,
         dimension512);
+    */
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
+    for (j = 0; j < SPLASH_H; j++)
+        for (i = 0; i < SPLASH_W; i++)
+        {
+            tex_p.x = (splash_grid[j][i]) << 6;
+            tex_p.y = 0;//(CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;
+            scr_p.x = (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + i * 64 + shift;
+            scr_p.y = (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + j * 64;
+            Iw2DDrawImageRegion(g_tiles, scr_p, tex_p, dimension64);
+        }
 }
 
 void CGame::Update_MAINMENU(int framex)
