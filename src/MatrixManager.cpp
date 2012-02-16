@@ -103,7 +103,7 @@ void MatrixManager::Star::SetStar()
     {
         enabled = 1;
         multiplier = 8 + (rand() % 24);
-        rot_inc = (rand() % 64);
+        rot_inc = (rand() % 128) - 64;
         star_hue = (rand() % 16);
         rot = 0;
         time_appeared = (int)s3eTimerGetMs();
