@@ -877,6 +877,7 @@ void CGame::Render_PLAY(int framex, int shift)
         Iw2DSetColour(0xffffffff);
     }
     */
+    Iw2DSetColour(0xffffffff);
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
 
     // draw the arrows
@@ -1080,6 +1081,7 @@ void CGame::Render_SPLASH(int framex, int shift)
 {
     CIwSVec2 scr_p, tex_p;
     int i, j;
+    char strbuf[256];
     //
     if (game_state != GAMESTATE_SPLASH)
     {
@@ -1119,6 +1121,20 @@ void CGame::Render_SPLASH(int framex, int shift)
     lightning->DrawLightning(2, shift);
     lightning->UpdateAllSparkles();
     lightning->DrawSparkles(shift);
+    //
+    //
+    Iw2DSetColour(0xffffffff);
+    Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
+    //
+    sprintf(strbuf, "Design, Programming, Graphics");
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 - 320, 20, strbuf);
+    sprintf(strbuf, "ANDREI ROMAN");
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 - 320 + 32, 20, strbuf);
+    //
+    sprintf(strbuf, "Music by");
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 + 320 - 64, 20, strbuf);
+    sprintf(strbuf, "KEVIN MACLEOD");
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 - 320 - 32, 20, strbuf);
 }
 
 void CGame::Update_MAINMENU(int framex)
