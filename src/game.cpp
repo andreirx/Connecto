@@ -298,6 +298,9 @@ CGame::CGame()
     last_sent = 0;
     touchdown = 0;
     //
+    spl_glow_frame = -1;
+    spl_lightning = -1;
+    //
     InitTileRotation();
     myIwGxInitBonus();
     //
@@ -345,6 +348,15 @@ void CGame::Update_PLAY(int framex)
     //
     // update bonus items
     game_table->UpdateBonusItems();
+    //
+    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
+        if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) &&
+            (s3ePointerGetX() <= Iw2DGetSurfaceWidth() - 10) &&
+            (s3ePointerGetY() >= 10) &&
+            (s3ePointerGetY() <= 118))
+        {
+            SwitchGameState(GAMESTATE_PAUSE);
+        }
     //
     if (game_table->is_animating())
     {
@@ -493,14 +505,6 @@ void CGame::Update_PLAY(int framex)
                 }
             }
     }
-    if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
-        if ((s3ePointerGetX() >= Iw2DGetSurfaceWidth() - 118) &&
-            (s3ePointerGetX() <= Iw2DGetSurfaceWidth() - 10) &&
-            (s3ePointerGetY() >= 10) &&
-            (s3ePointerGetY() <= 118))
-        {
-            SwitchGameState(GAMESTATE_PAUSE);
-        }
     rotated = 0;
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_DOWN))
         touchdown = 1;
@@ -1003,9 +1007,72 @@ void CGame::Render_PLAY(int framex, int shift)
 
 void CGame::Update_SPLASH(int framex)
 {
+    lightning->ResetBranches();
+    //
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
     {
         SwitchGameState(GAMESTATE_MAINMENU);
+    }
+    //
+    if (spl_glow_frame >= 0)
+    {
+        spl_glow_frame++;
+        if (spl_glow_frame >= 10)
+            spl_glow_frame = -1;
+    }
+    //
+    if ((spl_glow_frame < 0) && (spl_lightning < 0))
+        if ((rand() % 32) == 0)
+        {
+            spl_lightning = 1;
+            spl_ci = 0;
+            spl_oi = -1;
+            spl_cj = (rand() % SPLASH_H);
+            spl_oj = spl_cj;
+        }
+    //
+    if (spl_lightning >= 0)
+    {
+        int ldir = (rand() % 3);
+        //
+        while (((spl_cj == 0) && (ldir == 0)) ||
+            ((spl_cj == SPLASH_H - 1) && (ldir == 2)))
+            ldir = (rand() % 3);
+        //
+        spl_oi = spl_ci;
+        spl_oj = spl_cj;
+        switch (ldir)
+        {
+        case 0:
+            spl_cj--;
+            break;
+        case 1:
+            spl_ci++;
+            break;
+        case 2:
+            spl_cj++;
+            break;
+        }
+        //
+        if (spl_ci > SPLASH_W)
+        {
+            spl_lightning = -1;
+            spl_glow_frame = 0;
+        }
+        else
+        {
+            lightning->AddSparkle_SetXYCS((Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_ci * 64 + 32,
+                (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + spl_cj * 64 + 32,
+                (rand() % 5120) - 2560, (rand() % 5120) - 3840,
+                ((rand() % 3) + 11) % 12,
+                (rand() % 2) + 1);
+            lightning->AddBranch_Generate(DEFAULT_LEN / 2,
+                (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_oi * 64 + 32,
+                (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + spl_oj * 64 + 32,
+                (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_ci * 64 + 32,
+                (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + spl_cj * 64 + 32,
+                (rand() % 12));
+        }
     }
 }
 
@@ -1013,6 +1080,16 @@ void CGame::Render_SPLASH(int framex, int shift)
 {
     CIwSVec2 scr_p, tex_p;
     int i, j;
+    //
+    if (game_state != GAMESTATE_SPLASH)
+    {
+        if (spl_glow_frame >= 0)
+        {
+            spl_glow_frame++;
+            if (spl_glow_frame >= 10)
+                spl_glow_frame = -1;
+        }
+    }
     //
     Iw2DSetColour(0xffffffff);
     /*
@@ -1032,11 +1109,16 @@ void CGame::Render_SPLASH(int framex, int shift)
         for (i = 0; i < SPLASH_W; i++)
         {
             tex_p.x = (splash_grid[j][i]) << 6;
-            tex_p.y = 0;//(CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;
+            tex_p.y = (3 - get_grid_anim_frame(spl_glow_frame)) << 6;//(CONNECT_NONE - game_table->get_grid_color_shift(i, j)) << 6;
             scr_p.x = (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + i * 64 + shift;
             scr_p.y = (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + j * 64;
             Iw2DDrawImageRegion(g_tiles, scr_p, tex_p, dimension64);
         }
+    //
+    // draw some lightning
+    lightning->DrawLightning(1, shift);
+    lightning->UpdateAllSparkles();
+    lightning->DrawSparkles(shift);
 }
 
 void CGame::Update_MAINMENU(int framex)

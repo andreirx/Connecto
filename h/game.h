@@ -315,6 +315,9 @@ private:
     int transition_update;
     int transition_shift;
     //
+    int spl_glow_frame, spl_lightning;
+    int spl_ci, spl_cj, spl_oi, spl_oj;
+    //
     int FPS_frames[FPS_AVERAGE];
 
     void Update_SPLASH(int framex);

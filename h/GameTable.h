@@ -48,6 +48,9 @@ void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval, int alphaf);
 void myIwGxDoneBonus();
 
 
+int get_grid_anim_frame(int i);
+
+
 typedef struct send_rval_s 
 {
     int bits_sent;
