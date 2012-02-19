@@ -614,6 +614,7 @@ SendRval GameTable::send_connections()
                     }
                     cross->enabled = 0;
                 }
+                //
                 if (i == (GRID_W - 1))
                     if (grid_connectors[i][j] & CB_RIGHT != 0)
                     {
@@ -621,6 +622,7 @@ SendRval GameTable::send_connections()
                         total_send_capacity += RC[j].capacity;
                         links_right++;
                     }
+                //
                 if (i == 0)
                     if (grid_connectors[i][j] & CB_LEFT != 0)
                     {
@@ -628,6 +630,28 @@ SendRval GameTable::send_connections()
                         total_bits_to_send += LC[j].accumulator;
                         links_left++;
                     }
+            }
+        }
+    }
+    //
+    for (i = 0; i < GRID_W; i++)
+    {
+        for (j = 0; j < GRID_H; j++)
+        {
+            if (grid_state[i][j] == CONNECT_OK)
+            {
+                if (i == (GRID_W - 1))
+                {
+                    RC[j].SetupSending(total_bits_to_send);
+                    RC[j].IncrementCapacity();
+                }
+                //
+                if (i == 0)
+                {
+                    LC[j].Reset_acc();
+                    LC[j].IncrementCapacity();
+                    LC[j].IncrementSpeed();
+                }
                 // move one position down
                 for (k = j; k > 0; k--)
                 {
@@ -655,17 +679,6 @@ SendRval GameTable::send_connections()
             }
             grid_color_shift[i][j] = 0;
         }
-    }
-    // NEW!LOGIC
-    if (total_bits_to_send <= total_send_capacity)
-    {
-    }
-    else
-    {
-    }
-    for (j = 0; j < GRID_H; j++)
-    {
-
     }
     return rVal;
 }

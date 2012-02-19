@@ -1061,15 +1061,15 @@ void CGame::Update_SPLASH(int framex)
         }
         else
         {
-            lightning->AddSparkle_SetXYCS((Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_ci * 64 + 32,
+            lightning->AddSparkle_SetXYCS((Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_ci * 64 - 32,
                 (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + spl_cj * 64 + 32,
                 (rand() % 5120) - 2560, (rand() % 5120) - 3840,
-                ((rand() % 3) + 11) % 12,
+                (rand() % 12),//((rand() % 3) + 11) % 12,
                 (rand() % 2) + 1);
             lightning->AddBranch_Generate(DEFAULT_LEN / 2,
-                (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_oi * 64 + 32,
+                (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_oi * 64 - 32,
                 (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + spl_oj * 64 + 32,
-                (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_ci * 64 + 32,
+                (Iw2DGetSurfaceWidth() - (64 * SPLASH_W)) / 2 + spl_ci * 64 - 32,
                 (Iw2DGetSurfaceHeight() - (64 * SPLASH_H)) / 2 + spl_cj * 64 + 32,
                 (rand() % 12));
         }
@@ -1116,7 +1116,7 @@ void CGame::Render_SPLASH(int framex, int shift)
         }
     //
     // draw some lightning
-    lightning->DrawLightning(1, shift);
+    lightning->DrawLightning(2, shift);
     lightning->UpdateAllSparkles();
     lightning->DrawSparkles(shift);
 }
