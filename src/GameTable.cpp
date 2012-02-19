@@ -822,17 +822,19 @@ int GameTable::check_connections()
         return rVal;
     // check connections to the right
     for (j = 0; j < GRID_H; j++)
-        expand_connections(GRID_W - 1, j, CB_RIGHT, CONNECT_RIGHT);
+        if (RC[j].enabled)
+            expand_connections(GRID_W - 1, j, CB_RIGHT, CONNECT_RIGHT);
     // check connections to the left
     for (j = 0; j < GRID_H; j++)
-    {
-        if ((grid_state[0][j] == CONNECT_RIGHT) || (grid_state[0][j] == CONNECT_OK))
-            expand_connections(0, j, CB_LEFT, CONNECT_OK);
-        else
-            expand_connections(0, j, CB_LEFT, CONNECT_LEFT);
-        if (grid_state[0][j] == CONNECT_OK)
-            rVal = 1;
-    }
+        if (LC[j].enabled)
+        {
+            if ((grid_state[0][j] == CONNECT_RIGHT) || (grid_state[0][j] == CONNECT_OK))
+                expand_connections(0, j, CB_LEFT, CONNECT_OK);
+            else
+                expand_connections(0, j, CB_LEFT, CONNECT_LEFT);
+            if (grid_state[0][j] == CONNECT_OK)
+                rVal = 1;
+        }
     can_send_connections = rVal;
     return rVal;
 }
