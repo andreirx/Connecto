@@ -41,6 +41,9 @@ void GameTable::LeftConnector::RenderConnectorL(int x, int y)
 {
     CIwSVec2 scr_p, tex_p;
     //
+    if (!enabled)
+        return;
+    //
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //
     scr_p.x = x;
@@ -71,6 +74,9 @@ void GameTable::LeftConnector::RenderConnectorL(int x, int y)
 void GameTable::RightConnector::RenderConnectorR(int x, int y)
 {
     CIwSVec2 scr_p, tex_p;
+    //
+    if (!enabled)
+        return;
     //
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //

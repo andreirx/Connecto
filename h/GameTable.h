@@ -107,6 +107,9 @@ public:
         {
             int recv_interval;
             //
+            if (!enabled)
+                return;
+            //
             if (frames_incoming >= 0)
                 frames_incoming--;
             if (frames_sending >= 0)
@@ -181,6 +184,9 @@ public:
         }
         void UpdateConnectorR()
         {
+            if (!enabled)
+                return;
+            //
             if (frames_sending >= 0)
                 frames_sending--;
             if ((frames_sending < 0) && (still_to_send > 0))
