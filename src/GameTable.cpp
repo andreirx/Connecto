@@ -96,7 +96,7 @@ void GameTable::RightConnector::RenderConnectorR(int x, int y)
     if (frames_sending >= 0)
     {
         Iw2DSetColour(0xff00ff00);
-        bitmapStringAt(x + 68 - frames_sending * 4, y + 32, 20, display_bit);
+        bitmapStringAt(x + 68 - frames_sending * 4, y + 48, 20, display_bit);
     }
 }
 

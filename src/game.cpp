@@ -467,7 +467,7 @@ void CGame::Update_PLAY(int framex)
                 SendRval csc = game_table->send_connections();
                 //
                 // NEW!LOGIC
-                total_score += csc.bits_sent * 100 + csc.tiles_replaced;
+                total_score += (csc.bits_sent * 100 + csc.tiles_replaced) * csc.connections_right;
                 charges += csc.bonus_collected;
                 last_sent = csc.connections_right;
                 //
