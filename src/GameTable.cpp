@@ -561,12 +561,18 @@ void GameTable::click_element(int x, int y)
 // returns how many tiles were part of the "circuit" (lower 16 bits) and how many connected to the right (upper 16 bits)
 int GameTable::send_connections()
 {
-    int i, j, k;
-    int rVal = 0;
+    int i, j, k, total_bits_to_send, links_left;
+    int rVal = 0, total_send_capacity, links_right;
     BonusItem *cross;
     //
     if (!can_send_connections)
         return rVal;
+    //
+    total_bits_to_send = 0;
+    total_send_capacity = 0;
+    links_left = 0;
+    links_right = 0;
+    //
     for (i = 0; i < GRID_W; i++)
     {
         for (j = 0; j < GRID_H; j++)
@@ -608,7 +614,17 @@ int GameTable::send_connections()
                 rVal += 0x000001;
                 if (i == (GRID_W - 1))
                     if (grid_connectors[i][j] & CB_RIGHT != 0)
+                    {
                         rVal += 0x010000;
+                        total_send_capacity += RC[j].capacity;
+                        links_right++;
+                    }
+                if (i == 0)
+                    if (grid_connectors[i][j] & CB_LEFT != 0)
+                    {
+                        total_bits_to_send += LC[j].accumulator;
+                        links_left++;
+                    }
                 // move one position down
                 for (k = j; k > 0; k--)
                 {
@@ -636,6 +652,16 @@ int GameTable::send_connections()
             }
             grid_color_shift[i][j] = 0;
         }
+    }
+    if (total_bits_to_send <= total_send_capacity)
+    {
+    }
+    else
+    {
+    }
+    for (j = 0; j < GRID_H; j++)
+    {
+
     }
     return rVal;
 }

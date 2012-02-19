@@ -54,7 +54,7 @@ public:
     class LeftConnector
     {
     public:
-        //friend class GameTable;
+        friend class GameTable;
         int enabled;
 
         LeftConnector()
@@ -146,7 +146,7 @@ public:
     class RightConnector
     {
     public:
-        //friend class GameTable;
+        friend class GameTable;
         int enabled;
 
         RightConnector()
