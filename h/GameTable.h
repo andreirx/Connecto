@@ -48,6 +48,17 @@ void myIwGxDrawBonus(int x, int y, CIwSVec2 texpos, iwangle rotval, int alphaf);
 void myIwGxDoneBonus();
 
 
+typedef struct send_rval_s 
+{
+    int bits_sent;
+    int connections_left;
+    int connections_right;
+    int bonus_collected;
+    int bomb;
+    int freeze;
+} SendRval;
+
+
 class GameTable
 {
 public:
@@ -356,7 +367,7 @@ public:
     // public function which "clicks" a grid element, rotating it counterclockwise
     void click_element(int x, int y);
     // public function which deletes the connected paths, and inserts new elements
-    int send_connections();
+    SendRval send_connections();
     inline int can_send()
     {
         return can_send_connections;

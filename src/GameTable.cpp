@@ -559,11 +559,12 @@ void GameTable::click_element(int x, int y)
 
 // public function which deletes the connected paths, and inserts new elements
 // returns how many tiles were part of the "circuit" (lower 16 bits) and how many connected to the right (upper 16 bits)
-int GameTable::send_connections()
+SendRval GameTable::send_connections()
 {
     int i, j, k, total_bits_to_send, links_left;
-    int rVal = 0, total_send_capacity, links_right;
+    int total_send_capacity, links_right;
     BonusItem *cross;
+    SendRval rVal = { 0, 0, 0, 0, 0, 0 };
     //
     if (!can_send_connections)
         return rVal;
@@ -595,33 +596,35 @@ int GameTable::send_connections()
                     {
                     case BONUS_CLOCK:
                         // TODO: see what you can do with the clock
+                        rVal.freeze = 1;
                         break;
                     case BONUS_BOMB:
                         // TODO: see what you can do with the bomb
+                        rVal.bomb = 1;
                         break;
                     case BONUS_CHARGE1:
-                        rVal += 0x000100;
+                        rVal.bonus_collected += 1;
                         break;
                     case BONUS_CHARGE2:
-                        rVal += 0x000200;
+                        rVal.bonus_collected += 2;
                         break;
                     case BONUS_CHARGE3:
-                        rVal += 0x000500;
+                        rVal.bonus_collected += 5;
                         break;
                     }
                     cross->enabled = 0;
                 }
-                rVal += 0x000001;
                 if (i == (GRID_W - 1))
                     if (grid_connectors[i][j] & CB_RIGHT != 0)
                     {
-                        rVal += 0x010000;
+                        rVal.connections_right++;
                         total_send_capacity += RC[j].capacity;
                         links_right++;
                     }
                 if (i == 0)
                     if (grid_connectors[i][j] & CB_LEFT != 0)
                     {
+                        rVal.connections_left++;
                         total_bits_to_send += LC[j].accumulator;
                         links_left++;
                     }
@@ -653,6 +656,7 @@ int GameTable::send_connections()
             grid_color_shift[i][j] = 0;
         }
     }
+    // NEW!LOGIC
     if (total_bits_to_send <= total_send_capacity)
     {
     }

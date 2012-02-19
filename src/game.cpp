@@ -452,7 +452,9 @@ void CGame::Update_PLAY(int framex)
                             (rand() % 3) + 1);
                     }
                 }
-                current_score = game_table->send_connections();
+                SendRval csc = game_table->send_connections();
+                //
+                // NEW!LOGIC
                 total_score += (current_score & 0x0000ff) * bonus;
                 charges += ((current_score & 0x00ff00) >> 8);
                 last_sent = ((current_score & 0xff0000) >> 16);
