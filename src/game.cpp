@@ -997,6 +997,7 @@ void CGame::Render_PLAY(int framex, int shift)
     Iw2DSetColour(0xffffffff);
     sprintf(strbuf, "Score %d", total_score);
     bitmapStringAt(16 + shift, 32, 20, strbuf);
+    /*
     Iw2DSetColour(0xff60ff60);
     for (j = 0; j < GRID_H; j++)
     {
@@ -1004,6 +1005,7 @@ void CGame::Render_PLAY(int framex, int shift)
         bitmapStringAt(2 + (Iw2DGetSurfaceWidth() + 640) / 2 + shift,
             16 + (j << 6) + (Iw2DGetSurfaceHeight() - 640) / 2, 20, strbuf);
     }
+    */
 }
 
 void CGame::Update_SPLASH(int framex)
