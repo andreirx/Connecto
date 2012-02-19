@@ -1008,8 +1008,6 @@ void CGame::Render_PLAY(int framex, int shift)
 
 void CGame::Update_SPLASH(int framex)
 {
-    lightning->ResetBranches();
-    //
     if ((s3ePointerGetState(S3E_POINTER_BUTTON_SELECT) & S3E_POINTER_STATE_PRESSED))
     {
         SwitchGameState(GAMESTATE_MAINMENU);
@@ -1126,15 +1124,17 @@ void CGame::Render_SPLASH(int framex, int shift)
     Iw2DSetColour(0xffffffff);
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //
-    sprintf(strbuf, "Design, Programming, Graphics");
+    sprintf(strbuf, "DESIGN, PROGRAMMING, GRAPHICS ");
     bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 - 320, 20, strbuf);
-    sprintf(strbuf, "ANDREI ROMAN");
+    sprintf(strbuf, "ANDREI ROMAN ");
     bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 - 320 + 32, 20, strbuf);
     //
-    sprintf(strbuf, "Music by");
+    sprintf(strbuf, "MUSIC BY ");
     bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 + 320 - 64, 20, strbuf);
-    sprintf(strbuf, "KEVIN MACLEOD");
+    sprintf(strbuf, "KEVIN MACLEOD ");
     bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 + 320 - 32, 20, strbuf);
+    //
+    lightning->ResetBranches();
 }
 
 void CGame::Update_MAINMENU(int framex)
