@@ -1127,14 +1127,14 @@ void CGame::Render_SPLASH(int framex, int shift)
     Iw2DSetAlphaMode(IW_2D_ALPHA_NONE);
     //
     sprintf(strbuf, "Design, Programming, Graphics");
-    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 - 320, 20, strbuf);
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 - 320, 20, strbuf);
     sprintf(strbuf, "ANDREI ROMAN");
-    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 - 320 + 32, 20, strbuf);
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 - 320 + 32, 20, strbuf);
     //
     sprintf(strbuf, "Music by");
-    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 + 320 - 64, 20, strbuf);
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 + 320 - 64, 20, strbuf);
     sprintf(strbuf, "KEVIN MACLEOD");
-    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2, Iw2DGetSurfaceHeight() / 2 - 320 - 32, 20, strbuf);
+    bitmapStringAt((Iw2DGetSurfaceWidth() - strlen(strbuf) * 20) / 2 + shift, Iw2DGetSurfaceHeight() / 2 + 320 - 32, 20, strbuf);
 }
 
 void CGame::Update_MAINMENU(int framex)
