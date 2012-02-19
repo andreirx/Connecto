@@ -53,6 +53,7 @@ int get_grid_anim_frame(int i);
 
 typedef struct send_rval_s 
 {
+    int tiles_replaced;
     int bits_sent;
     int connections_left;
     int connections_right;

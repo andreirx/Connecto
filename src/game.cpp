@@ -467,9 +467,9 @@ void CGame::Update_PLAY(int framex)
                 SendRval csc = game_table->send_connections();
                 //
                 // NEW!LOGIC
-                total_score += csc.bits_sent;//(current_score & 0x0000ff) * bonus;
-                charges += csc.bonus_collected;//((current_score & 0x00ff00) >> 8);
-                last_sent = csc.connections_right;//((current_score & 0xff0000) >> 16);
+                total_score += csc.bits_sent * 100 + csc.tiles_replaced;
+                charges += csc.bonus_collected;
+                last_sent = csc.connections_right;
                 //
                 for (i = 0; i < generate_bonuses[last_sent - 1][0]; i++)
                     game_table->AddBonusItem(BONUS_CHARGE1, 60000 - (rand() % 10000));

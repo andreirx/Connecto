@@ -564,7 +564,7 @@ SendRval GameTable::send_connections()
     int i, j, k, total_bits_to_send, links_left;
     int total_send_capacity, links_right;
     BonusItem *cross;
-    SendRval rVal = { 0, 0, 0, 0, 0, 0 };
+    SendRval rVal = { 0, 0, 0, 0, 0, 0, 0, };
     //
     if (!can_send_connections)
         return rVal;
@@ -580,6 +580,7 @@ SendRval GameTable::send_connections()
         {
             if (grid_state[i][j] == CONNECT_OK)
             {
+                rVal.tiles_replaced++;
                 //
                 // kill the worm, set timeout
                 if (the_worm.touches_xy(i, j))
