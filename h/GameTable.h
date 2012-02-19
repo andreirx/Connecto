@@ -179,6 +179,10 @@ public:
             still_to_send = -1;
         }
 
+        int GetCapacity()
+        {
+            return capacity;
+        }
         void IncrementCapacity()
         {
             capacity++;

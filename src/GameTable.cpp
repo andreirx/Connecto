@@ -642,7 +642,7 @@ SendRval GameTable::send_connections()
             {
                 if (i == (GRID_W - 1))
                 {
-                    RC[j].SetupSending(total_bits_to_send);
+                    rVal.bits_sent += (total_bits_to_send - RC[j].SetupSending(total_bits_to_send));
                     RC[j].IncrementCapacity();
                 }
                 //
